@@ -5,8 +5,10 @@ from .base import *
 
 
 DEBUG=False
+SECRET_KEY = os.environ['SECRET_KEY']
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = 'https://cos-labs.github.io/collections-service/'
+
 
 try:
     from .local import *
