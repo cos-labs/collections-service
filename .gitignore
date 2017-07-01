@@ -2,3 +2,5 @@ local.py
 *.pyc
 .python-version
 static
+staticfiles
+
