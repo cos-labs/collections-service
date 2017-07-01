@@ -167,3 +167,9 @@ CORS_ORIGIN_WHITELIST = (
 AUTH_USER_MODEL = 'api.User'
 
 SITE_ID = 1
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = '/static/'
