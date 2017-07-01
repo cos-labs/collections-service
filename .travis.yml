@@ -1,0 +1,14 @@
+language: python
+python:
+    - "3.6.1"
+install:
+    - pip install -r requirements.txt
+script:
+    - python manage.py collectstatic
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: static
+    on:
+        branch: master
