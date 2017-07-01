@@ -5,6 +5,7 @@ from .base import *
 
 
 DEBUG=False
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = 'https://cos-labs.github.io/collections-service/'
 
 try:
