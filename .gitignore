@@ -3,4 +3,5 @@ local.py
 .python-version
 static
 staticfiles
+static/*
 
