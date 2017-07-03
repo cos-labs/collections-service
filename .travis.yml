@@ -4,7 +4,7 @@ python:
 env:
     global:
         - DJANGO_SETTINGS_MODULE=service.settings.production
-        - secure: skAEtIyn1+zkAkJ+uqPe9936Z7yZFekcuKXqFttpaXjXS2e2qMcMrhmTOCotpvKT+mqs8kHfJuap8KiRlmHGkuAEBSMzzdC44A0xdkfNVPW+nYqQ3+T5a1vQUDRuOHYjo26xIftWvOKMOVFWD+Yq41s4/jI1nGT9syk8hucpPwzBzQLuNh5sMQaWiq4MIFTxb+ecCRoGKP5k2LehTbTwvSoEp5LOPLIjb260a0uOHl68SxrRrK4pbVPxvhye9Bf1r1SMoI5kDXGl0V+5+a2w6J7jPuHeDJbWwuy+9Wbn2HOPScdh8oeA1lnZVoGTngfl1+2IcQBIiLAuftCO+FdSW+l5Sde0pb8/U368volXUmg/qZVV404F8FzhRNrRrkpdmQaBHNmiCwEVmhv6sQ+1Te4v34gyf9IaYy/Hq1OVBQ+iMH98GzZt42I23UO1x6qBt226iSnDgoFOwEHb8PowepujmZxdC3fivsV640grgfc0HkechwJ7qkoylaw0SoidWl7MYDwfC59eA1cHLmuu2aTRvVvYeLacITRabjFDc9SdO9dnyXp/AgEwRiPFnRVBzFXhSlwyCdD45C9YERX1g2sFu4mhkBYsoTAqB1W9hIh2CRZD9NVpivj+cnIzGHY8L/BDXHmiE5TbryIIifn+oIpJVBBBiNBBLoble8ndggs=
+        - SECRET_KEY=somesecretkey
 install:
 - pip install -r requirements.txt
 script:
