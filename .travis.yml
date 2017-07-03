@@ -1,14 +1,18 @@
 language: python
 python:
-    - "3.6.1"
+    - 3.6.1
+env:
+    global:
+        - DJANGO_SETTINGS_MODULE=service.settings.production
+        - SECRET_KEY=somesecretkey
 install:
-    - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-    - python manage.py collectstatic
+- python manage.py collectstatic --noinput
 deploy:
-    provider: pages
-    skip_cleanup: true
-    github_token: $GITHUB_TOKEN
-    local_dir: static
-    on:
-        branch: master
+  provider: pages
+  skip_cleanup: true
+  github_token: "$GITHUB_TOKEN"
+  local_dir: static
+  on:
+    branch: master
