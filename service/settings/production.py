@@ -9,7 +9,7 @@ ALLOWED_HOSTS = [
     'osf-collections.herokuapp.com'
 ]
 
-DEBUG=True
+DEBUG=False
 SECRET_KEY = os.environ['SECRET_KEY']
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = 'https://cos-labs.github.io/collections-service/'
