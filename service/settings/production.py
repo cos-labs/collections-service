@@ -5,6 +5,9 @@ import dj_database_url
 
 from .base import *
 
+ALLOWED_HOSTS = [
+    'osf-collections.herokuapp.com'
+]
 
 DEBUG=False
 SECRET_KEY = os.environ['SECRET_KEY']
