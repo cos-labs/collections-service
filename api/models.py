@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
+from typedmodels.models import TypedModel
 
 
 class User(AbstractUser):
@@ -9,7 +10,7 @@ class User(AbstractUser):
     gravatar = models.URLField(blank=True)
 
 
-class Collection(models.Model):
+class Collection(TypedModel):
     title = models.TextField()
     description = models.TextField(null=True, blank=True)
     tags = models.TextField(null=True, blank=True)
@@ -26,6 +27,12 @@ class Collection(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Meeting(Collection):
+    location = models.TextField(null=True, blank=True, default=None)
+    start_date = models.DateTimeField(null=True, blank=True, default=None)
+    end_date = models.DateTimeField(null=True, blank=True, default=None)
 
 
 class Group(models.Model):
