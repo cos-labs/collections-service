@@ -1,10 +1,8 @@
 import json
-from collections import OrderedDict
 from django.utils import timezone
 from rest_framework import exceptions
-from rest_framework import serializers as rest_serializers
 from rest_framework_json_api import serializers
-from api.models import Collection, Group, Item, User
+from api.models import Collection, Meeting, Group, Item, User
 from api.base.serializers import RelationshipField
 from guardian.shortcuts import assign_perm
 from allauth.socialaccount.models import SocialAccount, SocialToken
@@ -169,7 +167,6 @@ class CollectionSerializer(serializers.Serializer):
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
     )
-    created_by = UserSerializer(read_only=True)
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     groups = RelationshipField(
@@ -200,4 +197,23 @@ class CollectionSerializer(serializers.Serializer):
         collection.settings = validated_data.get('settings', collection.settings)
         collection.submission_settings = validated_data.get('submission_settings', collection.submission_settings)
         collection.save()
+        return collection
+
+
+class MeetingSerializer(CollectionSerializer):
+    location = serializers.CharField()
+    start_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
+
+
+    class Meta:
+            model = Meeting
+
+    class JSONAPIMeta:
+        resource_name = 'meetings'
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        collection = Meeting.objects.create(created_by=user, **validated_data)
+        assign_perm('api.approve_items', user, collection)
         return collection

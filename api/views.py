@@ -6,8 +6,8 @@ from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from api.serializers import CollectionSerializer, GroupSerializer, ItemSerializer, UserSerializer
-from api.models import Collection, Group, Item, User
+from api.serializers import CollectionSerializer, MeetingSerializer, GroupSerializer, ItemSerializer, UserSerializer
+from api.models import Collection, Meeting, Group, Item, User
 from api.permissions import CanEditCollection, CanEditItem, CanEditGroup
 
 
@@ -46,6 +46,35 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
         except ObjectDoesNotExist:
             raise drf_exceptions.NotFound
         return collection
+
+
+class MeetingList(generics.ListCreateAPIView):
+    """View list of collections and create a new collection. """
+    serializer_class = MeetingSerializer
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+
+    def get_queryset(self):
+        queryset = Meeting.objects.all()
+        title = self.request.query_params.get('title', None)
+        if title is not None:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+
+
+class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = MeetingSerializer
+    queryset = Meeting.objects.all()
+    permission_classes = (
+      drf_permissions.IsAuthenticatedOrReadOnly,
+      CanEditCollection
+    )
+
+    def get_object(self):
+        try:
+            meeting = Meeting.objects.get(id=self.kwargs['pk'])
+        except ObjectDoesNotExist:
+            raise drf_exceptions.NotFound
+        return meeting
 
 
 class CollectionGroupList(generics.ListCreateAPIView):

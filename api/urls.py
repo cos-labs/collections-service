@@ -22,4 +22,7 @@ urlpatterns = [
     url(r'^users/$', api.views.UserList.as_view(), name='user-list'),
     url(r'^users/(?P<user_id>\w+)/$', api.views.UserDetail.as_view(), name='user-detail'),
 
+    url(r'^meetings/$', api.views.MeetingList.as_view(), name='meeting-list'),
+    url(r'^meetings/(?P<pk>\w+)/$', api.views.MeetingDetail.as_view(), name='meeting-detail'),
+
 ]
