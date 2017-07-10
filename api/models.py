@@ -10,11 +10,12 @@ class User(AbstractUser):
     gravatar = models.URLField(blank=True)
 
 
-class Collection(TypedModel):
+class CollectionBase(TypedModel):
     title = models.TextField()
     description = models.TextField(null=True, blank=True)
     tags = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User)
+    created_by_org = models.TextField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     settings = JSONField(default={})
@@ -29,7 +30,11 @@ class Collection(TypedModel):
         return self.title
 
 
-class Meeting(Collection):
+class Collection(CollectionBase):
+    pass
+
+
+class Meeting(CollectionBase):
     location = models.TextField(null=True, blank=True, default=None)
     start_date = models.DateTimeField(null=True, blank=True, default=None)
     end_date = models.DateTimeField(null=True, blank=True, default=None)
