@@ -163,6 +163,7 @@ class CollectionSerializer(serializers.Serializer):
     tags = serializers.CharField(allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
+    created_by_org = serializers.CharField(allow_blank=True)
     created_by = RelationshipField(
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
@@ -196,6 +197,7 @@ class CollectionSerializer(serializers.Serializer):
         collection.tags = validated_data.get('tags', collection.tags)
         collection.settings = validated_data.get('settings', collection.settings)
         collection.submission_settings = validated_data.get('submission_settings', collection.submission_settings)
+        collection.created_by_org = validated_data.get('created_by_org', collection.created_by_org)
         collection.save()
         return collection
 
@@ -205,7 +207,6 @@ class MeetingSerializer(CollectionSerializer):
     start_date = serializers.DateTimeField()
     end_date = serializers.DateTimeField()
 
-
     class Meta:
             model = Meeting
 
@@ -214,6 +215,16 @@ class MeetingSerializer(CollectionSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        collection = Meeting.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_items', user, collection)
-        return collection
+        meeting = Meeting.objects.create(created_by=user, **validated_data)
+        assign_perm('api.approve_items', user, meeting)
+        return meeting
+
+    def update(self, meeting, validated_data):
+        meeting.title = validated_data.get('title', meeting.title)
+        meeting.description = validated_data.get('description', meeting.description)
+        meeting.tags = validated_data.get('tags', meeting.tags)
+        meeting.settings = validated_data.get('settings', meeting.settings)
+        meeting.submission_settings = validated_data.get('submission_settings', meeting.submission_settings)
+        meeting.created_by_org = validated_data.get('created_by_org', meeting.created_by_org)
+        meeting.save()
+        return meeting
