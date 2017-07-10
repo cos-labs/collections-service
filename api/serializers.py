@@ -163,7 +163,7 @@ class CollectionSerializer(serializers.Serializer):
     tags = serializers.CharField(allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
-    created_by_org = serializers.CharField(allow_blank=True)
+    created_by_org = serializers.CharField(allow_blank=True, required=False)
     created_by = RelationshipField(
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
