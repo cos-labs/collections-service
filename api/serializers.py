@@ -2,7 +2,7 @@ import json
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework_json_api import serializers
-from api.models import Collection, Meeting, Group, Item, User
+from api.models import CollectionBase, Collection, Meeting, Group, Item, User
 from api.base.serializers import RelationshipField
 from guardian.shortcuts import assign_perm
 from allauth.socialaccount.models import SocialAccount, SocialToken
@@ -140,7 +140,7 @@ class GroupSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
-        collection = Collection.objects.get(id=collection_id)
+        collection = CollectionBase.objects.get(id=collection_id)
         return Group.objects.create(
             created_by=user,
             collection=collection,
@@ -206,6 +206,14 @@ class MeetingSerializer(CollectionSerializer):
     location = serializers.CharField()
     start_date = serializers.DateTimeField()
     end_date = serializers.DateTimeField()
+    groups = RelationshipField(
+        related_view='meeting-group-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
+    items = RelationshipField(
+        related_view='meeting-item-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
 
     class Meta:
             model = Meeting
@@ -228,3 +236,10 @@ class MeetingSerializer(CollectionSerializer):
         meeting.created_by_org = validated_data.get('created_by_org', meeting.created_by_org)
         meeting.save()
         return meeting
+
+
+class GroupMeetingSerializer(GroupSerializer):
+    items = RelationshipField(
+        related_view='meeting-group-item-list',
+        related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
+    )

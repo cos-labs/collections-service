@@ -6,8 +6,8 @@ from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from api.serializers import CollectionSerializer, MeetingSerializer, GroupSerializer, ItemSerializer, UserSerializer
-from api.models import Collection, Meeting, Group, Item, User
+from api.serializers import CollectionSerializer, MeetingSerializer, GroupSerializer, GroupMeetingSerializer, ItemSerializer, UserSerializer
+from api.models import CollectionBase, Collection, Meeting, Group, Item, User
 from api.permissions import CanEditCollection, CanEditItem, CanEditGroup
 
 
@@ -32,22 +32,6 @@ class CollectionList(generics.ListCreateAPIView):
         return queryset
 
 
-class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CollectionSerializer
-    queryset = Collection.objects.all()
-    permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditCollection
-    )
-
-    def get_object(self):
-        try:
-            collection = Collection.objects.get(id=self.kwargs['pk'])
-        except ObjectDoesNotExist:
-            raise drf_exceptions.NotFound
-        return collection
-
-
 class MeetingList(generics.ListCreateAPIView):
     """View list of collections and create a new collection. """
     serializer_class = MeetingSerializer
@@ -61,28 +45,40 @@ class MeetingList(generics.ListCreateAPIView):
         return queryset
 
 
-class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = MeetingSerializer
-    queryset = Meeting.objects.all()
+class CollectionBaseDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CollectionBase.objects.all()
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
       CanEditCollection
     )
 
+    def get_serializer_class(self):
+        collection = self.get_object()
+        if collection.type == 'api.meeting':
+            return MeetingSerializer
+        else:
+            return CollectionSerializer
+
     def get_object(self):
         try:
-            meeting = Meeting.objects.get(id=self.kwargs['pk'])
+            collection = CollectionBase.objects.get(id=self.kwargs['pk'])
         except ObjectDoesNotExist:
             raise drf_exceptions.NotFound
-        return meeting
+        return collection
 
 
 class CollectionGroupList(generics.ListCreateAPIView):
-    serializer_class = GroupSerializer
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
       CanEditGroup
     )
+
+    def get_serializer_class(self):
+        collection = CollectionBase.objects.get(id=self.kwargs['pk'])
+        if collection.type == 'api.meeting':
+            return GroupMeetingSerializer
+        else:
+            return GroupSerializer
 
     def get_queryset(self):
         return Group.objects.filter(collection=self.kwargs['pk'])
@@ -128,7 +124,7 @@ class CollectionItemList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         collection_id = self.kwargs['pk']
-        collection = Collection.objects.get(id=collection_id)
+        collection = CollectionBase.objects.get(id=collection_id)
         queryset = Item.objects.filter(collection=collection_id, group=None)
         if user.id == collection.created_by_id:
             return queryset
@@ -143,7 +139,7 @@ class GroupItemList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         collection_id = self.kwargs['pk']
-        collection = Collection.objects.get(id=collection_id)
+        collection = CollectionBase.objects.get(id=collection_id)
         queryset = Item.objects.filter(group=self.kwargs['group_id'])
         if user.id == collection.created_by_id:
             return queryset
