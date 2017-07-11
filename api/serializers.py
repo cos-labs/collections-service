@@ -35,15 +35,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
-    source_id = serializers.CharField()
-    title = serializers.CharField(required=True)
-    type = serializers.ChoiceField(choices=['project', 'preprint', 'registration', 'meeting', 'website'])
+    title = serializers.CharField()
+    description = serializers.CharField(required=False)
+    type = serializers.ChoiceField(choices=['project', 'preprint', 'registration', 'presentation', 'website', 'event'])
     status = serializers.ChoiceField(choices=['approved', 'pending', 'rejected'])
-    url = serializers.URLField()
+    source_id = serializers.CharField(required=False)
+    url = serializers.URLField(required=False)
     created_by = UserSerializer(read_only=True)
     metadata = serializers.JSONField(required=False)
-    date_added = serializers.DateTimeField(read_only=True, allow_null=True)
-    date_submitted = serializers.DateTimeField(read_only=True)
+    date_created = serializers.DateTimeField(read_only=True)
+    date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
+    date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
+    location = serializers.CharField(required=False)
+    start_time = serializers.DateTimeField(read_only=True, allow_null=True)
+    end_time = serializers.DateTimeField(read_only=True, allow_null=True)
+    category = serializers.CharField(required=False)
 
     class Meta:
         model = Item
@@ -54,7 +60,7 @@ class ItemSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
-        collection = Collection.objects.get(id=collection_id)
+        collection = CollectionBase.objects.get(id=collection_id)
 
         allow_all = None
         if collection.settings:
@@ -67,13 +73,15 @@ class ItemSerializer(serializers.Serializer):
         status = 'pending'
         if user.has_perm('api.approve_items', collection) or allow_all:
             status = 'approved'
-            validated_data['date_added'] = timezone.now()
+            validated_data['date_accepted'] = timezone.now()
 
         group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get('group_id', None)
         if group_id:
             validated_data['group'] = Group.objects.get(id=group_id)
 
         validated_data['status'] = status
+        validated_data['date_created'] = timezone.now()
+        validated_data['date_submitted'] = timezone.now()
         item = Item.objects.create(
             created_by=user,
             collection=collection,
@@ -111,10 +119,15 @@ class ItemSerializer(serializers.Serializer):
         item.group = group
         item.source_id = validated_data.get('source_id', item.source_id)
         item.title = validated_data.get('title', item.title)
+        item.description = validated_data.get('description', item.description)
         item.type = item_type
         item.status = status
         item.url = validated_data.get('url', item.url)
         item.metadata = validated_data.get('metadata', item.metadata)
+        item.location = validated_data.get('location', item.location)
+        item.start_time = validated_data.get('start_time', item.start_time)
+        item.end_time = validated_data.get('end_time', item.end_time)
+        item.category = validated_data.get('category', item.category)
         item.save()
         return item
 
