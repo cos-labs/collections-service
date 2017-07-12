@@ -11,11 +11,11 @@ class User(AbstractUser):
 
 
 class CollectionBase(TypedModel):
-    title = models.TextField()
+    title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     tags = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User)
-    created_by_org = models.TextField(null=True, blank=True)
+    created_by_org = models.CharField(null=True, blank=True, max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     settings = JSONField(default={})
@@ -35,13 +35,13 @@ class Collection(CollectionBase):
 
 
 class Meeting(CollectionBase):
-    location = models.TextField(null=True, blank=True, default=None)
+    location = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_date = models.DateTimeField(null=True, blank=True, default=None)
     end_date = models.DateTimeField(null=True, blank=True, default=None)
 
 
 class Group(models.Model):
-    title = models.TextField()
+    title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     collection = models.ForeignKey(to='CollectionBase', related_name='groups')
     created_by = models.ForeignKey(User)
@@ -51,6 +51,7 @@ class Group(models.Model):
 
 class Item(models.Model):
     TYPES = (
+        ('none', 'none'),
         ('project', 'project'),
         ('preprint', 'preprint'),
         ('registration', 'registration'),
@@ -59,15 +60,21 @@ class Item(models.Model):
         ('event', 'event')
     )
     STATUS = (
+        ('none', 'none'),
         ('approved', 'approved'),
         ('pending', 'pending'),
         ('rejected', 'rejected')
     )
-    title = models.TextField()
+    CATEGORIES = (
+        ('none', 'none'),
+        ('talk', 'talk'),
+        ('poster', 'poster')
+    )
+    title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    type = models.TextField(choices=TYPES)
-    status = models.TextField(choices=STATUS, null=True)
-    source_id = models.TextField(null=True, blank=True)
+    type = models.CharField(choices=TYPES, max_length=200)
+    status = models.CharField(choices=STATUS, null=True, max_length=200)
+    source_id = models.CharField(null=True, blank=True, max_length=200)
     url = models.URLField(null=True, blank=True)
     collection = models.ForeignKey(to='CollectionBase', related_name='items')
     group = models.ForeignKey(to='Group', null=True, blank=True, default=None, related_name='items')
@@ -76,7 +83,7 @@ class Item(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_submitted = models.DateTimeField(null=True, blank=True, default=None)
     date_accepted = models.DateTimeField(null=True, blank=True, default=None)
-    location = models.TextField(null=True, blank=True, default=None)
+    location = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_time = models.DateTimeField(null=True, blank=True, default=None)
     end_time = models.DateTimeField(null=True, blank=True, default=None)
-    category = models.TextField(null=True, blank=True, default=None)
+    category = models.CharField(choices=CATEGORIES, null=True, blank=True, max_length=200)

@@ -37,8 +37,8 @@ class ItemSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
     description = serializers.CharField(required=False)
-    type = serializers.ChoiceField(choices=['project', 'preprint', 'registration', 'presentation', 'website', 'event'])
-    status = serializers.ChoiceField(choices=['approved', 'pending', 'rejected'])
+    type = serializers.ChoiceField(choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event'])
+    status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
     source_id = serializers.CharField(required=False)
     url = serializers.URLField(required=False)
     created_by = UserSerializer(read_only=True)
@@ -49,7 +49,7 @@ class ItemSerializer(serializers.Serializer):
     location = serializers.CharField(required=False)
     start_time = serializers.DateTimeField(read_only=True, allow_null=True)
     end_time = serializers.DateTimeField(read_only=True, allow_null=True)
-    category = serializers.CharField(required=False)
+    category = serializers.ChoiceField(choices=['none', 'talk', 'poster'])
 
     class Meta:
         model = Item
