@@ -32,6 +32,22 @@ class CollectionList(generics.ListCreateAPIView):
         return queryset
 
 
+class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer
+    permission_classes = (
+      drf_permissions.IsAuthenticatedOrReadOnly,
+      CanEditCollection
+    )
+
+    def get_object(self):
+        try:
+            collection = Collection.objects.get(id=self.kwargs['pk'])
+        except ObjectDoesNotExist:
+            raise drf_exceptions.NotFound
+        return collection
+
+
 class MeetingList(generics.ListCreateAPIView):
     """View list of collections and create a new collection. """
     serializer_class = MeetingSerializer
@@ -45,23 +61,17 @@ class MeetingList(generics.ListCreateAPIView):
         return queryset
 
 
-class CollectionBaseDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CollectionBase.objects.all()
+class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
       CanEditCollection
     )
 
-    def get_serializer_class(self):
-        collection = self.get_object()
-        if collection.type == 'api.meeting':
-            return MeetingSerializer
-        else:
-            return CollectionSerializer
-
     def get_object(self):
         try:
-            collection = CollectionBase.objects.get(id=self.kwargs['pk'])
+            collection = Meeting.objects.get(id=self.kwargs['pk'])
         except ObjectDoesNotExist:
             raise drf_exceptions.NotFound
         return collection
