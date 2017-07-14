@@ -64,9 +64,8 @@ class ItemSerializer(serializers.Serializer):
 
         allow_all = None
         if collection.settings:
-            collection_settings = json.loads(collection.settings)
-            allow_all = collection_settings.get('allow_all', None)
-            collection_type = collection_settings.get('type', None)
+            allow_all = collection.settings.get('allow_all', None)
+            collection_type = collection.settings.get('type', None)
             if collection_type and validated_data['type'] != collection_type:
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
@@ -216,9 +215,9 @@ class CollectionSerializer(serializers.Serializer):
 
 
 class MeetingSerializer(CollectionSerializer):
-    location = serializers.CharField()
-    start_date = serializers.DateTimeField()
-    end_date = serializers.DateTimeField()
+    location = serializers.CharField(required=False)
+    start_date = serializers.DateTimeField(required=False)
+    end_date = serializers.DateTimeField(required=False)
     groups = RelationshipField(
         related_view='meeting-group-list',
         related_view_kwargs={'pk': '<pk>'}
