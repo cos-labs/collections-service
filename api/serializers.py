@@ -47,8 +47,8 @@ class ItemSerializer(serializers.Serializer):
     date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
     date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
     location = serializers.CharField(required=False)
-    start_time = serializers.DateTimeField(read_only=True, allow_null=True)
-    end_time = serializers.DateTimeField(read_only=True, allow_null=True)
+    start_time = serializers.DateTimeField(allow_null=True)
+    end_time = serializers.DateTimeField(allow_null=True)
     category = serializers.ChoiceField(choices=['none', 'talk', 'poster'])
 
     class Meta:
