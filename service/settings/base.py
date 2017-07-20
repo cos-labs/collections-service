@@ -159,7 +159,7 @@ FIXTURE_DIRS = (
    '/api/fixtures/',
 )
 
-SITE_ID = 2
+SITE_ID = 1
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
