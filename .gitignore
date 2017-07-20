@@ -1,7 +1,66 @@
-local.py
-*.pyc
+## Collections Django Gitignore ##
+# adapted from https://www.gitignore.io/api/python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.env
+.venv
+venv/
+ENV/
 .python-version
+
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Translations
+*.mo
+
+# IDE Stuff
+.mr.developer.cfg
+.project
+.pydevproject
+.idea
+
+
+# Rope
+.ropeproject
+
+# Django stuff:
+*.log
+*.pot
 static
 staticfiles
 static/*
+local.py
 
+# documentation
+docs/_build/ # Sphinx
+/site # mkdocs
