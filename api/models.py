@@ -36,6 +36,7 @@ class Collection(CollectionBase):
 
 class Meeting(CollectionBase):
     location = models.CharField(null=True, blank=True, default=None, max_length=200)
+    address = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_date = models.DateTimeField(null=True, blank=True, default=None)
     end_date = models.DateTimeField(null=True, blank=True, default=None)
 

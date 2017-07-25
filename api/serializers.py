@@ -216,6 +216,7 @@ class CollectionSerializer(serializers.Serializer):
 
 class MeetingSerializer(CollectionSerializer):
     location = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
     start_date = serializers.DateTimeField(required=False)
     end_date = serializers.DateTimeField(required=False)
     groups = RelationshipField(
