@@ -93,7 +93,7 @@ class ItemSerializer(serializers.Serializer):
         status = validated_data.get('status', item.status)
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
         if collection_id:
-            collection = Collection.objects.get(id=collection_id)
+            collection = CollectionBase.objects.get(id=collection_id)
         else:
             collection = item.collection
 
@@ -110,8 +110,7 @@ class ItemSerializer(serializers.Serializer):
 
         item_type = validated_data.get('type', item.type)
         if collection.settings:
-            collection_settings = json.loads(collection.settings)
-            collection_type = collection_settings.get('type', None)
+            collection_type = collection.settings.get('type', None)
             if collection_type and item_type != collection_type:
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
