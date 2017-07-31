@@ -46,9 +46,9 @@ class ItemSerializer(serializers.Serializer):
     date_created = serializers.DateTimeField(read_only=True)
     date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
     date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
-    location = serializers.CharField(required=False)
-    start_time = serializers.DateTimeField(allow_null=True)
-    end_time = serializers.DateTimeField(allow_null=True)
+    location = serializers.CharField(allow_null=True, required=False)
+    start_time = serializers.DateTimeField(allow_null=True, required=False)
+    end_time = serializers.DateTimeField(allow_null=True, required=False)
     category = serializers.ChoiceField(choices=['none', 'talk', 'poster'])
 
     class Meta:
@@ -214,10 +214,10 @@ class CollectionSerializer(serializers.Serializer):
 
 
 class MeetingSerializer(CollectionSerializer):
-    location = serializers.CharField(required=False)
-    address = serializers.CharField(required=False)
-    start_date = serializers.DateTimeField(required=False)
-    end_date = serializers.DateTimeField(required=False)
+    location = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    address = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    start_date = serializers.DateTimeField(allow_null=True, required=False)
+    end_date = serializers.DateTimeField(allow_null=True, required=False)
     groups = RelationshipField(
         related_view='meeting-group-list',
         related_view_kwargs={'pk': '<pk>'}
@@ -246,6 +246,9 @@ class MeetingSerializer(CollectionSerializer):
         meeting.settings = validated_data.get('settings', meeting.settings)
         meeting.submission_settings = validated_data.get('submission_settings', meeting.submission_settings)
         meeting.created_by_org = validated_data.get('created_by_org', meeting.created_by_org)
+        meeting.location = validated_data.get('location', meeting.location)
+        meeting.start_date = validated_data.get('start_date', meeting.start_date)
+        meeting.end_date = validated_data.get('end_date', meeting.end_date)
         meeting.save()
         return meeting
 
