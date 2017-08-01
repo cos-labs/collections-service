@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_nose',
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
@@ -118,6 +119,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
