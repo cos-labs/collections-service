@@ -17,9 +17,6 @@ class SimpleTest(TestCase):
         self.owner = UserFactory(username="owner")
         self.owner.save()
 
-        self.random_user = UserFactory(username="random_user")
-        self.random_user.save()
-
         self.submitter = UserFactory(username="submitter")
         self.submitter.save()
 
@@ -41,14 +38,17 @@ class SimpleTest(TestCase):
             i.save()
 
         self.factory = APIRequestFactory()
+        self.client = APIClient()
 
-    def test_cant_post_collection_unless_logged_in(self):
-        client = APIClient()
-        client.login(username="owner", password="password123")
-        response = client.post(reverse('collection-list'),
-                                {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': ''})
-        self.assertEqual(response.status_code, 201)
-        client.logout()
-        response = client.post(reverse('collection-list'),
+    def test_logged_out_users_cannot_post_collection(self):
+        self.client.logout()
+        response = self.client.post(reverse('collection-list'),
                                 {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': ''})
         self.assertEqual(response.status_code, 401)
+
+    def test_logged_in_users_can_post_collection(self):
+        self.client = APIClient()
+        self.client.login(username="owner", password="password123")
+        response = self.client.post(reverse('collection-list'),
+                                {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': ''})
+        self.assertEqual(response.status_code, 201)
