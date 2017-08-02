@@ -9,8 +9,10 @@ class UserFactory(factory.Factory):
 
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
-    username = factory.Faker('username')
-    password = "password123"
+    username = factory.LazyAttribute(
+        lambda u: (str(u.first_name)[0] + str(u.last_name)).lower()
+    )
+    password = factory.PostGenerationMethodCall('set_password', 'password123')
 
 
 class ItemFactory(factory.Factory):
@@ -24,6 +26,9 @@ class ItemFactory(factory.Factory):
 class GroupFactory(factory.Factory):
     class Meta:
         model = models.Group
+
+    title = factory.Faker('text', max_nb_chars=25)
+    description = factory.Faker('text', max_nb_chars=125)
 
 
 class CollectionFactory(factory.Factory):
