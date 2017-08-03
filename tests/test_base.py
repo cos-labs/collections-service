@@ -1,10 +1,7 @@
-from api import models
-from django.test import Client
-from django.contrib.auth import login
-from django.test import TestCase, Client
-from rest_framework.test import force_authenticate, APIRequestFactory, APIClient
+from django.test import TestCase
+from rest_framework.test import APIRequestFactory, APIClient
 from django.urls import reverse
-from .factories import UserFactory, ItemFactory, GroupFactory, CollectionFactory, MeetingFactory
+from .factories import UserFactory, ItemFactory, CollectionFactory, MeetingFactory
 
 
 class SimpleTest(TestCase):
