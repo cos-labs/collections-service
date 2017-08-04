@@ -116,7 +116,7 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
                                "type": "collections",   # required
                                "id":   {collection_id}, # required
                                "attributes": {
-                                 "title":               {title},              # required for PUT
+                                 "title":               {title},              # required
                                  "description":         {description},        # optional
                                  "tags":                {tag1, tag2, },       # optional
                                  "created_by_org":      {created_by_org}      # optional
@@ -217,6 +217,77 @@ class MeetingList(generics.ListCreateAPIView):
 
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
+    """ Details about a given meeting.
+
+     ## Meeting Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  meeting title
+        description                   string                  meeting description
+        tags                          string                  tags describing the meeting
+        settings                      object                  general settings for the meeting (e.g. collection_type)
+        submission_settings           object                  settings for the meeting's submission form
+        created_by_org                string                  the organization/institution associated with the meeting
+        date_created                  iso8601 timestamp       date/time when the meeting was created
+        date_updated                  iso8601 timestamp       date/time when the meeting was last updated
+        location                      string                  location of the meeting
+        address                       string                  street address of the meeting location
+        start_date                    iso8601 timestamp       date/time when the meeting begins
+        end_date                      iso8601 timestamp       date/time when the meeting ends
+
+    ##Relationships
+
+    ### Groups
+
+    List of groups that belong to this meeting.
+
+    ### Items
+
+    List of top-level items that belong to this meeting.
+
+    ### Created By
+
+    User who created this meeting.
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/meeting/<meeting_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "meetings",                            # required
+                               "id":   {meeting_id},                          # required
+                               "attributes": {
+                                 "title":               {title},              # required for PUT
+                                 "description":         {description},        # optional
+                                 "tags":                {tag1, tag2, },       # optional
+                                 "created_by_org":      {created_by_org}      # optional
+                                 "settings":            {settings}            # optional
+                                 "submission_settings": {submission_settings} # optional
+                                 "location":            {location}            # optional
+                                 "address":             {address}             # optional
+                                 "start_date":          {start_date}          # optional
+                                 "end_date":            {end_date}            # optional
+                               }
+                             }
+                           }
+            Success:       200 OK + meeting representation
+
+    Note: The `title` is required with PUT requests and optional with PATCH requests.
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/meetings/<meeting_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+    """
+
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     permission_classes = (
