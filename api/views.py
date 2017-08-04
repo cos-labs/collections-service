@@ -20,7 +20,49 @@ def api_root(request):
 
 
 class CollectionList(generics.ListCreateAPIView):
-    """View list of collections and create a new collection. """
+    """View list of collections and create a new collection.
+
+    ## Collection Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  collection title
+        description                   string                  collection description
+        tags                          string                  tags describing the collection
+        settings                      object                  general settings for the collection (e.g. collection_type)
+        submission_settings           object                  settings for the collection's submission form
+        created_by_org                string                  the organization/institution associated with the collection
+        date_created                  iso8601 timestamp       date/time when the collection was created
+        date_updated                  iso8601 timestamp       date/time when the collection was last updated
+
+    ## Actions
+
+    ### Creating New Collections
+
+        Method:        POST
+            URL:           /api/collections
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "collections", # required
+                               "attributes": {
+                                 "title":               {title},              # required
+                                 "description":         {description},        # optional
+                                 "tags":                {tag1, tag2, },       # optional
+                                 "created_by_org":      {created_by_org}      # optional
+                                 "settings":            {settings}            # optional
+                                 "submission_settings": {submission_settings} # optional
+                               }
+                             }
+                           }
+            Success:       201 CREATED + collection representation
+
+    ## Query Params
+    +  `title=<Str>`: filters collections by title
+
+    #This Request/Response
+
+    """
     serializer_class = CollectionSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
