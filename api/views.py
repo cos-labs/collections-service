@@ -304,6 +304,38 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CollectionGroupList(generics.ListCreateAPIView):
+    """ List of groups in a given collection/meeting.
+
+    ## Group Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  group title
+        description                   string                  group description
+        date_created                  iso8601 timestamp       date/time when the group was created
+        date_updated                  iso8601 timestamp       date/time when the group was last updated
+
+    ## Actions
+
+    ### Creating New Groups
+
+            Method:        POST
+            URL:           /api/collections/<collection_id>/groups OR /api/meetings/<meeting_id>/groups
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "groups",                 # required
+                               "attributes": {
+                                 "title":        {title},        # required
+                                 "description":  {description},  # optional
+                               }
+                             }
+                           }
+            Success:       201 CREATED + group representation
+
+    #This Request/Response
+
+    """
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
       CanEditGroup
