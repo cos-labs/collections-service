@@ -170,8 +170,8 @@ class GroupSerializer(serializers.Serializer):
 class CollectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(required=True)
-    description = serializers.CharField(allow_blank=True)
-    tags = serializers.CharField(allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    tags = serializers.CharField(required=False, allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
