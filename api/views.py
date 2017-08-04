@@ -44,7 +44,7 @@ class CollectionList(generics.ListCreateAPIView):
             Query Params:  <none>
             Body (JSON):   {
                              "data": {
-                               "type": "collections", # required
+                               "type": "collections",                         # required
                                "attributes": {
                                  "title":               {title},              # required
                                  "description":         {description},        # optional
@@ -154,7 +154,57 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class MeetingList(generics.ListCreateAPIView):
-    """View list of collections and create a new collection. """
+    """ View list of meetings and create a new meeting.
+
+    ## Meeting Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  meeting title
+        description                   string                  meeting description
+        tags                          string                  tags describing the meeting
+        settings                      object                  general settings for the meeting (e.g. collection_type)
+        submission_settings           object                  settings for the meeting's submission form
+        created_by_org                string                  the organization/institution associated with the meeting
+        date_created                  iso8601 timestamp       date/time when the meeting was created
+        date_updated                  iso8601 timestamp       date/time when the meeting was last updated
+        location                      string                  location of the meeting
+        address                       string                  street address of the meeting location
+        start_date                    iso8601 timestamp       date/time when the meeting begins
+        end_date                      iso8601 timestamp       date/time when the meeting ends
+
+    ## Actions
+
+    ### Creating New Meetings
+
+            Method:        POST
+            URL:           /api/meetings
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "meetings",                            # required
+                               "attributes": {
+                                 "title":               {title},              # required
+                                 "description":         {description},        # optional
+                                 "tags":                {tag1, tag2, },       # optional
+                                 "created_by_org":      {created_by_org}      # optional
+                                 "settings":            {settings}            # optional
+                                 "submission_settings": {submission_settings} # optional
+                                 "location":            {location}            # optional
+                                 "address":             {address}             # optional
+                                 "start_date":          {start_date}          # optional
+                                 "end_date":            {end_date}            # optional
+                               }
+                             }
+                           }
+            Success:       201 CREATED + meeting representation
+
+    ## Query Params
+    +  `title=<Str>`: filters meetings by title
+
+    #This Request/Response
+
+    """
     serializer_class = MeetingSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
