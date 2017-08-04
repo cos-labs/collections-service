@@ -20,7 +20,7 @@ def api_root(request):
 
 
 class CollectionList(generics.ListCreateAPIView):
-    """View list of collections and create a new collection.
+    """ View list of collections and create a new collection.
 
     ## Collection Attributes
 
@@ -39,7 +39,7 @@ class CollectionList(generics.ListCreateAPIView):
 
     ### Creating New Collections
 
-        Method:        POST
+            Method:        POST
             URL:           /api/collections
             Query Params:  <none>
             Body (JSON):   {
@@ -75,6 +75,69 @@ class CollectionList(generics.ListCreateAPIView):
 
 
 class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
+    """ Details about a given collection.
+
+    ## Collection Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  collection title
+        description                   string                  collection description
+        tags                          string                  tags describing the collection
+        settings                      object                  general settings for the collection (e.g. collection_type)
+        submission_settings           object                  settings for the collection's submission form
+        created_by_org                string                  the organization/institution associated with the collection
+        date_created                  iso8601 timestamp       date/time when the collection was created
+        date_updated                  iso8601 timestamp       date/time when the collection was last updated
+
+    ##Relationships
+
+    ### Groups
+
+    List of groups that belong to this collection.
+
+    ### Items
+
+    List of top-level items that belong to this collection.
+
+    ### Created By
+
+    User who created this collection.
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/collections/<collection_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "collections",   # required
+                               "id":   {collection_id}, # required
+                               "attributes": {
+                                 "title":               {title},              # required for PUT
+                                 "description":         {description},        # optional
+                                 "tags":                {tag1, tag2, },       # optional
+                                 "created_by_org":      {created_by_org}      # optional
+                                 "settings":            {settings}            # optional
+                                 "submission_settings": {submission_settings} # optional
+                               }
+                             }
+                           }
+            Success:       200 OK + collection representation
+
+    Note: The `title` is required with PUT requests and optional with PATCH requests.
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/collections/<collection_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+
+    """
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
     permission_classes = (
