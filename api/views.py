@@ -304,7 +304,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CollectionGroupList(generics.ListCreateAPIView):
-    """ List of groups in a given collection/meeting.
+    """ View list of groups in a given collection/meeting, or create a new group in a given collection/meeting.
 
     ## Group Attributes
 
@@ -386,6 +386,56 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CollectionItemList(generics.ListCreateAPIView):
+    """ View list of items in a given collection/meeting, or create a new item in a given collection/meeting.
+
+    ## Item Attributes
+
+        name                          type                    description
+        ================================================================================================================
+        title                         string                  item title
+        description                   string                  item description
+        type                          string                  type of item (e.g. 'project', 'presentation', etc.)
+        status                        string                  moderation status ('approved', 'pending', 'rejected')
+        source_id                     string                  guid of associated OSF object (e.g. node_id for an OSF project)
+        url                           string                  url of associated OSF object (e.g. project url)
+        metadata                      object                  additional information about the item
+        date_created                  iso8601 timestamp       date/time when the item was created
+        date_submitted                iso8601 timestamp       date/time when the item was submitted
+        date_accepted                 iso8601 timestamp       date/time when the item was accepted
+        location                      string                  location of the event item
+        start_time                    iso8601 timestamp       date/time when the event item begins
+        end_time                      iso8601 timestamp       date/time when the event item ends
+        category                      string                  item category (e.g. 'talk', 'poster')
+
+    ## Actions
+
+    ### Creating New Items
+
+            Method:        POST
+            URL:           /api/collections/<collection_id>/items OR /api/meetings/<meeting_id>/items
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "items",                  # required
+                               "attributes": {
+                                 "title":       {title},         # required
+                                 "description": {description},   # optional
+                                 "type":        {type},          # required
+                                 "status":      {status},        # required
+                                 "source_id":   {source_id},     # optional
+                                 "url":         {url},           # optional
+                                 "metadata":    {metadata},      # optional
+                                 "location":    {location},      # optional
+                                 "start_time":  {start_time},    # optional
+                                 "end_time":    {end_time},      # optional
+                                 "category":    {category}       # required
+                               }
+                             }
+                           }
+            Success:       201 CREATED + item representation
+
+    #This Request/Response
+    """
     serializer_class = ItemSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
@@ -400,7 +450,58 @@ class CollectionItemList(generics.ListCreateAPIView):
 
 
 class GroupItemList(generics.ListCreateAPIView):
-    """View items in a collection and create a new item to add to the collection. """
+    """ View list of items or create a new item in a given group.
+
+    ## Item Attributes
+
+        name                          type                    description
+        ================================================================================================================
+        title                         string                  item title
+        description                   string                  item description
+        type                          string                  type of item (e.g. 'project', 'presentation', etc.)
+        status                        string                  moderation status ('approved', 'pending', 'rejected')
+        source_id                     string                  guid of associated OSF object (e.g. node_id for an OSF project)
+        url                           string                  url of associated OSF object (e.g. project url)
+        metadata                      object                  additional information about the item
+        date_created                  iso8601 timestamp       date/time when the item was created
+        date_submitted                iso8601 timestamp       date/time when the item was submitted
+        date_accepted                 iso8601 timestamp       date/time when the item was accepted
+        location                      string                  location of the event item
+        start_time                    iso8601 timestamp       date/time when the event item begins
+        end_time                      iso8601 timestamp       date/time when the event item ends
+        category                      string                  item category (e.g. 'talk', 'poster')
+
+    ## Actions
+
+    ### Creating New Items
+
+            Method:        POST
+            URL:           /api/collections/<collection_id>/groups/<group_id>/items OR
+                           /api/meetings/<meeting_id>/groups/<group_id>/items
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "items",                  # required
+                               "attributes": {
+                                 "title":       {title},         # required
+                                 "description": {description},   # optional
+                                 "type":        {type},          # required
+                                 "status":      {status},        # required
+                                 "source_id":   {source_id},     # optional
+                                 "url":         {url},           # optional
+                                 "metadata":    {metadata},      # optional
+                                 "location":    {location},      # optional
+                                 "start_time":  {start_time},    # optional
+                                 "end_time":    {end_time},      # optional
+                                 "category":    {category}       # required
+                               }
+                             }
+                           }
+            Success:       201 CREATED + item representation
+
+    #This Request/Response
+    """
+
     serializer_class = ItemSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
