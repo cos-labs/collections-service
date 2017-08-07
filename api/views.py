@@ -353,6 +353,7 @@ class CollectionGroupList(generics.ListCreateAPIView):
 
 
 class GroupList(generics.ListCreateAPIView):
+    #TODO: Consider making this endpoint a ListAPIView
     serializer_class = GroupSerializer
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
@@ -370,6 +371,59 @@ class GroupList(generics.ListCreateAPIView):
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    """ Details about a given group.
+
+    ## Group Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  group title
+        description                   string                  group description
+        date_created                  iso8601 timestamp       date/time when the group was created
+        date_updated                  iso8601 timestamp       date/time when the group was last updated
+
+    ##Relationships
+
+    ### Items
+
+    List of items that belong to this group.
+
+    ### Created By
+
+    User who created this group.
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/collections/<collection_id>/groups/<group_id> OR
+                           /api/meetings/<meeting_id>/groups/<group_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "groups",                            # required
+                               "id":   {group_id},                          # required
+                               "attributes": {
+                                 "title":               {title},            # required
+                                 "description":         {description}       # optional
+                               }
+                             }
+                           }
+            Success:       200 OK + group representation
+
+    Note: The `title` is required with PUT requests and optional with PATCH requests.
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/collections/<collection_id>/groups/<group_id> OR
+                      /api/meetings/<meeting_id>/groups/<group_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+
+    """
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
     permission_classes = (
@@ -524,6 +578,7 @@ class GroupItemList(generics.ListCreateAPIView):
 
 
 class ItemList(generics.ListCreateAPIView):
+    #TODO: Consider making this endpoint a ListAPIView
     serializer_class = ItemSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
@@ -543,6 +598,73 @@ class ItemList(generics.ListCreateAPIView):
 
 
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    """ Details for a given item.
+
+    ## Item Attributes
+
+        name                          type                    description
+        ================================================================================================================
+        title                         string                  item title
+        description                   string                  item description
+        type                          string                  type of item (e.g. 'project', 'presentation', etc.)
+        status                        string                  moderation status ('approved', 'pending', 'rejected')
+        source_id                     string                  guid of associated OSF object (e.g. node_id for an OSF project)
+        url                           string                  url of associated OSF object (e.g. project url)
+        metadata                      object                  additional information about the item
+        date_created                  iso8601 timestamp       date/time when the item was created
+        date_submitted                iso8601 timestamp       date/time when the item was submitted
+        date_accepted                 iso8601 timestamp       date/time when the item was accepted
+        location                      string                  location of the event item
+        start_time                    iso8601 timestamp       date/time when the event item begins
+        end_time                      iso8601 timestamp       date/time when the event item ends
+        category                      string                  item category (e.g. 'talk', 'poster')
+
+    ##Relationships
+
+    ### Created By
+
+    User who created this item.
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
+                           /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "items",                  # required
+                               "attributes": {
+                                 "title":       {title},         # required
+                                 "description": {description},   # optional
+                                 "type":        {type},          # required
+                                 "status":      {status},        # required
+                                 "source_id":   {source_id},     # optional
+                                 "url":         {url},           # optional
+                                 "metadata":    {metadata},      # optional
+                                 "location":    {location},      # optional
+                                 "start_time":  {start_time},    # optional
+                                 "end_time":    {end_time},      # optional
+                                 "category":    {category}       # required
+                               }
+                             }
+                           }
+            Success:       200 OK + item representation
+
+    Note: The `title`, `type`, `status` and `category` fields are required for PUT and optional for PATCH requests.
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
+                      /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+
+    """
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = (
