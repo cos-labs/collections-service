@@ -434,6 +434,10 @@ class CollectionItemList(generics.ListCreateAPIView):
                            }
             Success:       201 CREATED + item representation
 
+    Note: Items added by the collection creator will automatically have the status "approved". If "approve_all" is true
+    in collection.settings, items added by other users will automatically have the status "approved", otherwise
+    they will be "pending".
+
     #This Request/Response
     """
     serializer_class = ItemSerializer
@@ -498,6 +502,10 @@ class GroupItemList(generics.ListCreateAPIView):
                              }
                            }
             Success:       201 CREATED + item representation
+
+    Note: Items added by the collection creator will automatically have the status "approved". If "approve_all" is true
+    in collection.settings, items added by other users will automatically have the status "approved", otherwise
+    they will be "pending".
 
     #This Request/Response
     """
