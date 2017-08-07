@@ -564,6 +564,56 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CurrentUser(generics.RetrieveUpdateDestroyAPIView):
+    """ Details about the currently logged-in user.
+
+    ## User Attributes
+
+        name                          type                    description
+        ======================================================================================================
+        username                      string                  username for the user
+        first_name                    string                  first name of the user
+        last_name                     string                  last name of the user
+        email                         string                  email address associated with the user's account
+        date_joined                   iso8601 timestamp       date/time of account creation
+        last_login                    iso8601 timestamp       date/time of last login
+        is_active                     boolean                 whether the user account is active
+        gravatar                      string                  link to user gravatar
+        token                         string                  access token for social account (used for OAUTH)
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/users/<user_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "users",                       # required
+                               "id":   {user_id},                     # required
+                               "attributes": {
+                                 "username":       {username},        # required
+                                 "first_name":     {first_name},      # optional
+                                 "last_name":      {last_name},       # optional
+                                 "email":          {email}            # optional
+                                 "date_joined":    {date_joined}      # optional
+                                 "last_login":     {last_login}       # optional
+                                 "is_active":      {is_active}        # optional
+                                 "gravatar":       {gravatar}         # optional
+                               }
+                             }
+                           }
+            Success:       200 OK + user representation
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/users/<user_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -572,7 +622,25 @@ class CurrentUser(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListAPIView):
-    """View list of users. """
+    """ View list of users.
+
+    ## User Attributes
+
+        name                          type                    description
+        ======================================================================================================
+        username                      string                  username for the user
+        first_name                    string                  first name of the user
+        last_name                     string                  last name of the user
+        email                         string                  email address associated with the user's account
+        date_joined                   iso8601 timestamp       date/time of account creation
+        last_login                    iso8601 timestamp       date/time of last login
+        is_active                     boolean                 whether the user account is active
+        gravatar                      string                  link to user gravatar
+        token                         string                  access token for social account (used for OAUTH)
+
+    #This Request/Response
+
+    """
     serializer_class = UserSerializer
     # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
@@ -581,7 +649,55 @@ class UserList(generics.ListAPIView):
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    """View user detail. """
+    """ Details about a given user.
+
+    ## User Attributes
+
+        name                          type                    description
+        ======================================================================================================
+        username                      string                  username for the user
+        first_name                    string                  first name of the user
+        last_name                     string                  last name of the user
+        email                         string                  email address associated with the user's account
+        date_joined                   iso8601 timestamp       date/time of account creation
+        last_login                    iso8601 timestamp       date/time of last login
+        is_active                     boolean                 whether the user account is active
+        gravatar                      string                  link to user gravatar
+        token                         string                  access token for social account (used for OAUTH)
+
+    ## Actions
+
+    ###Update
+
+            Method:        PUT / PATCH
+            URL:           /api/users/<user_id>
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "users",                       # required
+                               "id":   {user_id},                     # required
+                               "attributes": {
+                                 "username":       {username},        # required
+                                 "first_name":     {first_name},      # optional
+                                 "last_name":      {last_name},       # optional
+                                 "email":          {email}            # optional
+                                 "date_joined":    {date_joined}      # optional
+                                 "last_login":     {last_login}       # optional
+                                 "is_active":      {is_active}        # optional
+                                 "gravatar":       {gravatar}         # optional
+                               }
+                             }
+                           }
+            Success:       200 OK + user representation
+
+    ###Delete
+            Method:   DELETE
+            URL:      /api/users/<user_id>
+            Params:   <none>
+            Success:  204 No Content
+
+    #This Request/Response
+    """
     serializer_class = UserSerializer
     # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
