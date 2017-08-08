@@ -355,7 +355,7 @@ class CollectionGroupList(generics.ListCreateAPIView):
 class GroupList(generics.ListCreateAPIView):
     """ View list of all groups, or create a new group in a collection or meeting.
 
-     ## Group Attributes
+    ## Group Attributes
 
         name                          type                    description
         =================================================================================================================
@@ -373,15 +373,17 @@ class GroupList(generics.ListCreateAPIView):
             Query Params:  <none>
             Body (JSON):   {
                              "data": {
-                               "type": "groups",                        # required
+                               "type": "groups",                          # required
                                "attributes": {
-                                 "title":        {title},               # required
-                                 "description":  {description}          # optional
+                                 "title":        {title},                 # required
+                                 "description":  {description}            # optional
                                },
                                "relationships": {
                                  "collection": {
-                                    "type": "meetings" | "collections"  # required
-                                    "id": {collection_id}               # required
+                                    "data": {
+                                      "type": "meetings" | "collections"  # required
+                                      "id": {collection_id}               # required
+                                    }
                                  }
                                }
                              }
@@ -620,7 +622,77 @@ class GroupItemList(generics.ListCreateAPIView):
 
 
 class ItemList(generics.ListCreateAPIView):
-    #TODO: Consider making this endpoint a ListAPIView
+    """ View list of all items, or create a new item in a collection/meeting or group.
+
+    ## Item Attributes
+
+        name                          type                    description
+        ================================================================================================================
+        title                         string                  item title
+        description                   string                  item description
+        type                          string                  type of item (e.g. 'project', 'presentation', etc.)
+        status                        string                  moderation status ('approved', 'pending', 'rejected')
+        source_id                     string                  guid of associated OSF object (e.g. node_id for an OSF project)
+        url                           string                  url of associated OSF object (e.g. project url)
+        metadata                      object                  additional information about the item
+        date_created                  iso8601 timestamp       date/time when the item was created
+        date_submitted                iso8601 timestamp       date/time when the item was submitted
+        date_accepted                 iso8601 timestamp       date/time when the item was accepted
+        location                      string                  location of the event item
+        start_time                    iso8601 timestamp       date/time when the event item begins
+        end_time                      iso8601 timestamp       date/time when the event item ends
+        category                      string                  item category (e.g. 'talk', 'poster')
+
+    ## Actions
+
+    ### Creating New Items
+
+            Method:        POST
+            URL:           /api/items
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "items",                  # required
+                               "attributes": {
+                                 "title":       {title},         # required
+                                 "description": {description},   # optional
+                                 "type":        {type},          # required
+                                 "status":      {status},        # required
+                                 "source_id":   {source_id},     # optional
+                                 "url":         {url},           # optional
+                                 "metadata":    {metadata},      # optional
+                                 "location":    {location},      # optional
+                                 "start_time":  {start_time},    # optional
+                                 "end_time":    {end_time},      # optional
+                                 "category":    {category}       # required
+                               },
+                               "relationships": {
+                                 "collection": {
+                                    "data": {
+                                      "type": "meetings" | "collections"  # required
+                                      "id": {collection_id}               # required
+                                    }
+                                 },
+                                 "group": {
+                                   "data": {
+                                     "type": "groups",                    # optional
+                                     "id": {group_id}                     # optional
+                                   }
+                                 }
+                               }
+                             }
+                           }
+            Success:       201 CREATED + item representation
+
+
+    ### Notes:
+    - Since the route does not include the collection/meeting id or a group id, they must be specified in the payload.
+
+    - Items added by the collection creator will automatically have the status "approved". If "approve_all" is true
+    in collection.settings, items added by other users will automatically have the status "approved", otherwise
+    they will be "pending".
+
+    """
     serializer_class = ItemSerializer
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
@@ -673,7 +745,8 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
             Method:        PUT / PATCH
             URL:           /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
-                           /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id>
+                           /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id> OR
+                           /api/items/<item_id>
             Query Params:  <none>
             Body (JSON):   {
                              "data": {
@@ -700,7 +773,8 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     ###Delete
             Method:   DELETE
             URL:      /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
-                      /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id>
+                      /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id> OR
+                      /api/items/<item_id>
             Params:   <none>
             Success:  204 No Content
 
