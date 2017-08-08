@@ -353,7 +353,46 @@ class CollectionGroupList(generics.ListCreateAPIView):
 
 
 class GroupList(generics.ListCreateAPIView):
-    #TODO: Consider making this endpoint a ListAPIView
+    """ View list of all groups, or create a new group in a collection or meeting.
+
+     ## Group Attributes
+
+        name                          type                    description
+        =================================================================================================================
+        title                         string                  group title
+        description                   string                  group description
+        date_created                  iso8601 timestamp       date/time when the group was created
+        date_updated                  iso8601 timestamp       date/time when the group was last updated
+
+    ## Actions
+
+    ### Creating New Groups
+
+            Method:        POST
+            URL:           /api/groups
+            Query Params:  <none>
+            Body (JSON):   {
+                             "data": {
+                               "type": "groups",                        # required
+                               "attributes": {
+                                 "title":        {title},               # required
+                                 "description":  {description}          # optional
+                               },
+                               "relationships": {
+                                 "collection": {
+                                    "type": "meetings" | "collections"  # required
+                                    "id": {collection_id}               # required
+                                 }
+                               }
+                             }
+                           }
+            Success:       201 CREATED + group representation
+
+    Note: Since the route does not include the collection or meeting id, it must be specified in the payload.
+
+    #This Request/Response
+
+    """
     serializer_class = GroupSerializer
     permission_classes = (
       drf_permissions.IsAuthenticatedOrReadOnly,
@@ -363,7 +402,8 @@ class GroupList(generics.ListCreateAPIView):
     def get_serializer_context(self):
         context = super(GroupList, self).get_serializer_context()
         collection = self.request.data.get('collection', None)
-        context.update({'collection_id': collection['id']})
+        if collection:
+            context.update({'collection_id': collection['id']})
         return context
 
     def get_queryset(self):
@@ -398,7 +438,8 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
             Method:        PUT / PATCH
             URL:           /api/collections/<collection_id>/groups/<group_id> OR
-                           /api/meetings/<meeting_id>/groups/<group_id>
+                           /api/meetings/<meeting_id>/groups/<group_id> OR
+                           /api/groups/<group_id>
             Query Params:  <none>
             Body (JSON):   {
                              "data": {
@@ -417,7 +458,8 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     ###Delete
             Method:   DELETE
             URL:      /api/collections/<collection_id>/groups/<group_id> OR
-                      /api/meetings/<meeting_id>/groups/<group_id>
+                      /api/meetings/<meeting_id>/groups/<group_id> OR
+                      /api/groups/<group_id>
             Params:   <none>
             Success:  204 No Content
 
