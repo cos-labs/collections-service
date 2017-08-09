@@ -70,7 +70,7 @@ class ItemSerializer(serializers.Serializer):
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
-        if user.has_perm('api.approve_items', collection) or allow_all:
+        if user.has_perm(['api.approve_collection_items', 'api.approve_meeting_items'], collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
 
@@ -199,7 +199,7 @@ class CollectionSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         collection = Collection.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_items', user, collection)
+        assign_perm('api.approve_collection_items', user, collection)
         return collection
 
     def update(self, collection, validated_data):
@@ -236,7 +236,7 @@ class MeetingSerializer(CollectionSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         meeting = Meeting.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_items', user, meeting)
+        assign_perm('api.approve_meeting_items', user, CollectionBase(meeting))
         return meeting
 
     def update(self, meeting, validated_data):
