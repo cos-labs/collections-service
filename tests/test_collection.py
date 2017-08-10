@@ -3,6 +3,10 @@ from django.urls import reverse
 
 
 class CollectionTest(TestBase):
+    def setUp(self):
+        TestBase.setUp(self)
+        self.collection_url = reverse('collection-detail', args=[self.collection.id])
+
     def test_logged_in_user_can_post_collection(self):
         self.client.login(username="owner", password="password123")
         # try to post a collection
@@ -13,21 +17,21 @@ class CollectionTest(TestBase):
     def test_user_can_edit_own_collection(self):
         self.client.login(username="owner", password="password123")
         # attempt to patch collection
-        response = self.client.patch(reverse('collection-detail', args=[self.collection.id]),
+        response = self.client.patch(self.collection_url,
                                      {'title': 'New Title'})
         self.assertEqual(response.status_code, 200)
 
     def test_user_cannot_edit_others_collections(self):
         self.client.login(username="random", password="password123")
         # attempt to patch owner's collection
-        response = self.client.patch(reverse('collection-detail', args=[self.collection.id]),
+        response = self.client.patch(self.collection_url,
                                      {'title': 'New Title 2'})
         self.assertEqual(response.status_code, 403)
 
     def test_user_can_delete_own_collection(self):
         self.client.login(username="owner", password="password123")
         # attempt to delete own collection
-        response = self.client.delete(reverse('collection-detail', args=[self.collection.id]))
+        response = self.client.delete(self.collection_url)
         self.assertEqual(response.status_code, 204)
 
     def test_logged_out_cannot_post_collection(self):
@@ -38,10 +42,10 @@ class CollectionTest(TestBase):
 
     def test_cannot_delete_other_users_collection(self):
         self.client.login(username="random", password="password123")
-        response = self.client.delete(reverse('collection-detail', args=[self.collection.id]))
+        response = self.client.delete(self.collection_url)
         self.assertEqual(response.status_code, 403)
 
     def test_logged_out_user_cannot_delete_collection(self):
         self.client.logout()
-        response = self.client.delete(reverse('collection-detail', args=[self.collection.id]))
+        response = self.client.delete(self.collection_url)
         self.assertEqual(response.status_code, 401)
