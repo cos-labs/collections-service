@@ -70,7 +70,7 @@ class ItemSerializer(serializers.Serializer):
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
-        if user.has_perms(['api.approve_collection_items', 'api.approve_meeting_items'], collection) or allow_all:
+        if user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items', collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
 
@@ -97,7 +97,7 @@ class ItemSerializer(serializers.Serializer):
         else:
             collection = item.collection
 
-        if status != item.status and user.has_perms(['api.approve_collection_items', 'api.approve_meeting_items'], collection):
+        if status != item.status and user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items', collection):
             raise exceptions.PermissionDenied(detail='Cannot change submission status.')
         elif user.id != item.created_by_id and validated_data.keys() != ['status']:
             raise exceptions.PermissionDenied(detail='Cannot update another user\'s submission.')
