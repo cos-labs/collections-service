@@ -2,7 +2,6 @@ from .test_base import TestBase
 from django.urls import reverse
 from . import factories
 from guardian.shortcuts import assign_perm
-from api import models
 
 
 class ItemTest(TestBase):
@@ -51,7 +50,7 @@ class ItemTest(TestBase):
     def test_approve_items_permission_holder_can_change_item_status(self):
         permissions_holder = factories.UserFactory(username="jane")
         permissions_holder.save()
-        assign_perm("api.approve_items", permissions_holder, self.collection)
+        assign_perm("api.approve_collection_items", permissions_holder, self.collection)
         self.client.login(username="jane", password="password123")
         response = self.client.patch(reverse('collection-item-detail', args=[self.collection.id, self.item.id]),
                                      {'status': 'approved'})

@@ -44,4 +44,4 @@ class CollectionTest(TestBase):
     def test_logged_out_user_cannot_delete_collection(self):
         self.client.logout()
         response = self.client.delete(reverse('collection-detail', args=[self.collection.id]))
-        self.assertNotEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 401)
