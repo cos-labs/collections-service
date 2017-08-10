@@ -70,7 +70,7 @@ class ItemSerializer(serializers.Serializer):
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
-        if user.has_perm('api.approve_items', collection) or allow_all:
+        if user.has_perm(['api.approve_collection_items', 'api.approve_meeting_items'], collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
 
@@ -133,7 +133,7 @@ class ItemSerializer(serializers.Serializer):
 class GroupSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(required=True)
-    description = serializers.CharField(allow_blank=True)
+    description = serializers.CharField(allow_blank=True, required=False)
     created_by = UserSerializer(read_only=True)
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
@@ -170,8 +170,8 @@ class GroupSerializer(serializers.Serializer):
 class CollectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(required=True)
-    description = serializers.CharField(allow_blank=True)
-    tags = serializers.CharField(allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    tags = serializers.CharField(required=False, allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
@@ -199,7 +199,7 @@ class CollectionSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         collection = Collection.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_items', user, collection)
+        assign_perm('api.approve_collection_items', user, collection)
         return collection
 
     def update(self, collection, validated_data):
@@ -236,7 +236,7 @@ class MeetingSerializer(CollectionSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         meeting = Meeting.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_items', user, meeting)
+        assign_perm('api.approve_meeting_items', user, CollectionBase(meeting))
         return meeting
 
     def update(self, meeting, validated_data):
