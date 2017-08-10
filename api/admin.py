@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.helpers import ActionForm
-from api.models import Collection, Group, Item
+from api.models import CollectionBase, Collection, Meeting, Group, Item
 from guardian.shortcuts import get_objects_for_user, assign_perm
 
 
@@ -13,7 +13,7 @@ def approve_item(modeladmin, request, queryset):
 
 def add_admins(modeladmin, request, queryset):
     collection_id = request.POST.get('collection_id')
-    collection = Collection.objects.get(id=collection_id)
+    collection = CollectionBase.objects.get(id=collection_id)
     for user in queryset:
         # Add permissions to view/change items through django admin
         assign_perm('api.approve_items', user, collection)
@@ -35,8 +35,10 @@ class ItemAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         user = request.user
-        collections = get_objects_for_user(user, 'api.approve_items')
-        return self.model.objects.filter(collection__in=collections), True
+        collections = get_objects_for_user(user, 'api.approve_collection_items')
+        meetings = get_objects_for_user(user, 'api.approve_meeting_items')
+        can_moderate = list(collections) + list(meetings)
+        return self.model.objects.filter(collection__in=can_moderate), True
 
 
 class OSFUserAdmin(UserAdmin):
@@ -46,6 +48,7 @@ class OSFUserAdmin(UserAdmin):
 
 
 admin.site.register(Collection)
+admin.site.register(Meeting)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(get_user_model(), OSFUserAdmin)

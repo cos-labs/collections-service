@@ -21,17 +21,16 @@ class CollectionBase(TypedModel):
     settings = JSONField(default={})
     submission_settings = JSONField(default={})
 
-    class Meta:
-        permissions = (
-            ('approve_items', 'Approve items'),
-        )
-
     def __str__(self):
         return self.title
 
 
 class Collection(CollectionBase):
-    pass
+
+    class Meta:
+        permissions = (
+            ('approve_collection_items', 'Approve collection items'),
+        )
 
 
 class Meeting(CollectionBase):
@@ -39,6 +38,11 @@ class Meeting(CollectionBase):
     address = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_date = models.DateTimeField(null=True, blank=True, default=None)
     end_date = models.DateTimeField(null=True, blank=True, default=None)
+
+    class Meta:
+        permissions = (
+            ('approve_meeting_items', 'Approve meeting items'),
+        )
 
 
 class Group(models.Model):
