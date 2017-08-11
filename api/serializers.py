@@ -159,8 +159,8 @@ class GroupSerializer(serializers.Serializer):
         )
 
     def update(self, group, validated_data):
-        group.title = validated_data['title']
-        description = validated_data['description']
+        group.title = validated_data.get('title', None)
+        description = validated_data.get('description', None)
         if description:
             group.description = description
         group.save()
