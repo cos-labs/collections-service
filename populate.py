@@ -20,22 +20,25 @@ import datetime
 import pytz
 
 owner = models.User.objects.get(pk=3)
-# collections = factories.CollectionFactory.build_batch(10, created_by=owner)
-# for c in collections:
-#     c.save()
-#     users = factories.UserFactory.build_batch(9) + [owner]
-#     for u in users:
-#         if not models.User.objects.all().filter(username=u.username).exists():
-#             print("new user: " + u.username)
-#             u.save()
-#         else:
-#             u = models.User.objects.get(username=u.username)
-#         items = factories.ItemFactory.build_batch(random.randint(1, 10), collection=c, created_by=u)
-#         for i in items:
-#             print("new item: " + i.title)
-#             i.status = random.choice(
-#                 ['approved', 'approved', 'approved', 'approved', 'pending', 'pending', 'rejected'])
-#             i.save()
+collections = factories.CollectionFactory.build_batch(10, created_by=owner)
+for c in collections:
+    c.save()
+    users = factories.UserFactory.build_batch(9) + [owner]
+    for u in users:
+        if not models.User.objects.all().filter(username=u.username).exists():
+            print("new user: " + u.username)
+            u.save()
+        else:
+            u = models.User.objects.get(username=u.username)
+        items = factories.ItemFactory.build_batch(random.randint(1, 10), collection=c, created_by=u)
+        for i in items:
+            print("new item: " + i.title)
+            i.status = random.choice(
+                ['approved', 'approved', 'approved', 'approved', 'pending', 'pending', 'rejected'])
+            i.date_submitted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+            i.date_accepted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+            i.type = 'preprint'
+            i.save()
 
 
 meetings = factories.MeetingFactory.build_batch(10, created_by=owner)
@@ -56,14 +59,14 @@ for m in meetings:
                 ['approved', 'approved', 'approved', 'approved', 'pending', 'pending', 'rejected'])
             i.category = 'presentation'
             i.type = 'event'
-            i.start_time = m.start_date + datetime.timedelta(0, 0, 0, 0, 0, int(ctr/2))
+            i.start_time = m.start_date + datetime.timedelta(0, 0, 0, 0, 0, ctr)
             i.end_time = i.start_time + datetime.timedelta(0, 0, 0, 0, 0, 1)
             i.location = 'Room ' + random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'])
             i.date_submitted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
             i.date_accepted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
 
             i.save()
-            if ctr == 20:
+            if ctr == 10:
                 ctr = 0
             else:
                 ctr += 1
