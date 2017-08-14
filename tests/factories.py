@@ -2,7 +2,9 @@ import factory
 from api import models
 import pytz
 import random
-import datetime
+
+# TODO: move to sublcassing factory.django.DjangoModelFactory instead of factory.Factory
+
 
 class UserFactory(factory.Factory):
     class Meta:
@@ -48,17 +50,12 @@ class MeetingFactory(factory.Factory):
     class Meta:
         model = models.Meeting
 
-    address = str(factory.Faker('street_address')) + " " + str(factory.Faker('city')) + " " + \
-            str(factory.Faker('state_abbr')) + " " + str(
-            factory.Faker('zipcode'))
-    location = str(factory.Faker('city')) + ", " + str(factory.Faker('state_abbr'))
-    import ipdb; ipdb.set_trace()
+    address = factory.Faker('address')
+    location = factory.Faker('city')
     title = factory.Faker('text', max_nb_chars=25)
     description = factory.Faker('text', max_nb_chars=125)
-    tags = "foo, bar, baz"
+    tags = random.choice(["foo", "bar", "baz"])
     start_date = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
-    # start_date = datetime.datetime(start_date).replace(minute=0, second=0, microsecond=0)
     end_date = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
-    # end_date = datetime.datetime(end_date).replace(minute=0, second=0, microsecond=0)
     settings = {}
     submission_settings = {}
