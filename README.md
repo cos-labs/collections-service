@@ -57,7 +57,6 @@ Follow the set-up instructions in the README for https://github.com/cos-labs/col
 
 Visit your app at [http://localhost:4200](http://localhost:4200).
 
-
 ## Configuration
 
 Set up the backend to use either staging or prod. Do this in the sessions for both the client and the service. `export BACKEND=prod` or `export BACKEND=stage`
@@ -79,6 +78,10 @@ Set up the backend to use either staging or prod. Do this in the sessions for bo
 * Set provider to "Open Science Framework"
 * Set the client id and secret key to the ones defined in your developer app
 * Select http://localhost:8000/ as the site
+
+## Populating the database
+* Before moving forward, make sure you've logged into the test server using your OSF staging credentials.
+* To populate the database with users, meetings, collections, and items, run `$ python populate.py` from the project root.
 
 ### Running Tests
 

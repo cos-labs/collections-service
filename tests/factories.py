@@ -1,6 +1,10 @@
 import factory
 from api import models
 import pytz
+import random
+from . import resources
+
+# TODO: move to sublcassing factory.django.DjangoModelFactory instead of factory.Factory
 
 
 class UserFactory(factory.Factory):
@@ -19,8 +23,10 @@ class ItemFactory(factory.Factory):
     class Meta:
         model = models.Item
 
-    title = factory.Faker('text', max_nb_chars=25)
-    description = factory.Faker('text', max_nb_chars=125)
+    title = factory.Faker('text', max_nb_chars=75)
+    description = factory.Faker('text', max_nb_chars=500)
+    status = 'approved'
+    source_id = 'fxsa9'
 
 
 class GroupFactory(factory.Factory):
@@ -46,13 +52,12 @@ class MeetingFactory(factory.Factory):
     class Meta:
         model = models.Meeting
 
-    address = str(factory.Faker('street_address')) + " " + str(factory.Faker('city')) + " " + str(factory.Faker('state_abbr')) + " " + str(
-        factory.Faker('zipcode'))
-    location = str(factory.Faker('city')) + ", " + str(factory.Faker('state_abbr'))
+    address = factory.Faker('address')
+    location = factory.Faker('city')
     title = factory.Faker('text', max_nb_chars=25)
     description = factory.Faker('text', max_nb_chars=125)
-    tags = "foo, bar, baz"
+    tags = random.choice(["foo", "bar", "baz"])
     start_date = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
     end_date = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
-    settings = {}
+    settings = resources.meetings_json
     submission_settings = {}
