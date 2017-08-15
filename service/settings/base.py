@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_nose',
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
@@ -119,8 +120,10 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 100,
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework_json_api.pagination.PageNumberPagination',
@@ -154,6 +157,10 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 AUTH_USER_MODEL = 'api.User'
+
+FIXTURE_DIRS = (
+   '/api/fixtures/',
+)
 
 SITE_ID = 1
 # Static files (CSS, JavaScript, Images)
