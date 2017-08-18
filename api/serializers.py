@@ -1,4 +1,3 @@
-import json
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework_json_api import serializers
@@ -7,6 +6,38 @@ from api.base.serializers import RelationshipField
 from guardian.shortcuts import assign_perm
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from django.core.exceptions import ObjectDoesNotExist
+from api import search_indexes
+from drf_haystack.serializers import HaystackSerializer
+
+
+class UserSearchSerializer(HaystackSerializer):
+    class Meta:
+        index_classes = [search_indexes.UserIndex]
+        fields = ['text', 'first_name', 'last_name']
+
+
+class CollectionBaseSearchSerializer(HaystackSerializer):
+    class Meta:
+        index_classes = [search_indexes.CollectionBaseIndex]
+        fields = ['text', 'title', 'description', 'created_by']
+
+
+class MeetingSearchSerializer(HaystackSerializer):
+    class Meta:
+        index_classes = [search_indexes.MeetingIndex]
+        fields = ['text', 'title', 'description', 'created_by']
+
+
+class ItemSearchSerializer(HaystackSerializer):
+    class Meta:
+        index_classes = [search_indexes.ItemIndex]
+        fields = ['text', 'title', 'description', 'created_by']
+
+
+class CollectionSearchSerializer(HaystackSerializer):
+    class Meta:
+        index_classes = [search_indexes.CollectionIndex]
+        fields = ['text', 'title', 'description', 'created_by']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,7 +68,8 @@ class ItemSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
     description = serializers.CharField(required=False)
-    type = serializers.ChoiceField(choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event'])
+    type = serializers.ChoiceField(
+        choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event'])
     status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
     source_id = serializers.CharField(required=False)
     url = serializers.URLField(required=False)
@@ -59,7 +91,8 @@ class ItemSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
+        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
+            'pk', None)
         collection = CollectionBase.objects.get(id=collection_id)
 
         allow_all = None
@@ -70,11 +103,13 @@ class ItemSerializer(serializers.Serializer):
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
-        if user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items', collection) or allow_all:
+        if user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items',
+                                                                                      collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
 
-        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get('group_id', None)
+        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get(
+            'group_id', None)
         if group_id:
             validated_data['group'] = Group.objects.get(id=group_id)
 
@@ -91,18 +126,21 @@ class ItemSerializer(serializers.Serializer):
     def update(self, item, validated_data):
         user = self.context['request'].user
         status = validated_data.get('status', item.status)
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
+        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
+            'pk', None)
         if collection_id:
             collection = CollectionBase.objects.get(id=collection_id)
         else:
             collection = item.collection
 
-        if status != item.status and user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items', collection):
+        if status != item.status and user.has_perm('api.approve_collection_items', collection) or user.has_perm(
+                'api.approve_meeting_items', collection):
             raise exceptions.PermissionDenied(detail='Cannot change submission status.')
         elif user.id != item.created_by_id and validated_data.keys() != ['status']:
             raise exceptions.PermissionDenied(detail='Cannot update another user\'s submission.')
 
-        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get('group_id', None)
+        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get(
+            'group_id', None)
         if group_id:
             group = Group.objects.get(id=group_id)
         else:
@@ -141,6 +179,11 @@ class GroupSerializer(serializers.Serializer):
         related_view='group-item-list',
         related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
     )
+    items = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='track-detail'
+    )
 
     class Meta:
         model = Group
@@ -150,7 +193,8 @@ class GroupSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get('pk', None)
+        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
+            'pk', None)
         collection = CollectionBase.objects.get(id=collection_id)
         return Group.objects.create(
             created_by=user,
@@ -175,23 +219,30 @@ class CollectionSerializer(serializers.Serializer):
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
-    created_by = RelationshipField(
-        related_view='user-detail',
-        related_view_kwargs={'user_id': '<created_by.pk>'},
-    )
+    # created_by = RelationshipField(
+    #     related_view='user-detail',
+    #     related_view_kwargs={'user_id': '<created_by.pk>'},
+    # )
+    # import ipdb; ipdb.set_trace()
+    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
-    groups = RelationshipField(
-        related_view='collection-group-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
-    items = RelationshipField(
-        related_view='collection-item-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
+    # groups = RelationshipField(
+    #     related_view='collection-group-list',
+    #     related_view_kwargs={'pk': '<pk>'}
+    # )
+    # items = RelationshipField(
+    #     related_view='collection-item-list',
+    #     related_view_kwargs={'pk': '<pk>'}
+    # )
+    # ipdb.set_trace()
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=Group.objects.all())
+    # ipdb.set_trace()
+    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all())
 
     class Meta:
         model = Collection
+        fields = ['id', 'title', 'description', 'tags', 'created_by']
 
     class JSONAPIMeta:
         resource_name = 'collections'
@@ -218,17 +269,17 @@ class MeetingSerializer(CollectionSerializer):
     address = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     start_date = serializers.DateTimeField(allow_null=True, required=False)
     end_date = serializers.DateTimeField(allow_null=True, required=False)
-    groups = RelationshipField(
-        related_view='meeting-group-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
-    items = RelationshipField(
-        related_view='meeting-item-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
+    # groups = RelationshipField(
+    #     related_view='meeting-group-list',
+    #     related_view_kwargs={'pk': '<pk>'}
+    # )
+    # items = RelationshipField(
+    #     related_view='meeting-item-list',
+    #     related_view_kwargs={'pk': '<pk>'}
+    # )
 
     class Meta:
-            model = Meeting
+        model = Meeting
 
     class JSONAPIMeta:
         resource_name = 'meetings'
@@ -254,7 +305,8 @@ class MeetingSerializer(CollectionSerializer):
 
 
 class GroupMeetingSerializer(GroupSerializer):
-    items = RelationshipField(
-        related_view='meeting-group-item-list',
-        related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
-    )
+    # items = RelationshipField(
+    #     related_view='meeting-group-item-list',
+    #     related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
+    # )
+    pass

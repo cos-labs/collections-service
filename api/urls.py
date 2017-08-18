@@ -1,7 +1,16 @@
 from django.conf.urls import url, include
 import api.views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register("collections/search", api.views.CollectionSearchView, base_name="collection-search")
+router.register("collectionbases/search", api.views.CollectionBaseSearchView, base_name="collectionbase-search")
+router.register("items/search", api.views.ItemSearchView, base_name="item-search")
+router.register("meetings/search", api.views.MeetingSearchView, base_name="meeting-search")
+router.register("users/search", api.views.UserSearchView, base_name="user-search")
 
 urlpatterns = [
+    url(r'', include(router.urls)),
     url(r'^$', api.views.api_root),
     url(r'^collections/$', api.views.CollectionList.as_view(), name='collection-list'),
     url(r'^collections/(?P<pk>\w+)/$', api.views.CollectionDetail.as_view(), name='collection-detail'),
@@ -30,5 +39,4 @@ urlpatterns = [
     url(r'^meetings/(?P<pk>\w+)/groups/(?P<group_id>\w+)/items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='meeting-group-item-detail'),
     url(r'^meetings/(?P<pk>\w+)/items/$', api.views.CollectionItemList.as_view(), name='meeting-item-list'),
     url(r'^meetings/(?P<pk>\w+)/items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='meeting-item-detail'),
-
 ]

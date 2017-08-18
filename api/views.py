@@ -6,9 +6,38 @@ from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from api.serializers import CollectionSerializer, MeetingSerializer, GroupSerializer, GroupMeetingSerializer, ItemSerializer, UserSerializer
+from api.serializers import CollectionSerializer, CollectionSearchSerializer, MeetingSerializer, \
+    MeetingSearchSerializer, GroupSerializer,GroupMeetingSerializer, ItemSerializer, ItemSearchSerializer, \
+    CollectionBaseSearchSerializer, UserSerializer, UserSearchSerializer
 from api.models import CollectionBase, Collection, Meeting, Group, Item, User
 from api.permissions import CanEditCollection, CanEditItem, CanEditGroup
+
+from drf_haystack.viewsets import HaystackViewSet
+
+
+class CollectionSearchView(HaystackViewSet):
+    index_models = [Collection]
+    serializer_class = CollectionSearchSerializer
+
+
+class CollectionBaseSearchView(HaystackViewSet):
+    index_models = [CollectionBase]
+    serializer_class = CollectionBaseSearchSerializer
+
+
+class MeetingSearchView(HaystackViewSet):
+    index_models = [Meeting]
+    serializer_class = MeetingSearchSerializer
+
+
+class ItemSearchView(HaystackViewSet):
+    index_models = [Item]
+    serializer_class = ItemSearchSerializer
+
+
+class UserSearchView(HaystackViewSet):
+    index_models = [User]
+    serializer_class = UserSearchSerializer
 
 
 @api_view(['GET'])
@@ -64,7 +93,7 @@ class CollectionList(generics.ListCreateAPIView):
 
     """
     serializer_class = CollectionSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         queryset = Collection.objects.all()
@@ -141,8 +170,8 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditCollection
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditCollection
     )
 
     def get_object(self):
@@ -206,7 +235,7 @@ class MeetingList(generics.ListCreateAPIView):
 
     """
     serializer_class = MeetingSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         queryset = Meeting.objects.all()
@@ -291,8 +320,8 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditCollection
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditCollection
     )
 
     def get_object(self):
@@ -337,8 +366,8 @@ class CollectionGroupList(generics.ListCreateAPIView):
 
     """
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditGroup
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditGroup
     )
 
     def get_serializer_class(self):
@@ -397,8 +426,8 @@ class GroupList(generics.ListCreateAPIView):
     """
     serializer_class = GroupSerializer
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditGroup
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditGroup
     )
 
     def get_serializer_context(self):
@@ -471,8 +500,8 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditGroup
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditGroup
     )
 
     def get_object(self):
@@ -539,7 +568,7 @@ class CollectionItemList(generics.ListCreateAPIView):
     #This Request/Response
     """
     serializer_class = ItemSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         user = self.request.user
@@ -609,7 +638,7 @@ class GroupItemList(generics.ListCreateAPIView):
     """
 
     serializer_class = ItemSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         user = self.request.user
@@ -694,7 +723,7 @@ class ItemList(generics.ListCreateAPIView):
 
     """
     serializer_class = ItemSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_serializer_context(self):
         context = super(ItemList, self).get_serializer_context()
@@ -784,8 +813,8 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
     permission_classes = (
-      drf_permissions.IsAuthenticatedOrReadOnly,
-      CanEditItem
+        drf_permissions.IsAuthenticatedOrReadOnly,
+        CanEditItem
     )
 
     def get_serializer_context(self):
@@ -888,6 +917,7 @@ class UserList(generics.ListAPIView):
 
     """
     serializer_class = UserSerializer
+
     # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
@@ -945,6 +975,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     #This Request/Response
     """
     serializer_class = UserSerializer
+
     # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
     def get_object(self):
