@@ -218,26 +218,22 @@ class CollectionSerializer(serializers.Serializer):
     tags = serializers.CharField(required=False, allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
-    created_by_org = serializers.CharField(allow_blank=True, required=False)
-    # created_by = RelationshipField(
-    #     related_view='user-detail',
-    #     related_view_kwargs={'user_id': '<created_by.pk>'},
-    # )
-    # import ipdb; ipdb.set_trace()
+    created_by = RelationshipField(
+        related_view='user-detail',
+        related_view_kwargs={'user_id': '<created_by.pk>'},
+    )
     created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
-    # groups = RelationshipField(
-    #     related_view='collection-group-list',
-    #     related_view_kwargs={'pk': '<pk>'}
-    # )
-    # items = RelationshipField(
-    #     related_view='collection-item-list',
-    #     related_view_kwargs={'pk': '<pk>'}
-    # )
-    # ipdb.set_trace()
+    groups = RelationshipField(
+        related_view='collection-group-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
+    items = RelationshipField(
+        related_view='collection-item-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=Group.objects.all())
-    # ipdb.set_trace()
     items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all())
 
     class Meta:
@@ -269,14 +265,14 @@ class MeetingSerializer(CollectionSerializer):
     address = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     start_date = serializers.DateTimeField(allow_null=True, required=False)
     end_date = serializers.DateTimeField(allow_null=True, required=False)
-    # groups = RelationshipField(
-    #     related_view='meeting-group-list',
-    #     related_view_kwargs={'pk': '<pk>'}
-    # )
-    # items = RelationshipField(
-    #     related_view='meeting-item-list',
-    #     related_view_kwargs={'pk': '<pk>'}
-    # )
+    groups = RelationshipField(
+        related_view='meeting-group-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
+    items = RelationshipField(
+        related_view='meeting-item-list',
+        related_view_kwargs={'pk': '<pk>'}
+    )
 
     class Meta:
         model = Meeting
@@ -305,8 +301,7 @@ class MeetingSerializer(CollectionSerializer):
 
 
 class GroupMeetingSerializer(GroupSerializer):
-    # items = RelationshipField(
-    #     related_view='meeting-group-item-list',
-    #     related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
-    # )
-    pass
+    items = RelationshipField(
+        related_view='meeting-group-item-list',
+        related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
+    )
