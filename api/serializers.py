@@ -233,8 +233,6 @@ class CollectionSerializer(serializers.Serializer):
         related_view='collection-item-list',
         related_view_kwargs={'pk': '<pk>'}
     )
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=Group.objects.all())
-    items = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all())
 
     class Meta:
         model = Collection
