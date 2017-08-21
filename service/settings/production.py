@@ -6,7 +6,8 @@ import dj_database_url
 from .base import *
 
 ALLOWED_HOSTS = [
-    'osf-collections.herokuapp.com'
+    'osf-collections.herokuapp.com',
+    '*'
 ]
 
 DEBUG=True
