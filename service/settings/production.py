@@ -11,6 +11,7 @@ ALLOWED_HOSTS = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = ['cos-labs.github.io']
 
 DEBUG=True
 SECRET_KEY = os.environ['SECRET_KEY']
