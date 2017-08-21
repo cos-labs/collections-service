@@ -153,7 +153,8 @@ AUTHENTICATION_BACKENDS = [
 CORS_PREFLIGHT_MAX_AGE = 1
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
-    'localhost:4200'
+    'localhost:4200',
+    'osf-collections.herokuapp.com'
 )
 
 AUTH_USER_MODEL = 'api.User'
