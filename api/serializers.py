@@ -218,11 +218,11 @@ class CollectionSerializer(serializers.Serializer):
     tags = serializers.CharField(required=False, allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
+    created_by_org = serializers.CharField(allow_blank=True, required=False)
     created_by = RelationshipField(
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
     )
-    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     groups = RelationshipField(
