@@ -81,7 +81,7 @@ OAUTH2_PROVIDER = {
     }
 }
 
-LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_URL', 'http://localhost:4200/')
+LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_URL', 'https://cos-labs.github.io/collections/#/')
 ACCOUNT_LOGOUT_REDIRECT_URL = os.environ.get('ACCOUNT_LOGOUT_REDIRECT_URL', '/api/')
 SOCIALACCOUNT_ADAPTER = 'osf_oauth2_adapter.views.OSFOAuth2Adapter'
 SOCIALACCOUNT_PROVIDERS = \
