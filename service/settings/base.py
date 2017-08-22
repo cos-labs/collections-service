@@ -154,7 +154,8 @@ CORS_PREFLIGHT_MAX_AGE = 1
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'localhost:4200',
-    'osf-collections.herokuapp.com'
+    'osf-collections.herokuapp.com',
+    'dev-labs-2.cos.io'
 )
 
 AUTH_USER_MODEL = 'api.User'
