@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
+from rest_framework_json_api import pagination
 from rest_framework import exceptions as drf_exceptions
 from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
@@ -39,6 +40,11 @@ class UserSearchView(HaystackViewSet):
     index_models = [User]
     serializer_class = UserSearchSerializer
 
+
+class LargeResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 @api_view(['GET'])
 def api_root(request):
@@ -568,7 +574,8 @@ class CollectionItemList(generics.ListCreateAPIView):
     #This Request/Response
     """
     serializer_class = ItemSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
+    pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         user = self.request.user

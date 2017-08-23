@@ -6,8 +6,13 @@ import dj_database_url
 from .base import *
 
 ALLOWED_HOSTS = [
-    'osf-collections.herokuapp.com'
+    'osf-collections.herokuapp.com',
+    'dev-labs-2.cos.io',
+    '*'
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = ['dev-labs-2.cos.io']
 
 DEBUG=True
 SECRET_KEY = os.environ['SECRET_KEY']
