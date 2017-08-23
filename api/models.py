@@ -18,8 +18,8 @@ class CollectionBase(TypedModel):
     created_by_org = models.CharField(null=True, blank=True, max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    settings = JSONField(default={})
-    submission_settings = JSONField(default={})
+    settings = JSONField(default={}, blank=True)
+    submission_settings = JSONField(default={}, blank=True)
 
     def __str__(self):
         return self.title

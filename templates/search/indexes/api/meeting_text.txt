@@ -1,0 +1,7 @@
+{{object.title}}
+{{object.description}}
+{{object.tags}}
+{{object.created_by.first_name}} {{object.created_by.last_name}}
+{{object.created_by.id}}
+{{object.start_date}}
+{{object.end_date}}
