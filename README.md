@@ -79,6 +79,10 @@ Set up the backend to use either staging or prod. Do this in the sessions for bo
 * Set the client id and secret key to the ones defined in your developer app
 * Select http://localhost:8000/ as the site
 
+## Build the search index
+* `python manage.py rebuild_index`
+* This needs to be done on first run / population and then on a semi-regular basis when running the API to index new content from the API.
+
 ## Populating the database
 * Before moving forward, make sure you've logged into the test server using your OSF staging credentials.
 * To populate the database with users, meetings, collections, and items, run `$ python populate.py` from the project root.
