@@ -281,7 +281,7 @@ class MeetingSerializer(CollectionSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         meeting = Meeting.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_meeting_items', user, CollectionBase(meeting))
+        assign_perm('api.approve_meeting_items', user, meeting)
         return meeting
 
     def update(self, meeting, validated_data):
