@@ -81,6 +81,7 @@ class ItemSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField(allow_null=True, required=False)
     end_time = serializers.DateTimeField(allow_null=True, required=False)
     category = serializers.ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
+    file_link = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = Item
@@ -163,6 +164,7 @@ class ItemSerializer(serializers.Serializer):
         item.start_time = validated_data.get('start_time', item.start_time)
         item.end_time = validated_data.get('end_time', item.end_time)
         item.category = validated_data.get('category', item.category)
+        item.file_link = validated_data.get('file_link', item.file_link)
         item.save()
         return item
 
