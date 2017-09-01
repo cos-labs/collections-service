@@ -1,16 +1,11 @@
 meetings_json = {
-  "collectionType": "preprint",
+  "collectionType": "Meeting",
   "branding": {
     "colors": {
       "primary": "#444",
       "secondary": "#fff",
       "background": "#000",
       "text": "#fff"
-    },
-    "logo": {
-      "label": "OSF Preprints",
-      "url": "https://osf.io/preprints/assets/img/preprints-logo-bb26fbaa227c1fc8b5cc6f8c7d1705e69c18bfd9.png",
-      "height": "70px"
     }
   },
   "layout": [

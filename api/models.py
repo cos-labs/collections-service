@@ -20,6 +20,7 @@ class CollectionBase(TypedModel):
     date_updated = models.DateTimeField(auto_now=True)
     settings = JSONField(default={}, blank=True)
     submission_settings = JSONField(default={}, blank=True)
+    collection_type = models.CharField(max_length=50)
 
     def __str__(self):
         return self.title

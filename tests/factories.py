@@ -46,6 +46,7 @@ class CollectionFactory(factory.Factory):
     tags = "foo, bar, baz"
     settings = {}
     submission_settings = {}
+    collection_type = "Meeting"
 
 
 class MeetingFactory(factory.Factory):
