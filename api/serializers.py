@@ -98,9 +98,9 @@ class ItemSerializer(serializers.Serializer):
         allow_all = None
         if collection.settings:
             allow_all = collection.settings.get('allow_all', None)
-            collection_type = collection.settings.get('type', None)
-            if collection_type and validated_data['type'] != collection_type:
-                raise ValueError('Collection only accepts items of type ' + collection_type)
+        collection_type = collection.collection_type
+        if collection_type and validated_data['type'] != collection_type:
+            raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
         if user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items',
@@ -223,6 +223,7 @@ class CollectionSerializer(serializers.Serializer):
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
     )
+    collection_type = serializers.CharField()
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     groups = RelationshipField(
@@ -271,6 +272,7 @@ class MeetingSerializer(CollectionSerializer):
         related_view='meeting-item-list',
         related_view_kwargs={'pk': '<pk>'}
     )
+    collection_type = serializers.CharField()
 
     class Meta:
         model = Meeting
