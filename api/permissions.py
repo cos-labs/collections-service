@@ -1,11 +1,11 @@
 from rest_framework import permissions
-from api.models import CollectionBase, Group, Item
+from api.models import Group, Item, Collection
 
 
 class CanEditCollection(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        assert isinstance(obj, CollectionBase)
+        assert isinstance(obj, Collection)
         user = request.user
         if request.method in permissions.SAFE_METHODS:
             return True
