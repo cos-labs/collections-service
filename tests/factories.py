@@ -50,7 +50,7 @@ class CollectionFactory(factory.Factory):
 
 
 class MeetingFactory(CollectionFactory):
-    collection_type = "Meeting"
+    collection_type = "meeting"
     address = factory.Faker('address')
     location = factory.Faker('city')
     start_date = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
