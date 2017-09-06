@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
-from typedmodels.models import TypedModel
 
 
 class User(AbstractUser):
@@ -10,7 +9,7 @@ class User(AbstractUser):
     gravatar = models.URLField(blank=True)
 
 
-class CollectionBase(TypedModel):
+class Collection(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     tags = models.TextField(null=True, blank=True)
@@ -21,12 +20,12 @@ class CollectionBase(TypedModel):
     settings = JSONField(default={}, blank=True)
     submission_settings = JSONField(default={}, blank=True)
     collection_type = models.CharField(max_length=50)
+    location = models.CharField(max_length=200)
+    start_datetime = models.DateTimeField(null=True, blank=True)
+    end_datetime = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.title
-
-
-class Collection(CollectionBase):
 
     class Meta:
         permissions = (
@@ -34,22 +33,10 @@ class Collection(CollectionBase):
         )
 
 
-class Meeting(CollectionBase):
-    location = models.CharField(null=True, blank=True, default=None, max_length=200)
-    address = models.CharField(null=True, blank=True, default=None, max_length=200)
-    start_date = models.DateTimeField(null=True, blank=True, default=None)
-    end_date = models.DateTimeField(null=True, blank=True, default=None)
-
-    class Meta:
-        permissions = (
-            ('approve_meeting_items', 'Approve meeting items'),
-        )
-
-
 class Group(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    collection = models.ForeignKey(to='CollectionBase', related_name='groups')
+    collection = models.ForeignKey(to='Collection', related_name='groups')
     created_by = models.ForeignKey(User)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -82,7 +69,7 @@ class Item(models.Model):
     status = models.CharField(choices=STATUS, null=True, max_length=200)
     source_id = models.CharField(null=True, blank=True, max_length=200)
     url = models.URLField(null=True, blank=True)
-    collection = models.ForeignKey(to='CollectionBase', related_name='items')
+    collection = models.ForeignKey(to='Collection', related_name='items')
     group = models.ForeignKey(to='Group', null=True, blank=True, default=None, related_name='items')
     created_by = models.ForeignKey(User)
     metadata = JSONField(null=True, blank=True)

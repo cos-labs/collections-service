@@ -6,10 +6,10 @@ from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from api.serializers import CollectionSerializer, CollectionSearchSerializer, MeetingSerializer, \
-    MeetingSearchSerializer, GroupSerializer,GroupMeetingSerializer, ItemSerializer, ItemSearchSerializer, \
-    CollectionBaseSearchSerializer, UserSerializer, UserSearchSerializer
-from api.models import CollectionBase, Collection, Meeting, Group, Item, User
+from api.serializers import CollectionSerializer, CollectionSearchSerializer, \
+    GroupSerializer, ItemSerializer, ItemSearchSerializer, \
+    UserSerializer, UserSearchSerializer
+from api.models import Collection, Group, Item, User
 from api.permissions import CanEditCollection, CanEditItem, CanEditGroup
 
 from drf_haystack.viewsets import HaystackViewSet
@@ -18,16 +18,6 @@ from drf_haystack.viewsets import HaystackViewSet
 class CollectionSearchView(HaystackViewSet):
     index_models = [Collection]
     serializer_class = CollectionSearchSerializer
-
-
-class CollectionBaseSearchView(HaystackViewSet):
-    index_models = [CollectionBase]
-    serializer_class = CollectionBaseSearchSerializer
-
-
-class MeetingSearchView(HaystackViewSet):
-    index_models = [Meeting]
-    serializer_class = MeetingSearchSerializer
 
 
 class ItemSearchView(HaystackViewSet):
@@ -182,156 +172,6 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
         return collection
 
 
-class MeetingList(generics.ListCreateAPIView):
-    """ View list of meetings and create a new meeting.
-
-    ## Meeting Attributes
-
-        name                          type                    description
-        =================================================================================================================
-        title                         string                  meeting title
-        description                   string                  meeting description
-        tags                          string                  tags describing the meeting
-        settings                      object                  general settings for the meeting (e.g. collection_type)
-        submission_settings           object                  settings for the meeting's submission form
-        created_by_org                string                  the organization/institution associated with the meeting
-        date_created                  iso8601 timestamp       date/time when the meeting was created
-        date_updated                  iso8601 timestamp       date/time when the meeting was last updated
-        location                      string                  location of the meeting
-        address                       string                  street address of the meeting location
-        start_date                    iso8601 timestamp       date/time when the meeting begins
-        end_date                      iso8601 timestamp       date/time when the meeting ends
-
-    ## Actions
-
-    ### Creating New Meetings
-
-            Method:        POST
-            URL:           /api/meetings
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "meetings",                            # required
-                               "attributes": {
-                                 "title":               {title},              # required
-                                 "description":         {description},        # optional
-                                 "tags":                {tag1, tag2, },       # optional
-                                 "created_by_org":      {created_by_org}      # optional
-                                 "settings":            {settings}            # optional
-                                 "submission_settings": {submission_settings} # optional
-                                 "location":            {location}            # optional
-                                 "address":             {address}             # optional
-                                 "start_date":          {start_date}          # optional
-                                 "end_date":            {end_date}            # optional
-                               }
-                             }
-                           }
-            Success:       201 CREATED + meeting representation
-
-    ## Query Params
-    +  `title=<Str>`: filters meetings by title
-
-    #This Request/Response
-
-    """
-    serializer_class = MeetingSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        queryset = Meeting.objects.all()
-        title = self.request.query_params.get('title', None)
-        if title is not None:
-            queryset = queryset.filter(title__icontains=title)
-        return queryset
-
-
-class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
-    """ Details about a given meeting.
-
-     ## Meeting Attributes
-
-        name                          type                    description
-        =================================================================================================================
-        title                         string                  meeting title
-        description                   string                  meeting description
-        tags                          string                  tags describing the meeting
-        settings                      object                  general settings for the meeting (e.g. collection_type)
-        submission_settings           object                  settings for the meeting's submission form
-        created_by_org                string                  the organization/institution associated with the meeting
-        date_created                  iso8601 timestamp       date/time when the meeting was created
-        date_updated                  iso8601 timestamp       date/time when the meeting was last updated
-        location                      string                  location of the meeting
-        address                       string                  street address of the meeting location
-        start_date                    iso8601 timestamp       date/time when the meeting begins
-        end_date                      iso8601 timestamp       date/time when the meeting ends
-
-    ##Relationships
-
-    ### Groups
-
-    List of groups that belong to this meeting.
-
-    ### Items
-
-    List of top-level items that belong to this meeting.
-
-    ### Created By
-
-    User who created this meeting.
-
-    ## Actions
-
-    ###Update
-
-            Method:        PUT / PATCH
-            URL:           /api/meeting/<meeting_id>
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "meetings",                            # required
-                               "id":   {meeting_id},                          # required
-                               "attributes": {
-                                 "title":               {title},              # required for PUT
-                                 "description":         {description},        # optional
-                                 "tags":                {tag1, tag2, },       # optional
-                                 "created_by_org":      {created_by_org}      # optional
-                                 "settings":            {settings}            # optional
-                                 "submission_settings": {submission_settings} # optional
-                                 "location":            {location}            # optional
-                                 "address":             {address}             # optional
-                                 "start_date":          {start_date}          # optional
-                                 "end_date":            {end_date}            # optional
-                               }
-                             }
-                           }
-            Success:       200 OK + meeting representation
-
-    Note: The `title` is required with PUT requests and optional with PATCH requests.
-
-    ###Delete
-            Method:   DELETE
-            URL:      /api/meetings/<meeting_id>
-            Params:   <none>
-            Success:  204 No Content
-
-    #This Request/Response
-    """
-
-    queryset = Meeting.objects.all()
-    serializer_class = MeetingSerializer
-    permission_classes = (
-        drf_permissions.IsAuthenticatedOrReadOnly,
-        CanEditCollection
-    )
-
-    def get_object(self):
-        try:
-            collection = Meeting.objects.get(id=self.kwargs['pk'])
-        except ObjectDoesNotExist:
-            raise drf_exceptions.NotFound
-        return collection
-
-
 class CollectionGroupList(generics.ListCreateAPIView):
     """ View list of groups in a given collection/meeting, or create a new group in a given collection/meeting.
 
@@ -371,11 +211,7 @@ class CollectionGroupList(generics.ListCreateAPIView):
     )
 
     def get_serializer_class(self):
-        collection = CollectionBase.objects.get(id=self.kwargs['pk'])
-        if collection.type == 'api.meeting':
-            return GroupMeetingSerializer
-        else:
-            return GroupSerializer
+        return GroupSerializer
 
     def get_queryset(self):
         return Group.objects.filter(collection=self.kwargs['pk'])
@@ -573,7 +409,7 @@ class CollectionItemList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         collection_id = self.kwargs['pk']
-        collection = CollectionBase.objects.get(id=collection_id)
+        collection = Collection.objects.get(id=collection_id)
         queryset = Item.objects.filter(collection=collection_id, group=None)
         if user.id == collection.created_by_id:
             return queryset
@@ -643,7 +479,7 @@ class GroupItemList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         collection_id = self.kwargs['pk']
-        collection = CollectionBase.objects.get(id=collection_id)
+        collection = Collection.objects.get(id=collection_id)
         queryset = Item.objects.filter(group=self.kwargs['group_id'])
         if user.id == collection.created_by_id:
             return queryset

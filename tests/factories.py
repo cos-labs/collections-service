@@ -4,7 +4,7 @@ import pytz
 import random
 from . import resources
 
-# TODO: move to sublcassing factory.django.DjangoModelFactory instead of factory.Factory
+# TODO: move to subclassing factory.django.DjangoModelFactory instead of factory.Factory
 
 
 class UserFactory(factory.Factory):
@@ -49,16 +49,10 @@ class CollectionFactory(factory.Factory):
     collection_type = "Meeting"
 
 
-class MeetingFactory(factory.Factory):
-    class Meta:
-        model = models.Meeting
-
+class MeetingFactory(CollectionFactory):
+    collection_type = "Meeting"
     address = factory.Faker('address')
     location = factory.Faker('city')
-    title = factory.Faker('text', max_nb_chars=25)
-    description = factory.Faker('text', max_nb_chars=125)
-    tags = random.choice(["foo", "bar", "baz"])
     start_date = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
     end_date = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
     settings = resources.meetings_json
-    submission_settings = {}

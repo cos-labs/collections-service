@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework_json_api import serializers
-from api.models import CollectionBase, Collection, Meeting, Group, Item, User
+from api.models import Collection, Group, Item, User
 from api.base.serializers import RelationshipField
 from guardian.shortcuts import assign_perm
 from allauth.socialaccount.models import SocialAccount, SocialToken
@@ -14,18 +14,6 @@ class UserSearchSerializer(HaystackSerializer):
     class Meta:
         index_classes = [search_indexes.UserIndex]
         fields = ['text', 'first_name', 'last_name']
-
-
-class CollectionBaseSearchSerializer(HaystackSerializer):
-    class Meta:
-        index_classes = [search_indexes.CollectionBaseIndex]
-        fields = ['text', 'title', 'description', 'created_by']
-
-
-class MeetingSearchSerializer(HaystackSerializer):
-    class Meta:
-        index_classes = [search_indexes.MeetingIndex]
-        fields = ['text', 'title', 'description', 'created_by']
 
 
 class ItemSearchSerializer(HaystackSerializer):
@@ -93,7 +81,7 @@ class ItemSerializer(serializers.Serializer):
         user = self.context['request'].user
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
             'pk', None)
-        collection = CollectionBase.objects.get(id=collection_id)
+        collection = Collection.objects.get(id=collection_id)
 
         allow_all = None
         if collection.settings:
@@ -103,8 +91,7 @@ class ItemSerializer(serializers.Serializer):
             raise ValueError('Collection only accepts items of type ' + collection_type)
 
         status = 'pending'
-        if user.has_perm('api.approve_collection_items', collection) or user.has_perm('api.approve_meeting_items',
-                                                                                      collection) or allow_all:
+        if user.has_perm('api.approve_collection_items', collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
 
@@ -129,12 +116,11 @@ class ItemSerializer(serializers.Serializer):
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
             'pk', None)
         if collection_id:
-            collection = CollectionBase.objects.get(id=collection_id)
+            collection = Collection.objects.get(id=collection_id)
         else:
             collection = item.collection
 
-        if status != item.status and user.has_perm('api.approve_collection_items', collection) or user.has_perm(
-                'api.approve_meeting_items', collection):
+        if status != item.status and user.has_perm('api.approve_collection_items', collection):
             raise exceptions.PermissionDenied(detail='Cannot change submission status.')
         elif user.id != item.created_by_id and validated_data.keys() != ['status']:
             raise exceptions.PermissionDenied(detail='Cannot update another user\'s submission.')
@@ -195,7 +181,7 @@ class GroupSerializer(serializers.Serializer):
         user = self.context['request'].user
         collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
             'pk', None)
-        collection = CollectionBase.objects.get(id=collection_id)
+        collection = Collection.objects.get(id=collection_id)
         return Group.objects.create(
             created_by=user,
             collection=collection,
@@ -257,51 +243,3 @@ class CollectionSerializer(serializers.Serializer):
         collection.created_by_org = validated_data.get('created_by_org', collection.created_by_org)
         collection.save()
         return collection
-
-
-class MeetingSerializer(CollectionSerializer):
-    location = serializers.CharField(allow_blank=True, allow_null=True, required=False)
-    address = serializers.CharField(allow_blank=True, allow_null=True, required=False)
-    start_date = serializers.DateTimeField(allow_null=True, required=False)
-    end_date = serializers.DateTimeField(allow_null=True, required=False)
-    groups = RelationshipField(
-        related_view='meeting-group-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
-    items = RelationshipField(
-        related_view='meeting-item-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
-    collection_type = serializers.CharField()
-
-    class Meta:
-        model = Meeting
-
-    class JSONAPIMeta:
-        resource_name = 'meetings'
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        meeting = Meeting.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_meeting_items', user, meeting)
-        return meeting
-
-    def update(self, meeting, validated_data):
-        meeting.title = validated_data.get('title', meeting.title)
-        meeting.description = validated_data.get('description', meeting.description)
-        meeting.tags = validated_data.get('tags', meeting.tags)
-        meeting.settings = validated_data.get('settings', meeting.settings)
-        meeting.submission_settings = validated_data.get('submission_settings', meeting.submission_settings)
-        meeting.created_by_org = validated_data.get('created_by_org', meeting.created_by_org)
-        meeting.location = validated_data.get('location', meeting.location)
-        meeting.start_date = validated_data.get('start_date', meeting.start_date)
-        meeting.end_date = validated_data.get('end_date', meeting.end_date)
-        meeting.save()
-        return meeting
-
-
-class GroupMeetingSerializer(GroupSerializer):
-    items = RelationshipField(
-        related_view='meeting-group-item-list',
-        related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
-    )
