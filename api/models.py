@@ -76,6 +76,7 @@ class Item(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_submitted = models.DateTimeField(null=True, blank=True, default=None)
     date_accepted = models.DateTimeField(null=True, blank=True, default=None)
+    file_link = models.TextField(null=True, blank=True)
     location = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_time = models.DateTimeField(null=True, blank=True, default=None)
     end_time = models.DateTimeField(null=True, blank=True, default=None)
