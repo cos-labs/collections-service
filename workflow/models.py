@@ -38,7 +38,7 @@ class WidgetParameterMapping(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64, blank=False, null=False)
     parameter = models.ForeignKey('Parameter', related_name='widget_parameter_mappings', null=True)
-    case = models.ForeignKey('Case', null=True)
+    case = models.ForeignKey('Case', related_name='widget_parameter_mappings', null=True)
     workflow = models.ForeignKey('Workflow', related_name='widget_parameter_mappings', null=False)
     def __str__(self):
         return self.name
@@ -60,4 +60,4 @@ class Case(models.Model):
     id = models.AutoField(primary_key=True)
     workflow = models.ForeignKey('Workflow', related_name='cases')
     def __str__(self):
-        return self.id
+        return str(self.id)

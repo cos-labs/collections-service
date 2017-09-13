@@ -17,7 +17,7 @@ class Workflow(ModelSerializer):
         fields = [
             'id',
             'title',
-            'decription',
+            'description',
             'initialization_values',
             'sections',
             'widgets',

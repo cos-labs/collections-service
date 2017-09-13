@@ -155,6 +155,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
+# REST FRAMEWORK
+JSON_API_PLURALIZE_TYPES = True
+JSON_API_FORMAT_TYPES = 'camelize'
+JSON_API_FORMAT_KEYS = 'dasherize'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
