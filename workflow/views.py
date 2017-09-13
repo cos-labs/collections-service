@@ -30,9 +30,9 @@ class Widget(viewsets.ModelViewSet):
         return self.queryset
 
 
-class ParameterMapping(viewsets.ModelViewSet):
-    queryset = models.ParameterMapping.objects.all()
-    serializer_class = serializers.ParameterMapping
+class WidgetParameterMapping(viewsets.ModelViewSet):
+    queryset = models.WidgetParameterMapping.objects.all()
+    serializer_class = serializers.WidgetParameterMapping
 
     def get_queryset(self):
         return self.queryset

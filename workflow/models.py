@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
 
 
-class Workflow(models.Model)
+class Workflow(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, blank=False)
     description = models.TextField(null=False, blank=True)
@@ -23,8 +23,8 @@ class Widget(models.Model):
     label = models.CharField(max_length=128, null=False, blank=False)
     description = models.TextField(null=False, blank=True)
     widget_type = models.CharField(max_length=24, blank=False, null=False)
-    parameter_mappings = models.ManyToMany('WidgetParameterMapping', related_name='consumer_widgets')
-    section = models.ForiegnKey('Section', related_name='widgets', null=False)
+    parameter_mappings = models.ManyToManyField('WidgetParameterMapping', related_name='consumer_widgets')
+    section = models.ForeignKey('Section', related_name='widgets', null=False)
     workflow = models.ForeignKey('Workflow', related_name='widgets', null=False)
 
 
