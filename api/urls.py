@@ -2,13 +2,17 @@ from django.conf.urls import url, include
 import api.views
 from rest_framework.routers import DefaultRouter
 
+from workflow.routers import workflow_router
+
 router = DefaultRouter()
 router.register("collections/search", api.views.CollectionSearchView, base_name="collection-search")
 router.register("items/search", api.views.ItemSearchView, base_name="item-search")
 router.register("users/search", api.views.UserSearchView, base_name="user-search")
 
 urlpatterns = [
+
     url(r'', include(router.urls)),
+    url(r'', include(workflow_router.urls)),
     url(r'^$', api.views.api_root),
     url(r'^collections/$', api.views.CollectionList.as_view(), name='collection-list'),
     url(r'^collections/(?P<pk>\w+)/$', api.views.CollectionDetail.as_view(), name='collection-detail'),
@@ -18,6 +22,7 @@ urlpatterns = [
     url(r'^collections/(?P<pk>\w+)/groups/(?P<group_id>\w+)/items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='group-item-detail'),
     url(r'^collections/(?P<pk>\w+)/items/$', api.views.CollectionItemList.as_view(), name='collection-item-list'),
     url(r'^collections/(?P<pk>\w+)/items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='collection-item-detail'),
+
 
     url(r'^groups/$', api.views.GroupList.as_view(), name='group-list'),
     url(r'^groups/(?P<group_id>\w+)/$', api.views.GroupDetail.as_view(), name='group-detail'),
