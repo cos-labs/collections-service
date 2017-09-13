@@ -37,7 +37,8 @@ class Section(ModelSerializer):
             'label',
             'description',
             'workflow',
-            'widgets'
+            'widgets',
+            'index'
         ]
 
 
@@ -53,7 +54,8 @@ class Widget(ModelSerializer):
             'widget_type',
             'parameter_mappings',
             'section',
-            'workflow'
+            'workflow',
+            'index'
         ]
 
 
