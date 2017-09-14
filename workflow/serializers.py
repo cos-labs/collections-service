@@ -52,7 +52,7 @@ class Widget(ModelSerializer):
             'label',
             'description',
             'widget_type',
-            'parameter_mappings',
+            'widget_parameter_mappings',
             'section',
             'workflow',
             'index'
@@ -69,7 +69,7 @@ class WidgetParameterMapping(ModelSerializer):
             'name',
             'parameter',
             'workflow',
-            'consumer_widgets'
+            'widget'
         ]
 
 

@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 import api.views
 from rest_framework.routers import DefaultRouter
 
-from workflow.routers import workflow_router
+from workflow.routers import workflow_router, case_router
 
 router = DefaultRouter()
 router.register("collections/search", api.views.CollectionSearchView, base_name="collection-search")
@@ -11,9 +11,10 @@ router.register("users/search", api.views.UserSearchView, base_name="user-search
 
 urlpatterns = [
 
+    url(r'^$', api.views.api_root),
     url(r'', include(router.urls)),
     url(r'', include(workflow_router.urls)),
-    url(r'^$', api.views.api_root),
+    url(r'', include(case_router.urls)),
     url(r'^collections/$', api.views.CollectionList.as_view(), name='collection-list'),
     url(r'^collections/(?P<pk>\w+)/$', api.views.CollectionDetail.as_view(), name='collection-detail'),
     url(r'^collections/(?P<pk>\w+)/groups/$', api.views.CollectionGroupList.as_view(), name='collection-group-list'),

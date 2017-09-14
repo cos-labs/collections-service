@@ -27,7 +27,6 @@ class Widget(models.Model):
     label = models.CharField(max_length=128, null=False, blank=False)
     description = models.TextField(null=False, blank=True)
     widget_type = models.CharField(max_length=24, blank=False, null=False)
-    parameter_mappings = models.ManyToManyField('WidgetParameterMapping', related_name='consumer_widgets')
     section = models.ForeignKey('Section', related_name='widgets', null=False)
     workflow = models.ForeignKey('Workflow', related_name='widgets', null=False)
     index = models.IntegerField(null=True, blank=True)
@@ -37,6 +36,7 @@ class Widget(models.Model):
 class WidgetParameterMapping(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64, blank=False, null=False)
+    widget = models.ForeignKey('Widget', related_name='widget_parameter_mappings', null=True)
     parameter = models.ForeignKey('Parameter', related_name='widget_parameter_mappings', null=True)
     case = models.ForeignKey('Case', related_name='widget_parameter_mappings', null=True)
     workflow = models.ForeignKey('Workflow', related_name='widget_parameter_mappings', null=False)
@@ -48,7 +48,7 @@ class Parameter(models.Model):
     name = models.CharField(max_length=64, blank=False)
     value = JSONField()
     properties = JSONField()
-    case = models.ForeignKey('Case', null=True)
+    case = models.ForeignKey('Case', related_name='parameters', null=True)
     workflow = models.ForeignKey('Workflow', related_name='parameters', null=False)
     def __str__(self):
         return self.name

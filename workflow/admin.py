@@ -87,6 +87,7 @@ class SectionAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'label',
+        'index',
         'get_workflow_name',
         'description'
     ]

@@ -43,7 +43,10 @@ class Parameter(viewsets.ModelViewSet):
     serializer_class = serializers.Parameter
 
     def get_queryset(self):
-        return self.queryset
+        queryset = self.queryset
+        if self.kwargs['case_pk']:
+            queryset = queryset.filter(case__id=self.kwargs['case_pk'])
+        return queryset
 
 
 class Case(viewsets.ModelViewSet):
