@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 
 
 class Workflow(models.Model):
+
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, blank=False)
     description = models.TextField(null=False, blank=True)
@@ -12,6 +13,7 @@ class Workflow(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
@@ -59,5 +61,10 @@ class Parameter(models.Model):
 class Case(models.Model):
     id = models.AutoField(primary_key=True)
     workflow = models.ForeignKey('Workflow', related_name='cases')
+
+    def save(self, *args, **kwargs):
+        import ipdb; ipdb.set_trace()
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.id)

@@ -137,7 +137,9 @@ class ParameterAdmin(admin.ModelAdmin):
 
 
     def get_case_id(self, object):
-        return object.case.id
+        if object.case:
+            return object.case.id
+        return ''
 
     get_case_id.admin_order_field = 'id'
     get_case_id.short_description = 'case'

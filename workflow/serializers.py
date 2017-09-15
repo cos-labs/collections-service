@@ -3,6 +3,7 @@
 
 
 from rest_framework.serializers import CharField, ModelSerializer
+from rest_framework_json_api.relations import ResourceRelatedField
 from rest_framework_json_api import serializers, relations
 from django.contrib.auth.models import User, Group
 
@@ -90,6 +91,9 @@ class Parameter(ModelSerializer):
 
 
 class Case(ModelSerializer):
+
+    parameters = ResourceRelatedField(many=True, required=False, queryset=models.Parameter.objects.all())
+    workflow = ResourceRelatedField(many=False, required=True, queryset=models.Workflow.objects.all())
 
     class Meta:
         resource_name = 'cases'
