@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from workflow.models import Workflow, Section, Widget, WidgetParameterMapping, Parameter, Case
+from workflow.models import Workflow, Section, Widget, ParameterAlias, ParameterStub, Parameter, Case
 
 from django.contrib.admin import SimpleListFilter
 
@@ -112,8 +112,21 @@ class WidgetAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(WidgetParameterMapping)
-class WidgetParameterMappingAdmin(admin.ModelAdmin):
+@admin.register(ParameterAlias)
+class ParameterAliasAdmin(admin.ModelAdmin):
+
+    list_display = [
+        'id',
+        'alias'
+    ]
+
+    list_filter = [
+        WorkflowListFilter
+    ]
+
+
+@admin.register(ParameterStub)
+class ParameterStubAdmin(admin.ModelAdmin):
 
     list_display = [
         'id',
