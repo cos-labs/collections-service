@@ -117,7 +117,9 @@ class ParameterAliasAdmin(admin.ModelAdmin):
 
     list_display = [
         'id',
-        'alias'
+        'alias',
+        'widget',
+        'parameter_stub'
     ]
 
     list_filter = [
