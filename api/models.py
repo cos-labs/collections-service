@@ -50,7 +50,8 @@ class Item(models.Model):
         ('registration', 'registration'),
         ('presentation', 'presentation'),
         ('website', 'website'),
-        ('event', 'event')
+        ('event', 'event'),
+        ('meeting', 'meeting')
     )
     STATUS = (
         ('none', 'none'),

@@ -1,5 +1,4 @@
 meetings_json = {
-  "collectionType": "Meeting",
   "branding": {
     "colors": {
       "primary": "#444",
