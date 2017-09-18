@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from workflow.models import Workflow, Section, Widget, WidgetParameterMapping, Parameter, Case
+from workflow.models import Workflow, Section, Widget, ParameterAlias, ParameterStub, Parameter, Case
 
 from django.contrib.admin import SimpleListFilter
 
@@ -87,6 +87,7 @@ class SectionAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'label',
+        'index',
         'get_workflow_name',
         'description'
     ]
@@ -111,8 +112,23 @@ class WidgetAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(WidgetParameterMapping)
-class WidgetParameterMappingAdmin(admin.ModelAdmin):
+@admin.register(ParameterAlias)
+class ParameterAliasAdmin(admin.ModelAdmin):
+
+    list_display = [
+        'id',
+        'alias',
+        'widget',
+        'parameter_stub'
+    ]
+
+    list_filter = [
+        WorkflowListFilter
+    ]
+
+
+@admin.register(ParameterStub)
+class ParameterStubAdmin(admin.ModelAdmin):
 
     list_display = [
         'id',
@@ -136,7 +152,9 @@ class ParameterAdmin(admin.ModelAdmin):
 
 
     def get_case_id(self, object):
-        return object.case.id
+        if object.case:
+            return object.case.id
+        return ''
 
     get_case_id.admin_order_field = 'id'
     get_case_id.short_description = 'case'
