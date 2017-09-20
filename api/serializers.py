@@ -55,21 +55,22 @@ class UserSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
-    description = serializers.CharField(required=False)
     type = serializers.ChoiceField(
         choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
+    description = serializers.CharField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
-    source_id = serializers.CharField(required=False)
-    url = serializers.URLField(required=False)
+    source_id = serializers.CharField(required=False, allow_null=True)
+    url = serializers.URLField(required=False, allow_null=True)
     created_by = UserSerializer(read_only=True)
-    metadata = serializers.JSONField(required=False)
+    metadata = serializers.JSONField(required=False, allow_null=True)
     date_created = serializers.DateTimeField(read_only=True)
     date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
     date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
     location = serializers.CharField(allow_null=True, required=False)
     start_time = serializers.DateTimeField(allow_null=True, required=False)
     end_time = serializers.DateTimeField(allow_null=True, required=False)
-    category = serializers.ChoiceField(choices=['none', 'talk', 'poster'])
+    category = serializers.ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
+    file_link = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = Item
@@ -150,6 +151,7 @@ class ItemSerializer(serializers.Serializer):
         item.start_time = validated_data.get('start_time', item.start_time)
         item.end_time = validated_data.get('end_time', item.end_time)
         item.category = validated_data.get('category', item.category)
+        item.file_link = validated_data.get('file_link', item.file_link)
         item.save()
         return item
 
