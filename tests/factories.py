@@ -46,13 +46,13 @@ class CollectionFactory(factory.Factory):
     tags = "foo, bar, baz"
     settings = {}
     submission_settings = {}
-    collection_type = "Meeting"
+    collection_type = "meeting"
 
 
 class MeetingFactory(CollectionFactory):
     collection_type = "meeting"
     address = factory.Faker('address')
     location = factory.Faker('city')
-    start_date = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
-    end_date = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
+    start_datetime = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
+    end_datetime = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
     settings = resources.meetings_json

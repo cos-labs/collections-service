@@ -6,6 +6,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+service/settings/whoosh_index/*
+
 # C extensions
 *.so
 
@@ -64,3 +66,5 @@ local.py
 # documentation
 docs/_build/ # Sphinx
 /site # mkdocs
+
+*.DS_Store
