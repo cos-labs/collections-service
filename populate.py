@@ -20,26 +20,6 @@ import datetime
 import pytz
 
 owner = models.User.objects.get(pk=3)
-# collections = factories.CollectionFactory.build_batch(10, created_by=owner)
-# for c in collections:
-#     c.save()
-#     users = factories.UserFactory.build_batch(9) + [owner]
-#     for u in users:
-#         if not models.User.objects.all().filter(username=u.username).exists():
-#             print("new user: " + u.username)
-#             u.save()
-#         else:
-#             u = models.User.objects.get(username=u.username)
-#         items = factories.ItemFactory.build_batch(random.randint(1, 10), collection=c, created_by=u)
-#         for i in items:
-#             print("new item: " + i.title)
-#             i.status = random.choice(
-#                 ['approved', 'approved', 'approved', 'approved', 'pending', 'pending', 'rejected'])
-#             i.date_submitted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
-#             i.date_accepted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
-#             i.type = 'preprint'
-#             i.save()
-
 
 meetings = factories.MeetingFactory.build_batch(10, created_by=owner)
 for m in meetings:
