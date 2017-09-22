@@ -1,0 +1,13 @@
+[Service]
+ExecStart=/root/.pyenv/versions/3.6.2/bin/uwsgi --plugin python --chdir /srv/collections-service --socket 127.0.0.1:8000 --wsgi-file /srv/collections-service/service/wsgi.py --virtualenv /root/.pyenv/versions/3.6.2
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=collectionsservice
+User=root
+Group=root
+Environment='DJANGO_SETTINGS_MODULE=service.settings.production'
+Environment='BACKEND=prod'
+
+[Install]
+WantedBy=multi-user.target
