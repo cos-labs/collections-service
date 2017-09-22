@@ -26,7 +26,7 @@ class ItemFactory(factory.Factory):
     title = factory.Faker('text', max_nb_chars=75)
     description = factory.Faker('text', max_nb_chars=500)
     status = 'approved'
-    source_id = 'fxsa9'
+    source_id = 'xrfye'
 
 
 class GroupFactory(factory.Factory):
