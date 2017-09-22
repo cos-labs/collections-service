@@ -94,6 +94,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('date_submitted', models.DateTimeField(blank=True, default=None, null=True)),
                 ('date_accepted', models.DateTimeField(blank=True, default=None, null=True)),
+                ('file_link', models.TextField(blank=True, null=True)),
                 ('location', models.CharField(blank=True, default=None, max_length=200, null=True)),
                 ('start_time', models.DateTimeField(blank=True, default=None, null=True)),
                 ('end_time', models.DateTimeField(blank=True, default=None, null=True)),
