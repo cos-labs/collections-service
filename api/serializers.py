@@ -55,9 +55,9 @@ class UserSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
-    description = serializers.CharField(required=False, allow_null=True)
     type = serializers.ChoiceField(
         choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
+    description = serializers.CharField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
     source_id = serializers.CharField(required=False, allow_null=True)
     url = serializers.URLField(required=False, allow_null=True)

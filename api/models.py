@@ -21,6 +21,7 @@ class Collection(models.Model):
     submission_settings = JSONField(default={}, blank=True)
     collection_type = models.CharField(max_length=50)
     location = models.CharField(max_length=200)
+    address = models.CharField(max_length=200)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
 
@@ -82,3 +83,4 @@ class Item(models.Model):
     start_time = models.DateTimeField(null=True, blank=True, default=None)
     end_time = models.DateTimeField(null=True, blank=True, default=None)
     category = models.CharField(choices=CATEGORIES, null=True, blank=True, max_length=200)
+    file_link = models.CharField(null=True, blank=True, max_length=1000)
