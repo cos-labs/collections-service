@@ -11,6 +11,8 @@ from workflow import models
 
 class Workflow(ModelSerializer):
 
+    initialization_values = JSONField(required=False)
+
     class Meta:
         resource_name = 'workflow'
         model = models.Workflow
@@ -19,6 +21,7 @@ class Workflow(ModelSerializer):
             'title',
             'description',
             'initialization_values',
+            'workflow_config',
             'sections',
             'widgets',
             'parameter_aliases',

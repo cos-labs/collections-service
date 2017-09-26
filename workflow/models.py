@@ -13,7 +13,8 @@ class Workflow(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, blank=False)
     description = models.TextField(null=False, blank=True)
-    initialization_values = JSONField()
+    initialization_values = JSONField(default={})
+    workflow_config = JSONField(default={})
 
     class JSONAPIMeta:
         resource_name = 'workflows'
