@@ -1,2 +1,4 @@
 {{object.title}}
 {{object.description}}
+{{object.collection__title}}
+{{object.created_by__full_name}}
