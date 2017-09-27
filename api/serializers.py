@@ -13,13 +13,13 @@ from drf_haystack.serializers import HaystackSerializer
 class UserSearchSerializer(HaystackSerializer):
     class Meta:
         index_classes = [search_indexes.UserIndex]
-        fields = ['text', 'first_name', 'last_name']
+        fields = ['text', 'first_name', 'last_name', 'full_name', 'email']
 
 
 class ItemSearchSerializer(HaystackSerializer):
     class Meta:
         index_classes = [search_indexes.ItemIndex]
-        fields = ['text', 'title', 'description', 'created_by']
+        fields = ['text', 'title', 'description', 'created_by', 'collection']
 
 
 class CollectionSearchSerializer(HaystackSerializer):
@@ -34,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login',
+            'id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'date_joined', 'last_login',
             'is_active', 'gravatar', 'token'
         )
 
@@ -70,7 +70,7 @@ class ItemSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField(allow_null=True, required=False)
     end_time = serializers.DateTimeField(allow_null=True, required=False)
     category = serializers.ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
-    file_link = serializers.CharField(allow_null=True, required=False)
+    file_link = serializers.CharField(allow_null=True, allow_blank=True, required=False)
 
     class Meta:
         model = Item

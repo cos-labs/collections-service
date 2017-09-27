@@ -4,8 +4,6 @@ import pytz
 import random
 from . import resources
 
-# TODO: move to subclassing factory.django.DjangoModelFactory instead of factory.Factory
-
 
 class UserFactory(factory.Factory):
     class Meta:
@@ -55,4 +53,3 @@ class MeetingFactory(CollectionFactory):
     location = factory.Faker('city')
     start_datetime = factory.Faker('date_time_between', start_date="-1w", end_date="-1d", tzinfo=pytz.timezone('US/Eastern'))
     end_datetime = factory.Faker('date_time_between', start_date="+1d", end_date="+1w", tzinfo=pytz.timezone('US/Eastern'))
-    settings = resources.meetings_json
