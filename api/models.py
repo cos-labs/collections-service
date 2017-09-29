@@ -37,7 +37,7 @@ class Collection(models.Model):
                 self.settings = resources.meeting_json
             elif self.collection_type == 'dataset':
                 self.settings = resources.dataset_json
-        super(Collection, self).save(args, kwargs)
+        super(Collection, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
