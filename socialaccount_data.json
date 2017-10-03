@@ -1,0 +1,1 @@
+[{"model": "socialaccount.socialapp", "pk": 1, "fields": {"provider": "osf", "name": "OSF Collections", "client_id": "55b229c83f6946fe8c16b86217781028", "secret": "70z9QBGWmYlFoXUr6HYZoi3QPr4ksafSEbJvTyNr", "key": "", "sites": [3]}}]

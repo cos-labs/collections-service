@@ -13,86 +13,41 @@ application = get_wsgi_application()
 
 from workflow import models
 
-wf_config = {
-  "title": "Dataset Submission Form",
-  "description": "The dataset submission form allows users to submit data to a data repository.",
-  "initialParameters": {
-    "event-creation-choices": {
-      "value": [
-        {
-          "label": "Use an existing node",
-          "parameter": "useExistingNode"
-        },
-        {
-          "label": "Create a new node",
-          "parameter": "createNewNode"
-        }
-      ]
-    }
-  },
-  "sections": [
-    {
-      "label": "Upload Data",
-      "widgets": [
-        {
-          "label": "Upload a file",
-          "description": "Select the file to upload",
-          "widgetType": "file-uploader",
-          "parameters": {
-            "fileData": "file-data",
-            "fileName": "file-name"
-          }
-        },
-        {
-          "label": "Title",
-          "description": "Enter the title of the file.",
-          "widgetType": "text-field",
-          "parameters": {
-            "value": "title-widget"
-          }
-        }
-      ]
-    },
-    {
-      "label": "File Metadata",
-      "description": "Enter the metadata for the file",
-      "widgets": [
-        {
-          "label": "Metadata",
-          "desciption": "Enter the metadata for the file that is being uploaded",
-          "widgetType": "text-field",
-          "parameters": {
-            "value": "metadata",
-          }
-        },
-      ]
-    },
-    {
-      "label": "Submit",
-      "description": "Submit this talk to the meeting",
-      "widgets": [
-        {
-          "label": "Submit",
-          "description": "Submit this talk",
-          "widgetType": "meeting-submit",
-          "parameters": {
-            "title": "title-widget",
-            "fileData": "file-data",
-            "fileName": "file-name",
-            "metadata": "metadata"
-          }
-        }
-      ]
-    }
-  ]
-}
+import json
+from pprint import pprint
 
+
+
+with open('workflow/schemas/' + sys.argv[1]) as data_file:
+    wf_config = json.load(data_file)
 
 workflow = models.Workflow()
 workflow.title = wf_config.get("title", "")
 workflow.description = wf_config.get("description", "")
 workflow.initialization_values = wf_config.get("initialParameters", {})
 workflow.save()
+
+for name, value in wf_config.get("initialParameters", {}).items():
+
+    try:
+        parameter_stub = models.ParameterStub.objects.filter(workflow_id=workflow.id).get(name=name)
+    except:
+        parameter_stub = models.ParameterStub()
+
+    parameter_stub.name = name
+    parameter_stub.scope = "WORKFLOW"
+    parameter_stub.workflow = workflow
+    parameter_stub.save()
+
+    parameter = models.Parameter()
+    parameter.name = name
+    parameter.value = value.get('value', None)
+    parameter.properties = value.get('properties', None)
+    parameter.stub = parameter_stub
+    parameter.workflow = workflow
+    parameter.save()
+
+
 
 section_index = 0
 for section_config in wf_config.get("sections", []):
@@ -128,12 +83,13 @@ for section_config in wf_config.get("sections", []):
                 parameter_stub = models.ParameterStub.objects.filter(workflow_id=workflow.id).get(name=parameter_name)
             except:
                 parameter_stub = models.ParameterStub()
+                parameter_stub.scope = "CASE"
 
             parameter_alias.alias = alias
             parameter_alias.workflow = workflow
+            parameter_alias.widget = widget
 
             parameter_stub.name = parameter_name
-            parameter_stub.scope = "CASE"
             parameter_stub.workflow = workflow
             parameter_stub.save()
 

@@ -2,16 +2,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
-from tests import resources
 
 
 class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     gravatar = models.URLField(blank=True)
-
-    @property
-    def full_name(self):
-        return self.first_name + " " + self.last_name
 
 
 class Collection(models.Model):
@@ -30,14 +25,13 @@ class Collection(models.Model):
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-
-        if not self.pk:  # if this is the first save, set default settings based on collection_type
-            if self.collection_type == 'meeting':
-                self.settings = resources.meeting_json
-            elif self.collection_type == 'dataset':
-                self.settings = resources.dataset_json
-        super(Collection, self).save(args, kwargs)
+    workflow = models.ForeignKey(
+        'workflow.Workflow',
+        null=True,
+        blank=True,
+        related_name="collections",
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.title

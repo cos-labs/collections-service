@@ -1,0 +1,112 @@
+{
+  "title": "Meeting Submission Form",
+  "description": "The meeting submission form allows users to submit information about their talks",
+  "initialParameters": {
+    "event-creation-choices": {
+      "value": [
+        {
+          "label": "Use an existing node",
+          "parameter": "use-existing-node"
+        },
+        {
+          "label": "Create a new node",
+          "parameter": "create-new-node"
+        }
+      ]
+    }
+  },
+  "sections": [
+    {
+      "Label": "Event Information",
+      "Description": "Add basic information about this meeting event",
+      "widgets": [
+        {
+          "label": "Event Type",
+          "description": "Select the type of event that is being submitted. Events may be \"talk\" or \"poster\"",
+          "widgetType": "text-field",
+          "parameters": {
+            "value": "event-type"
+          }
+        },
+        {
+          "label": "Title",
+          "description": "Enter the title of the file.",
+          "widgetType": "text-field",
+          "parameters": {
+            "value": "title-widget"
+          }
+        },
+        {
+          "label": "Description",
+          "description": "Add a brief description explaining what this talk or poster is about",
+          "widgetType": "text-area",
+          "parameters": {
+            "value": "event-description"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Materials",
+      "description": "Upload the materials that are related to this meeting event",
+      "widgets": [
+        {
+          "label": "Use an existing node",
+          "description": "Any materials related to this talk are stored in an OSF Project. Files are automatically uploaded to a new project. If a project containing the materials that are related to this talk already exists, that project may be selected instead of creating a new one. Click here to learn more about OSF projects. (This link will open in a new window.)",
+          "widgetType": "choice-picker",
+          "parameters": {
+            "choices": "event-creation-choices"
+          }
+        },
+        {
+          "label": "Node Create",
+          "description": "Creates the node when its parameter 'enable' is set to true",
+          "widgetType": "node-creator",
+          "parameters": {
+            "enable": "create-new-node"
+          }
+        },
+        {
+          "label": "Upload Materials",
+          "description": "Select the file to upload",
+          "widgetType": "file-uploader",
+          "parameters": {
+            "fileData": "file-data",
+            "fileName": "file-name"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Speakers",
+      "description": "Add the names of the speakers for this talk",
+      "widgets": [
+        {
+          "label": "Speakers",
+          "description": "Select the names of the people that will be spealing at the talk or are authors of the poster",
+          "widgetType": "osf-user-picker",
+          "parameters": {
+            "users": "event-speakers"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Submit",
+      "description": "Submit this talk to the meeting",
+      "widgets": [
+        {
+          "label": "Submit",
+          "description": "Submit this talk",
+          "widgetType": "meeting-submit",
+          "parameters": {
+            "title": "title-widget",
+            "fileData": "file-data",
+            "fileName": "file-name",
+            "metadata": "metadata"
+          }
+        }
+      ]
+    }
+  ]
+}

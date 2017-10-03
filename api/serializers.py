@@ -9,11 +9,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from api import search_indexes
 from drf_haystack.serializers import HaystackSerializer
 
+from workflow.models import Workflow
+
+from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 
 class UserSearchSerializer(HaystackSerializer):
     class Meta:
         index_classes = [search_indexes.UserIndex]
-        fields = ['text', 'first_name', 'last_name', 'full_name', 'email']
+        fields = ['text', 'first_name', 'last_name', 'email']
 
 
 class ItemSearchSerializer(HaystackSerializer):
@@ -34,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'date_joined', 'last_login',
+            'id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login',
             'is_active', 'gravatar', 'token'
         )
 
@@ -200,6 +203,11 @@ class GroupSerializer(serializers.Serializer):
 
 
 class CollectionSerializer(serializers.Serializer):
+
+    included_serializers = {
+        'workflow': 'workflow.serializers.Workflow'
+    }
+
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(required=True)
     description = serializers.CharField(required=False, allow_blank=True)
@@ -223,12 +231,28 @@ class CollectionSerializer(serializers.Serializer):
         related_view_kwargs={'pk': '<pk>'}
     )
 
+    workflow = ResourceRelatedField(
+        queryset=Workflow.objects.all(),
+        many=False,
+        required=True
+    )
+
     class Meta:
         model = Collection
-        fields = ['id', 'title', 'description', 'tags', 'created_by']
+        fields = [
+            'id',
+            'title',
+            'description',
+            'tags',
+            'created_by',
+            'workflow'
+        ]
 
     class JSONAPIMeta:
         resource_name = 'collections'
+        included_resources = [
+            'workflow',
+        ]
 
     def create(self, validated_data):
         user = self.context['request'].user

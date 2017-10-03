@@ -2,7 +2,8 @@
 """Workflow Serializers"""
 
 
-from rest_framework.serializers import CharField, ModelSerializer, JSONField
+from rest_framework.serializers import CharField, ModelSerializer, JSONField, raise_errors_on_nested_writes
+from rest_framework.utils import model_meta
 from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 from django.contrib.auth.models import User, Group
 
@@ -12,6 +13,15 @@ from workflow import models
 class Workflow(ModelSerializer):
 
     initialization_values = JSONField(required=False)
+
+    included_serializers = {
+        'sections': 'workflow.serializers.Section',
+        'widgets': 'workflow.serializers.Widget',
+        'cases': 'workflow.serializers.Case',
+        'parameter_aliases': 'workflow.serializers.ParameterAlias',
+        'parameters': 'workflow.serializers.Parameter',
+        'parameter_stubs': 'workflow.serializers.ParameterStub'
+    }
 
     class Meta:
         resource_name = 'workflow'
@@ -30,6 +40,15 @@ class Workflow(ModelSerializer):
             'cases'
         ]
 
+    class JSONAPIMeta:
+        included_resources = [
+            'sections',
+            'widgets',
+            'case',
+            'parameter_aliases',
+            'parameters',
+            'parameter_stub'
+        ]
 
 class Section(ModelSerializer):
 
@@ -65,25 +84,34 @@ class Widget(ModelSerializer):
 
 class ParameterAlias(ModelSerializer):
 
+    included_serializers = {
+        'parameters': 'workflow.serializers.Parameter',
+        'widget': 'workflow.serializers.Widget',
+        'cases': 'workflow.serializers.Case'
+    }
+
     parameter_stub = ResourceRelatedField(
         queryset=models.Parameter.objects.all(),
         many=False,
         required=False
     )
 
-    parameter = SerializerMethodResourceRelatedField(
-        read_only=True,
-        source='get_parameter',
-        model=models.Parameter,
-        many=False,
+    cases = ResourceRelatedField(
+        queryset=models.Case.objects.all(),
+        many=True,
         required=False
     )
 
-    def get_parameter(self, obj):
-        if obj.parameter_stub.scope != 'CASE':
-            return models.Parameter.objects.get(name=obj.parameter_stub.name)
-        case_pk = self._context['request']._request.resolver_match.kwargs['case_pk']
-        return models.Parameter.objects.filter(case__id=case_pk).get(name=obj.parameter_stub.name)
+    parameters = SerializerMethodResourceRelatedField(
+        read_only=True,
+        source='get_parameters',
+        model=models.Parameter,
+        many=True,
+        required=False
+    )
+
+    def get_parameters(self, obj):
+        return models.Parameter.objects.filter(name=obj.parameter_stub.name)
 
     class Meta:
         resource_name = 'parameter-aliases'
@@ -92,9 +120,17 @@ class ParameterAlias(ModelSerializer):
             'id',
             'alias',
             'widget',
-            'parameter',
+            'parameters',
+            'cases',
             'parameter_stub',
             'workflow',
+        ]
+
+    class JSONAPIMeta:
+        included_resources = [
+            'parameters',
+            'widget',
+            'cases'
         ]
 
 
@@ -134,9 +170,9 @@ class Parameter(ModelSerializer):
     properties = JSONField(required=False)
     value = JSONField(required=False)
 
-    case = ResourceRelatedField(
+    cases = ResourceRelatedField(
         queryset=models.Case.objects.all(),
-        many=False,
+        many=True,
         required=False
     )
 
@@ -160,6 +196,40 @@ class Parameter(ModelSerializer):
         required=False
     )
 
+    def update(self, instance, validated_data):
+        raise_errors_on_nested_writes('update', self, validated_data)
+        info = model_meta.get_field_info(instance)
+
+        # Simply set each attribute on the instance, and then save it.
+        # Note that unlike `.create()` we don't need to treat many-to-many
+        # relationships as being a special case. During updates we already
+        # have an instance pk for the relationships to be associated with.
+        for attr, value in validated_data.items():
+
+            # THIS NEEDS TESTING
+            if attr in info.relations and info.relations[attr].has_through_model:
+                for related_instance in value:
+                    through_class = info.relations[attr].model_field.rel.through
+                    through_instance = through_class()
+                    existing_through_instances = through_class.objects.filter(**{
+                        info.relations[attr].model_field.m2m_field_name()+"_id": instance.id
+                    }).filter(**{
+                        info.relations[attr].model_field.m2m_reverse_field_name()+"_id": related_instance.id
+                    })
+                    if existing_through_instances.exists():
+                        continue
+                    setattr(through_instance, info.relations[attr].model_field.m2m_field_name(), instance)
+                    setattr(through_instance, info.relations[attr].model_field.m2m_reverse_field_name(), related_instance)
+                    through_instance.save()
+
+            elif attr in info.relations and info.relations[attr].to_many:
+                set_many(instance, attr, value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+
     def get_aliases(self, obj):
         if not obj.stub:
             return models.ParameterAlias.objects.none()
@@ -175,12 +245,45 @@ class Parameter(ModelSerializer):
             'properties',
             'aliases',
             'stub',
-            'case',
+            'cases',
             'workflow'
         ]
 
 
 class Case(ModelSerializer):
+
+    included_serializers = {
+        'workflow': 'workflow.serializers.Workflow',
+        'sections': 'workflow.serializers.Section',
+        'widgets': 'workflow.serializers.Widget',
+        'parameter_aliases': 'workflow.serializers.ParameterAlias',
+        'parameters': 'workflow.serializers.Parameter',
+        'stubs': 'workflow.serializers.ParameterStub'
+    }
+
+    workflow = ResourceRelatedField(
+        queryset=models.Workflow.objects.all(),
+        many=False,
+        required=True
+    )
+
+    sections = ResourceRelatedField(
+        queryset=models.Section.objects.all(),
+        many=True,
+        required=False
+    )
+
+    widgets = ResourceRelatedField(
+        queryset=models.Widget.objects.all(),
+        many=True,
+        required=False
+    )
+
+    parameter_aliases = ResourceRelatedField(
+        queryset=models.ParameterAlias.objects.all(),
+        many=True,
+        required=False
+    )
 
     parameters = ResourceRelatedField(
         queryset=models.Parameter.objects.all(),
@@ -188,10 +291,10 @@ class Case(ModelSerializer):
         required=False
     )
 
-    workflow = ResourceRelatedField(
-        queryset=models.Workflow.objects.all(),
-        many=False,
-        required=True
+    stubs = ResourceRelatedField(
+        queryset=models.ParameterStub.objects.all(),
+        many=True,
+        required=False
     )
 
     class Meta:
@@ -200,5 +303,19 @@ class Case(ModelSerializer):
         fields = [
             'id',
             'workflow',
-            'parameters'
+            'sections',
+            'widgets',
+            'parameter_aliases',
+            'parameters',
+            'stubs'
+        ]
+
+    class JSONAPIMeta:
+        included_resources = [
+            'workflow',
+            'sections',
+            'widgets',
+            'parameter_aliases',
+            'parameters',
+            'stubs'
         ]

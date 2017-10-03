@@ -170,6 +170,7 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
         CanEditCollection
     )
 
+
     def get_object(self):
         try:
             collection = Collection.objects.get(id=self.kwargs['pk'])

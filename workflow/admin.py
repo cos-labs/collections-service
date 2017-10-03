@@ -65,6 +65,32 @@ class CaseListFilter(SimpleListFilter):
         return queryset
 
 
+class FirstCaseListFilter(SimpleListFilter):
+    """Filter an object list by workflow"""
+
+    title = 'Case'
+    parameter_name = 'cases'
+    default_value = None
+
+    def lookups(self, request, model_admin):
+        """Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar."""
+
+        return sorted([(str(case.id), case.id)
+            for case in Case.objects.all()])
+
+    def queryset(self, request, queryset):
+        """Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`."""
+
+        if self.value():
+            return queryset.filter(cases=self.value())
+
+
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):
 
@@ -152,9 +178,11 @@ class ParameterAdmin(admin.ModelAdmin):
 
 
     def get_case_id(self, object):
-        if object.case:
-            return object.case.id
-        return ''
+        print(dir(object))
+        cases = getattr(object, 'cases', None)
+        if not cases:
+            return ''
+        return getattr(cases.first(), 'id', '')
 
     get_case_id.admin_order_field = 'id'
     get_case_id.short_description = 'case'
@@ -169,7 +197,7 @@ class ParameterAdmin(admin.ModelAdmin):
 
     list_filter = [
         WorkflowListFilter,
-        CaseListFilter
+        FirstCaseListFilter
     ]
 
 
