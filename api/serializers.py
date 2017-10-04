@@ -14,21 +14,41 @@ from workflow.models import Workflow
 from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 
 class UserSearchSerializer(HaystackSerializer):
+
     class Meta:
         index_classes = [search_indexes.UserIndex]
-        fields = ['text', 'first_name', 'last_name', 'email']
+        fields = [
+            'text',
+            'first_name',
+            'last_name',
+            'email',
+            'full_name'
+        ]
 
 
 class ItemSearchSerializer(HaystackSerializer):
+
     class Meta:
         index_classes = [search_indexes.ItemIndex]
-        fields = ['text', 'title', 'description', 'created_by', 'collection']
+        fields = [
+            'text',
+            'title',
+            'description',
+            'created_by',
+            'collection'
+        ]
 
 
 class CollectionSearchSerializer(HaystackSerializer):
+
     class Meta:
         index_classes = [search_indexes.CollectionIndex]
-        fields = ['text', 'title', 'description', 'created_by']
+        fields = [
+            'text',
+            'title',
+            'description',
+            'created_by'
+        ]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,10 +56,18 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            'id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login',
-            'is_active', 'gravatar', 'token'
-        )
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'date_joined',
+            'last_login',
+            'is_active',
+            'gravatar',
+            'token'
+        ]
 
     class JSONAPIMeta:
         resource_name = 'users'

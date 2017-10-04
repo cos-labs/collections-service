@@ -8,6 +8,9 @@ class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     gravatar = models.URLField(blank=True)
 
+    @property
+    def full_name(self):
+        return self.first_name + " " + self.last_name
 
 class Collection(models.Model):
     title = models.CharField(max_length=200)

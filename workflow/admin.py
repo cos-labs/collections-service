@@ -178,7 +178,6 @@ class ParameterAdmin(admin.ModelAdmin):
 
 
     def get_case_id(self, object):
-        print(dir(object))
         cases = getattr(object, 'cases', None)
         if not cases:
             return ''
