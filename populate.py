@@ -19,13 +19,30 @@ from tests import factories
 from api import models
 import datetime
 import pytz
+from faker import Faker
+
 
 owner = models.User.objects.get(pk=3)
 
 meetings = factories.MeetingFactory.build_batch(10, created_by=owner)
+
+names = []
+
+with open('tests/diverse_names.txt') as name_file:
+    content = name_file.readlines()
+    content = [x.strip() for x in content]
+    names = [(x.split(' ')[0], ' '.join(x.split(' ')[1:])) for x in content]
+
+
 for m in meetings:
     m.save()
-    users = factories.UserFactory.build_batch(9) + [owner]
+    print("New meeting: " + m.title)
+    users = [owner]
+    for x in range(0,9):
+        name = random.choice(names)
+        f_name = name[0]
+        l_name = name[1]
+        users.append(factories.UserFactory(first_name=f_name, last_name=l_name))
     ctr = 0
     for u in users:
         if not models.User.objects.all().filter(username=u.username).exists():

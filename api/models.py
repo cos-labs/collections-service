@@ -44,7 +44,6 @@ class Collection(models.Model):
                 self.settings = resources.dataset_json
         super().save(*args, **kwargs)
 
-
     def __str__(self):
         return self.title
 
