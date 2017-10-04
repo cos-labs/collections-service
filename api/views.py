@@ -92,7 +92,7 @@ class CollectionList(generics.ListCreateAPIView):
     permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        queryset = Collection.objects.all()
+        queryset = Collection.objects.all().order_by('-date_created')
         title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title__icontains=title)
