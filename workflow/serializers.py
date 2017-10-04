@@ -16,54 +16,6 @@ from rest_framework.fields import empty
 from workflow import models
 from rest_framework.fields import SkipField
 
-class MyRRField(ResourceRelatedField):
-
-    def validate_empty_values(self, data):
-        """
-        Validate empty values, and either:
-        * Raise `ValidationError`, indicating invalid data.
-        * Raise `SkipField`, indicating that the field should be ignored.
-        * Return (True, data), indicating an empty value that should be
-          returned without any further validation being applied.
-        * Return (False, data), indicating a non-empty value, that should
-          have validation applied as normal.
-        """
-        #import ipdb; ipdb.set_trace()
-        if self.read_only:
-            return (True, self.get_default())
-
-        if data is empty:
-            if getattr(self.root, 'partial', False):
-                raise SkipField()
-            if self.required:
-                self.fail('required')
-            return (True, self.get_default())
-
-        if data is None:
-            if not self.allow_null:
-                self.fail('null')
-            return (True, None)
-
-        return (False, data)
-
-    def run_validation(self, data=empty):
-        """
-        Validate a simple representation and return the internal value.
-        The provided data may be `empty` if no representation was included
-        in the input.
-        May raise `SkipField` if the field should not be included in the
-        validated data.
-        """
-
-
-        if data == '':
-            data = None
-        (is_empty_value, data) = self.validate_empty_values(data)
-        if is_empty_value:
-            return data
-        value = self.to_internal_value(data)
-        self.run_validators(value)
-        return value
 
 class Workflow(ModelSerializer):
 
@@ -237,7 +189,7 @@ class Parameter(ModelSerializer):
         required=True
     )
 
-    stub = MyRRField(
+    stub = ResourceRelatedField(
         queryset=models.ParameterStub.objects.all(),
         required=False,
         many=False,
@@ -308,6 +260,14 @@ class Parameter(ModelSerializer):
             for field_name, value in many_to_many.items():
 
                 # THIS NEEDS TESTING
+                """
+                If the m2m has a model defined as a through table, then
+                relations cannot be added by that relationship's .add() method.
+
+                This loop checks to ensure that if the relation does not exist
+                it is created. The way this is set up now, it requires the relation
+                to be unique.
+                """
                 if field_name in info.relations and info.relations[field_name].has_through_model:
                     field = info.relations[field_name].model_field
                     for related_instance in value:
@@ -337,6 +297,14 @@ class Parameter(ModelSerializer):
         for attr, value in validated_data.items():
 
             # THIS NEEDS TESTING
+            """
+            If the m2m has a model defined as a through table, then
+            relations cannot be added by that relationship's .add() method.
+
+            This loop checks to ensure that if the relation does not exist
+            it is created. The way this is set up now, it requires the relation
+            to be unique.
+            """
             if attr in info.relations and info.relations[attr].has_through_model:
                 field = info.relations[attr].model_field
                 for related_instance in value:
