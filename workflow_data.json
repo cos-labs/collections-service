@@ -1,1 +1,1053 @@
-[{"model": "workflow.workflow", "pk": 1, "fields": {"title": "Add an Event", "description": "The submission workflow for creating a meeting event.", "initialization_values": {"true": "False"}}}, {"model": "workflow.workflow", "pk": 2, "fields": {"title": "Add Materials", "description": "Appendix for a Journal. A place to store and publish additional materials for published articles.", "initialization_values": {"true": "false"}}}, {"model": "workflow.section", "pk": 1, "fields": {"label": "Materials", "description": "Add materials that are associated with the event. If the materials are already uploaded to an OSF project, you may select that project to associate with this event. Otherwise, You can automatically create a new empty OSF Project to associate with the event, and upload materials to it here.", "index": 5, "workflow": 1}}, {"model": "workflow.section", "pk": 3, "fields": {"label": "Speakers", "description": "Select the people that are involved with this talk or poster. You may select individuals that already have an OSF account", "index": 4, "workflow": 1}}, {"model": "workflow.section", "pk": 4, "fields": {"label": "Submit", "description": "When you are satisfied with the information you have entered about your event, submit your event, making the information entered available to those browsing the meeting.", "index": 7, "workflow": 1}}, {"model": "workflow.section", "pk": 5, "fields": {"label": "Logistics", "description": "Select the date and time of when your poster or talk occurs", "index": 3, "workflow": 1}}, {"model": "workflow.section", "pk": 6, "fields": {"label": "Event Type", "description": "Select the type of event you would like to add to the meeting. Your event may be a talk, or a poster.", "index": 1, "workflow": 1}}, {"model": "workflow.section", "pk": 7, "fields": {"label": "Event Information", "description": "Enter basic information about your event, such as its title and a brief description about the topic.", "index": 2, "workflow": 1}}, {"model": "workflow.section", "pk": 8, "fields": {"label": "Submit", "description": "", "index": 100, "workflow": 2}}, {"model": "workflow.section", "pk": 9, "fields": {"label": "Select Materials", "description": "Select the materials to add to this appendix entry.", "index": 10, "workflow": 2}}, {"model": "workflow.section", "pk": 10, "fields": {"label": "Identify Primary Document", "description": "Provide a way to identify the document that these materials are associated with.", "index": 0, "workflow": 2}}, {"model": "workflow.widget", "pk": 2, "fields": {"label": "Title", "description": "Enter the title of your presentation or poster.", "widget_type": "text-field", "index": 1, "section": 7, "workflow": 1}}, {"model": "workflow.widget", "pk": 4, "fields": {"label": "Submit", "description": "Submit this talk to the meeting", "widget_type": "meeting-submit", "index": 0, "section": 4, "workflow": 1}}, {"model": "workflow.widget", "pk": 5, "fields": {"label": "Start Date", "description": "When does your talk start?", "widget_type": "datetime-field", "index": 2, "section": 5, "workflow": 1}}, {"model": "workflow.widget", "pk": 6, "fields": {"label": "End Date", "description": "When does your talk end?", "widget_type": "datetime-field", "index": 3, "section": 5, "workflow": 1}}, {"model": "workflow.widget", "pk": 7, "fields": {"label": "Location", "description": "Where is the talk happening?", "widget_type": "text-field", "index": 1, "section": 5, "workflow": 1}}, {"model": "workflow.widget", "pk": 8, "fields": {"label": "Description", "description": "Provide a description that will appear on your presentation's page.", "widget_type": "text-field", "index": 2, "section": 7, "workflow": 1}}, {"model": "workflow.widget", "pk": 9, "fields": {"label": "How should the event be created?", "description": "", "widget_type": "choice-picker", "index": 0, "section": 1, "workflow": 1}}, {"model": "workflow.widget", "pk": 10, "fields": {"label": "Category", "description": "Is this a poster or a talk?", "widget_type": "text-field", "index": 1, "section": 6, "workflow": 1}}, {"model": "workflow.widget", "pk": 11, "fields": {"label": "Speakers", "description": "Add speakers", "widget_type": "osf-user-picker", "index": 1, "section": 3, "workflow": 1}}, {"model": "workflow.widget", "pk": 12, "fields": {"label": "Upload Materials", "description": "Upload the materials that are associated with the event", "widget_type": "file-uploader", "index": 2, "section": 1, "workflow": 1}}, {"model": "workflow.widget", "pk": 13, "fields": {"label": "create-materials-node", "description": "", "widget_type": "node-creator", "index": 0, "section": 1, "workflow": 1}}, {"model": "workflow.widget", "pk": 14, "fields": {"label": "Submit", "description": "", "widget_type": "appendix-submit", "index": 0, "section": 8, "workflow": 2}}, {"model": "workflow.widget", "pk": 15, "fields": {"label": "Document ID", "description": "Something to Identify the document these materials are for.", "widget_type": "text-field", "index": 0, "section": 10, "workflow": 2}}, {"model": "workflow.widget", "pk": 16, "fields": {"label": "Upload Materials", "description": "Upload the additional materials related to this document", "widget_type": "file-uploader", "index": 0, "section": 9, "workflow": 2}}, {"model": "workflow.widget", "pk": 17, "fields": {"label": "create-materials-node", "description": "", "widget_type": "node-creator", "index": 0, "section": 9, "workflow": 2}}, {"model": "workflow.widget", "pk": 18, "fields": {"label": "Material Title", "description": "", "widget_type": "text-field", "index": 2, "section": 9, "workflow": 2}}, {"model": "workflow.widget", "pk": 19, "fields": {"label": "Materials Node", "description": "Should the node to store the material on be created now, or should an already existing node be used?", "widget_type": "choice-picker", "index": 0, "section": 9, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 1, "fields": {"alias": "value", "widget": 2, "parameter_stub": 1, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 2, "fields": {"alias": "choices", "widget": 9, "parameter_stub": 2, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 5, "fields": {"alias": "value", "widget": 8, "parameter_stub": 5, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 7, "fields": {"alias": "value", "widget": 10, "parameter_stub": 7, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 8, "fields": {"alias": "value", "widget": 7, "parameter_stub": 8, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 9, "fields": {"alias": "date", "widget": 5, "parameter_stub": 9, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 10, "fields": {"alias": "date", "widget": 6, "parameter_stub": 10, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 11, "fields": {"alias": "title", "widget": 4, "parameter_stub": 1, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 12, "fields": {"alias": "fileData", "widget": 4, "parameter_stub": 3, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 13, "fields": {"alias": "startTime", "widget": 4, "parameter_stub": 9, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 14, "fields": {"alias": "endTime", "widget": 4, "parameter_stub": 10, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 15, "fields": {"alias": "category", "widget": 4, "parameter_stub": 7, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 16, "fields": {"alias": "location", "widget": 4, "parameter_stub": 8, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 17, "fields": {"alias": "description", "widget": 4, "parameter_stub": 5, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 18, "fields": {"alias": "users", "widget": 11, "parameter_stub": 6, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 19, "fields": {"alias": "fileName", "widget": 12, "parameter_stub": 4, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 20, "fields": {"alias": "fileData", "widget": 12, "parameter_stub": 3, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 21, "fields": {"alias": "speakers", "widget": 4, "parameter_stub": 6, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 22, "fields": {"alias": "fileName", "widget": 4, "parameter_stub": 4, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 23, "fields": {"alias": "create", "widget": 13, "parameter_stub": 11, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 24, "fields": {"alias": "node", "widget": 13, "parameter_stub": 13, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 25, "fields": {"alias": "node", "widget": 4, "parameter_stub": 13, "workflow": 1}}, {"model": "workflow.parameteralias", "pk": 26, "fields": {"alias": "node", "widget": 14, "parameter_stub": 16, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 27, "fields": {"alias": "value", "widget": 15, "parameter_stub": 20, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 28, "fields": {"alias": "value", "widget": 18, "parameter_stub": 14, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 29, "fields": {"alias": "fileName", "widget": 16, "parameter_stub": 14, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 30, "fields": {"alias": "fileData", "widget": 16, "parameter_stub": 21, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 31, "fields": {"alias": "choices", "widget": 16, "parameter_stub": 17, "workflow": 2}}, {"model": "workflow.parameteralias", "pk": 32, "fields": {"alias": "create", "widget": 17, "parameter_stub": 19, "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 1, "fields": {"name": "event-title", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 2, "fields": {"name": "event-creation-choices", "scope": "WORKFLOW", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 3, "fields": {"name": "file-data", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 4, "fields": {"name": "file-name", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 5, "fields": {"name": "event-description", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 6, "fields": {"name": "speakers", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 7, "fields": {"name": "category", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 8, "fields": {"name": "location", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 9, "fields": {"name": "start-datetime", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 10, "fields": {"name": "end-datetime", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 11, "fields": {"name": "create-new-node", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 12, "fields": {"name": "use-existing-node", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 13, "fields": {"name": "node", "scope": "CASE", "workflow": 1}}, {"model": "workflow.parameterstub", "pk": 14, "fields": {"name": "material-title", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 16, "fields": {"name": "materials-node", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 17, "fields": {"name": "materials-creation-choices", "scope": "WORKFLOW", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 18, "fields": {"name": "use-existing-node", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 19, "fields": {"name": "create-new-node", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 20, "fields": {"name": "document-id", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameterstub", "pk": 21, "fields": {"name": "material-data", "scope": "CASE", "workflow": 2}}, {"model": "workflow.parameter", "pk": 1, "fields": {"name": "event-creation-choices", "value": [{"label": "Use and existing project", "parameter": "use-existing-node"}, {"label": "Create a new project", "parameter": "create-new-node"}], "properties": {"a": "b"}, "stub": 2, "case": null, "workflow": 1}}, {"model": "workflow.parameter", "pk": 1608, "fields": {"name": "materials-creation-choices", "value": [{"label": "Use and existing project", "parameter": "use-existing-node"}, {"label": "Create a new project", "parameter": "create-new-node"}], "properties": {"true": "false"}, "stub": 17, "case": null, "workflow": 2}}]
+[
+{
+  "model": "workflow.workflow",
+  "pk": 1,
+  "fields": {
+    "title": "Add an Event",
+    "description": "The submission workflow for creating a meeting event.",
+    "initialization_values": {
+      "true": "False"
+    },
+    "workflow_config": {}
+  }
+},
+{
+  "model": "workflow.workflow",
+  "pk": 2,
+  "fields": {
+    "title": "Add Materials",
+    "description": "Appendix for a Journal. A place to store and publish additional materials for published articles.",
+    "initialization_values": {
+      "true": "false"
+    },
+    "workflow_config": {}
+  }
+},
+{
+  "model": "workflow.workflow",
+  "pk": 14,
+  "fields": {
+    "title": "Dataset Submission Form",
+    "description": "The dataset submission form allows users to submit data to a data repository.",
+    "initialization_values": {
+      "event-creation-choices": {
+        "value": [
+          {
+            "label": "Use an existing node",
+            "parameter": "useExistingNode"
+          },
+          {
+            "label": "Create a new node",
+            "parameter": "createNewNode"
+          }
+        ]
+      }
+    },
+    "workflow_config": {}
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 1,
+  "fields": {
+    "label": "Materials",
+    "description": "Add materials that are associated with the event. If the materials are already uploaded to an OSF project, you may select that project to associate with this event. Otherwise, You can automatically create a new empty OSF Project to associate with the event, and upload materials to it here.",
+    "index": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 3,
+  "fields": {
+    "label": "Speakers",
+    "description": "Select the people that are involved with this talk or poster. You may select individuals that already have an OSF account",
+    "index": 4,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 4,
+  "fields": {
+    "label": "Submit",
+    "description": "When you are satisfied with the information you have entered about your event, submit your event, making the information entered available to those browsing the meeting.",
+    "index": 7,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 5,
+  "fields": {
+    "label": "Logistics",
+    "description": "Select the date and time of when your poster or talk occurs",
+    "index": 3,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 6,
+  "fields": {
+    "label": "Event Type",
+    "description": "Select the type of event you would like to add to the meeting. Your event may be a talk, or a poster.",
+    "index": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 7,
+  "fields": {
+    "label": "Event Information",
+    "description": "Enter basic information about your event, such as its title and a brief description about the topic.",
+    "index": 2,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 8,
+  "fields": {
+    "label": "Submit",
+    "description": "",
+    "index": 100,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 9,
+  "fields": {
+    "label": "Select Materials",
+    "description": "Select the materials to add to this appendix entry.",
+    "index": 10,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 10,
+  "fields": {
+    "label": "Identify Primary Document",
+    "description": "Provide a way to identify the document that these materials are associated with.",
+    "index": 0,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 24,
+  "fields": {
+    "label": "Upload Data",
+    "description": "Select the file to add to this dataset. The file may be added by dragging it into the grey box, or by clicking on the grey box to open a dialog where the file may be chosen.",
+    "index": 1,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 25,
+  "fields": {
+    "label": "File Metadata",
+    "description": "",
+    "index": 2,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.section",
+  "pk": 26,
+  "fields": {
+    "label": "Submit",
+    "description": "",
+    "index": 3,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 2,
+  "fields": {
+    "label": "Title",
+    "description": "Enter the title of your presentation or poster.",
+    "widget_type": "text-field",
+    "index": 1,
+    "section": 7,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 4,
+  "fields": {
+    "label": "Submit",
+    "description": "Submit this talk to the meeting",
+    "widget_type": "meeting-submit",
+    "index": 0,
+    "section": 4,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 5,
+  "fields": {
+    "label": "Start Date",
+    "description": "When does your talk start?",
+    "widget_type": "datetime-field",
+    "index": 2,
+    "section": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 6,
+  "fields": {
+    "label": "End Date",
+    "description": "When does your talk end?",
+    "widget_type": "datetime-field",
+    "index": 3,
+    "section": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 7,
+  "fields": {
+    "label": "Location",
+    "description": "Where is the talk happening?",
+    "widget_type": "text-field",
+    "index": 1,
+    "section": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 8,
+  "fields": {
+    "label": "Description",
+    "description": "Provide a description that will appear on your presentation's page.",
+    "widget_type": "text-area",
+    "index": 2,
+    "section": 7,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 9,
+  "fields": {
+    "label": "How should the event be created?",
+    "description": "",
+    "widget_type": "choice-picker",
+    "index": 0,
+    "section": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 10,
+  "fields": {
+    "label": "Category",
+    "description": "Is this a poster or a talk?",
+    "widget_type": "text-field",
+    "index": 1,
+    "section": 6,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 11,
+  "fields": {
+    "label": "Speakers",
+    "description": "Add speakers",
+    "widget_type": "osf-user-picker",
+    "index": 1,
+    "section": 3,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 12,
+  "fields": {
+    "label": "Upload Materials",
+    "description": "Upload the materials that are associated with the event",
+    "widget_type": "file-uploader",
+    "index": 2,
+    "section": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 13,
+  "fields": {
+    "label": "create-materials-node",
+    "description": "",
+    "widget_type": "node-creator",
+    "index": 0,
+    "section": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 14,
+  "fields": {
+    "label": "Submit",
+    "description": "",
+    "widget_type": "appendix-submit",
+    "index": 0,
+    "section": 8,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 15,
+  "fields": {
+    "label": "Document ID",
+    "description": "Something to Identify the document these materials are for.",
+    "widget_type": "text-field",
+    "index": 0,
+    "section": 10,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 16,
+  "fields": {
+    "label": "Upload Materials",
+    "description": "Upload the additional materials related to this document",
+    "widget_type": "file-uploader",
+    "index": 0,
+    "section": 9,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 17,
+  "fields": {
+    "label": "create-materials-node",
+    "description": "",
+    "widget_type": "node-creator",
+    "index": 0,
+    "section": 9,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 18,
+  "fields": {
+    "label": "Material Title",
+    "description": "",
+    "widget_type": "text-field",
+    "index": 2,
+    "section": 9,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 19,
+  "fields": {
+    "label": "Materials Node",
+    "description": "Should the node to store the material on be created now, or should an already existing node be used?",
+    "widget_type": "choice-picker",
+    "index": 0,
+    "section": 9,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 35,
+  "fields": {
+    "label": "Upload a file",
+    "description": "Select the file to upload",
+    "widget_type": "file-uploader",
+    "index": 1,
+    "section": 24,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 36,
+  "fields": {
+    "label": "Title",
+    "description": "Enter the title of the file.",
+    "widget_type": "text-field",
+    "index": 2,
+    "section": 24,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 37,
+  "fields": {
+    "label": "Metadata",
+    "description": "Enter metadata for the file. The metadata should fit the schema for this dataset, and should be formatted as JSON.",
+    "widget_type": "text-area",
+    "index": 1,
+    "section": 25,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.widget",
+  "pk": 38,
+  "fields": {
+    "label": "Submit",
+    "description": "Submit this talk",
+    "widget_type": "meeting-submit",
+    "index": 1,
+    "section": 26,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 1,
+  "fields": {
+    "alias": "value",
+    "widget": 2,
+    "parameter_stub": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 2,
+  "fields": {
+    "alias": "choices",
+    "widget": 9,
+    "parameter_stub": 2,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 5,
+  "fields": {
+    "alias": "value",
+    "widget": 8,
+    "parameter_stub": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 7,
+  "fields": {
+    "alias": "value",
+    "widget": 10,
+    "parameter_stub": 7,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 8,
+  "fields": {
+    "alias": "value",
+    "widget": 7,
+    "parameter_stub": 8,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 9,
+  "fields": {
+    "alias": "date",
+    "widget": 5,
+    "parameter_stub": 9,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 10,
+  "fields": {
+    "alias": "date",
+    "widget": 6,
+    "parameter_stub": 10,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 11,
+  "fields": {
+    "alias": "title",
+    "widget": 4,
+    "parameter_stub": 1,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 12,
+  "fields": {
+    "alias": "fileData",
+    "widget": 4,
+    "parameter_stub": 3,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 13,
+  "fields": {
+    "alias": "startTime",
+    "widget": 4,
+    "parameter_stub": 9,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 14,
+  "fields": {
+    "alias": "endTime",
+    "widget": 4,
+    "parameter_stub": 10,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 15,
+  "fields": {
+    "alias": "category",
+    "widget": 4,
+    "parameter_stub": 7,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 16,
+  "fields": {
+    "alias": "location",
+    "widget": 4,
+    "parameter_stub": 8,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 17,
+  "fields": {
+    "alias": "description",
+    "widget": 4,
+    "parameter_stub": 5,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 18,
+  "fields": {
+    "alias": "users",
+    "widget": 11,
+    "parameter_stub": 6,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 19,
+  "fields": {
+    "alias": "fileName",
+    "widget": 12,
+    "parameter_stub": 4,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 20,
+  "fields": {
+    "alias": "fileData",
+    "widget": 12,
+    "parameter_stub": 3,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 21,
+  "fields": {
+    "alias": "speakers",
+    "widget": 4,
+    "parameter_stub": 6,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 22,
+  "fields": {
+    "alias": "fileName",
+    "widget": 4,
+    "parameter_stub": 4,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 23,
+  "fields": {
+    "alias": "create",
+    "widget": 13,
+    "parameter_stub": 11,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 24,
+  "fields": {
+    "alias": "node",
+    "widget": 13,
+    "parameter_stub": 13,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 25,
+  "fields": {
+    "alias": "node",
+    "widget": 4,
+    "parameter_stub": 13,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 26,
+  "fields": {
+    "alias": "node",
+    "widget": 14,
+    "parameter_stub": 16,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 27,
+  "fields": {
+    "alias": "value",
+    "widget": 15,
+    "parameter_stub": 20,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 28,
+  "fields": {
+    "alias": "value",
+    "widget": 18,
+    "parameter_stub": 14,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 29,
+  "fields": {
+    "alias": "fileName",
+    "widget": 16,
+    "parameter_stub": 14,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 30,
+  "fields": {
+    "alias": "fileData",
+    "widget": 16,
+    "parameter_stub": 21,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 31,
+  "fields": {
+    "alias": "choices",
+    "widget": 16,
+    "parameter_stub": 17,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 32,
+  "fields": {
+    "alias": "create",
+    "widget": 17,
+    "parameter_stub": 19,
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 47,
+  "fields": {
+    "alias": "fileData",
+    "widget": null,
+    "parameter_stub": 34,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 48,
+  "fields": {
+    "alias": "fileName",
+    "widget": null,
+    "parameter_stub": 35,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 49,
+  "fields": {
+    "alias": "value",
+    "widget": null,
+    "parameter_stub": 36,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 50,
+  "fields": {
+    "alias": "value",
+    "widget": null,
+    "parameter_stub": 37,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 51,
+  "fields": {
+    "alias": "title",
+    "widget": null,
+    "parameter_stub": 36,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 52,
+  "fields": {
+    "alias": "fileData",
+    "widget": null,
+    "parameter_stub": 34,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 53,
+  "fields": {
+    "alias": "fileName",
+    "widget": null,
+    "parameter_stub": 35,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameteralias",
+  "pk": 54,
+  "fields": {
+    "alias": "metadata",
+    "widget": null,
+    "parameter_stub": 37,
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 1,
+  "fields": {
+    "name": "event-title",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 2,
+  "fields": {
+    "name": "event-creation-choices",
+    "scope": "WORKFLOW",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 3,
+  "fields": {
+    "name": "file-data",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 4,
+  "fields": {
+    "name": "file-name",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 5,
+  "fields": {
+    "name": "event-description",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 6,
+  "fields": {
+    "name": "speakers",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 7,
+  "fields": {
+    "name": "category",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 8,
+  "fields": {
+    "name": "location",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 9,
+  "fields": {
+    "name": "start-datetime",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 10,
+  "fields": {
+    "name": "end-datetime",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 11,
+  "fields": {
+    "name": "create-new-node",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 12,
+  "fields": {
+    "name": "use-existing-node",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 13,
+  "fields": {
+    "name": "node",
+    "scope": "CASE",
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 14,
+  "fields": {
+    "name": "material-title",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 16,
+  "fields": {
+    "name": "materials-node",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 17,
+  "fields": {
+    "name": "materials-creation-choices",
+    "scope": "WORKFLOW",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 18,
+  "fields": {
+    "name": "use-existing-node",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 19,
+  "fields": {
+    "name": "create-new-node",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 20,
+  "fields": {
+    "name": "document-id",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 21,
+  "fields": {
+    "name": "material-data",
+    "scope": "CASE",
+    "workflow": 2
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 34,
+  "fields": {
+    "name": "file-data",
+    "scope": "CASE",
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 35,
+  "fields": {
+    "name": "file-name",
+    "scope": "CASE",
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 36,
+  "fields": {
+    "name": "title-widget",
+    "scope": "CASE",
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameterstub",
+  "pk": 37,
+  "fields": {
+    "name": "metadata",
+    "scope": "CASE",
+    "workflow": 14
+  }
+},
+{
+  "model": "workflow.parameter",
+  "pk": 1,
+  "fields": {
+    "name": "event-creation-choices",
+    "value": [
+      {
+        "label": "Use and existing project",
+        "parameter": "use-existing-node"
+      },
+      {
+        "label": "Create a new project",
+        "parameter": "create-new-node"
+      }
+    ],
+    "properties": {
+      "a": "b"
+    },
+    "stub": 2,
+    "case": null,
+    "workflow": 1
+  }
+},
+{
+  "model": "workflow.parameter",
+  "pk": 1608,
+  "fields": {
+    "name": "materials-creation-choices",
+    "value": [
+      {
+        "label": "Use and existing project",
+        "parameter": "use-existing-node"
+      },
+      {
+        "label": "Create a new project",
+        "parameter": "create-new-node"
+      }
+    ],
+    "properties": {
+      "true": "false"
+    },
+    "stub": 17,
+    "case": null,
+    "workflow": 2
+  }
+}
+]

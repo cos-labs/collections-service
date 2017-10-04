@@ -1,0 +1,74 @@
+{
+  "title": "Dataset Submission Form",
+  "description": "The dataset submission form allows users to submit data to a data repository.",
+  "initialParameters": {
+    "event-creation-choices": {
+      "value": [
+        {
+          "label": "Use an existing node",
+          "parameter": "useExistingNode"
+        },
+        {
+          "label": "Create a new node",
+          "parameter": "createNewNode"
+        }
+      ]
+    }
+  },
+  "sections": [
+    {
+      "label": "Upload Data",
+      "widgets": [
+        {
+          "label": "Upload a file",
+          "description": "Select the file to upload",
+          "widgetType": "file-uploader",
+          "parameters": {
+            "fileData": "file-data",
+            "fileName": "file-name"
+          }
+        },
+        {
+          "label": "Title",
+          "description": "Enter the title of the file.",
+          "widgetType": "text-field",
+          "parameters": {
+            "value": "title-widget"
+          }
+        }
+      ]
+    },
+    {
+      "label": "File Metadata",
+      "description": "Enter the metadata for the file",
+      "widgets": [
+        {
+          "label": "Metadata",
+          "desciption": "Enter the metadata for the file that is being uploaded",
+          "widgetType": "text-field",
+          "parameters": {
+            "value": "metadata"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Submit",
+      "description": "Submit this talk to the meeting",
+      "widgets": [
+        {
+          "label": "Submit",
+          "description": "Submit this talk",
+          "widgetType": "meeting-submit",
+          "parameters": {
+            "title": "title-widget",
+            "fileData": "file-data",
+            "fileName": "file-name",
+            "metadata": "metadata"
+          }
+        }
+      ]
+    }
+  ]
+}
+
