@@ -7,14 +7,7 @@ from rest_framework.utils import model_meta
 from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 from django.contrib.auth.models import User, Group
 
-from collections import Mapping, OrderedDict
-from rest_framework.fields import get_error_detail, set_value
-from rest_framework.exceptions import ValidationError
-from django.core.exceptions import ValidationError as DjangoValidationError
-
-from rest_framework.fields import empty
 from workflow import models
-from rest_framework.fields import SkipField
 
 
 class Workflow(ModelSerializer):
@@ -170,10 +163,6 @@ class ParameterStub(ModelSerializer):
 
 class Parameter(ModelSerializer):
 
-    #included_serializers = {
-    #    'aliases': 'workflow.serializers.ParameterAlias'
-    #}
-
     properties = JSONField(required=False)
     value = JSONField(required=False)
 
@@ -259,15 +248,12 @@ class Parameter(ModelSerializer):
         if many_to_many:
             for field_name, value in many_to_many.items():
 
-                # THIS NEEDS TESTING
-                """
-                If the m2m has a model defined as a through table, then
-                relations cannot be added by that relationship's .add() method.
-
-                This loop checks to ensure that if the relation does not exist
-                it is created. The way this is set up now, it requires the relation
-                to be unique.
-                """
+                # If the m2m has a model defined as a through table, then
+                # relations cannot be added by that relationship's .add() method,
+                # but should be created using the model's constructor.
+                # This loop checks to ensure that if the relation does not exist
+                # it is created. The way this is set up now, it requires the relation
+                # to be unique.
                 if field_name in info.relations and info.relations[field_name].has_through_model:
                     field = info.relations[field_name].model_field
                     for related_instance in value:
@@ -296,15 +282,12 @@ class Parameter(ModelSerializer):
         # have an instance pk for the relationships to be associated with.
         for attr, value in validated_data.items():
 
-            # THIS NEEDS TESTING
-            """
-            If the m2m has a model defined as a through table, then
-            relations cannot be added by that relationship's .add() method.
-
-            This loop checks to ensure that if the relation does not exist
-            it is created. The way this is set up now, it requires the relation
-            to be unique.
-            """
+            # If the m2m has a model defined as a through table, then
+            # relations cannot be added by that relationship's .add() method,
+            # but should be created using the model's constructor.
+            # This loop checks to ensure that if the relation does not exist
+            # it is created. The way this is set up now, it requires the relation
+            # to be unique.
             if attr in info.relations and info.relations[attr].has_through_model:
                 field = info.relations[attr].model_field
                 for related_instance in value:

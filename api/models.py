@@ -36,6 +36,15 @@ class Collection(models.Model):
         on_delete=models.SET_NULL
     )
 
+    def save(self, *args, **kwargs):
+        if not self.pk:  # if this is the first save, set default settings based on collection_type
+            if self.collection_type == 'meeting':
+                self.settings = resources.meeting_json
+            elif self.collection_type == 'dataset':
+                self.settings = resources.dataset_json
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
         return self.title
 
