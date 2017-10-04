@@ -7,8 +7,63 @@ from rest_framework.utils import model_meta
 from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 from django.contrib.auth.models import User, Group
 
-from workflow import models
+from collections import Mapping, OrderedDict
+from rest_framework.fields import get_error_detail, set_value
+from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
+from rest_framework.fields import empty
+from workflow import models
+from rest_framework.fields import SkipField
+
+class MyRRField(ResourceRelatedField):
+
+    def validate_empty_values(self, data):
+        """
+        Validate empty values, and either:
+        * Raise `ValidationError`, indicating invalid data.
+        * Raise `SkipField`, indicating that the field should be ignored.
+        * Return (True, data), indicating an empty value that should be
+          returned without any further validation being applied.
+        * Return (False, data), indicating a non-empty value, that should
+          have validation applied as normal.
+        """
+        #import ipdb; ipdb.set_trace()
+        if self.read_only:
+            return (True, self.get_default())
+
+        if data is empty:
+            if getattr(self.root, 'partial', False):
+                raise SkipField()
+            if self.required:
+                self.fail('required')
+            return (True, self.get_default())
+
+        if data is None:
+            if not self.allow_null:
+                self.fail('null')
+            return (True, None)
+
+        return (False, data)
+
+    def run_validation(self, data=empty):
+        """
+        Validate a simple representation and return the internal value.
+        The provided data may be `empty` if no representation was included
+        in the input.
+        May raise `SkipField` if the field should not be included in the
+        validated data.
+        """
+
+
+        if data == '':
+            data = None
+        (is_empty_value, data) = self.validate_empty_values(data)
+        if is_empty_value:
+            return data
+        value = self.to_internal_value(data)
+        self.run_validators(value)
+        return value
 
 class Workflow(ModelSerializer):
 
@@ -182,10 +237,11 @@ class Parameter(ModelSerializer):
         required=True
     )
 
-    stub = ResourceRelatedField(
+    stub = MyRRField(
         queryset=models.ParameterStub.objects.all(),
         required=False,
-        many=False
+        many=False,
+        allow_null=True
     )
 
     aliases = SerializerMethodResourceRelatedField(
@@ -195,6 +251,80 @@ class Parameter(ModelSerializer):
         many=True,
         required=False
     )
+
+
+    def create(self, validated_data):
+        """
+        We have a bit of extra checking around this in order to provide
+        descriptive messages when something goes wrong, but this method is
+        essentially just:
+            return ExampleModel.objects.create(**validated_data)
+        If there are many to many fields present on the instance then they
+        cannot be set until the model is instantiated, in which case the
+        implementation is like so:
+            example_relationship = validated_data.pop('example_relationship')
+            instance = ExampleModel.objects.create(**validated_data)
+            instance.example_relationship = example_relationship
+            return instance
+        The default implementation also does not handle nested relationships.
+        If you want to support writable nested relationships you'll need
+        to write an explicit `.create()` method.
+        """
+        raise_errors_on_nested_writes('create', self, validated_data)
+
+        ModelClass = self.Meta.model
+
+        # Remove many-to-many relationships from validated_data.
+        # They are not valid arguments to the default `.create()` method,
+        # as they require that the instance has already been saved.
+        info = model_meta.get_field_info(ModelClass)
+        many_to_many = {}
+        for field_name, relation_info in info.relations.items():
+            if relation_info.to_many and (field_name in validated_data):
+                many_to_many[field_name] = validated_data.pop(field_name)
+
+        try:
+            instance = ModelClass.objects.create(**validated_data)
+        except TypeError:
+            tb = traceback.format_exc()
+            msg = (
+                'Got a `TypeError` when calling `%s.objects.create()`. '
+                'This may be because you have a writable field on the '
+                'serializer class that is not a valid argument to '
+                '`%s.objects.create()`. You may need to make the field '
+                'read-only, or override the %s.create() method to handle '
+                'this correctly.\nOriginal exception was:\n %s' %
+                (
+                    ModelClass.__name__,
+                    ModelClass.__name__,
+                    self.__class__.__name__,
+                    tb
+                )
+            )
+            raise TypeError(msg)
+
+        # Save many-to-many relationships after the instance is created.
+        if many_to_many:
+            for field_name, value in many_to_many.items():
+
+                # THIS NEEDS TESTING
+                if field_name in info.relations and info.relations[field_name].has_through_model:
+                    field = info.relations[field_name].model_field
+                    for related_instance in value:
+                        through_class = field.rel.through
+                        through_instance = through_class()
+                        existing_through_instances = through_class.objects\
+                            .filter(**{field.m2m_field_name()+"_id": instance.id})\
+                            .filter(**{field.m2m_reverse_field_name()+"_id": related_instance.id})
+                        if existing_through_instances.exists():
+                            continue
+                        setattr(through_instance, field.m2m_field_name(), instance)
+                        setattr(through_instance, field.m2m_reverse_field_name(), related_instance)
+                        through_instance.save()
+
+                else:
+                    set_many(instance, field_name, value)
+        return instance
 
     def update(self, instance, validated_data):
         raise_errors_on_nested_writes('update', self, validated_data)
@@ -208,24 +338,25 @@ class Parameter(ModelSerializer):
 
             # THIS NEEDS TESTING
             if attr in info.relations and info.relations[attr].has_through_model:
+                field = info.relations[attr].model_field
                 for related_instance in value:
-                    through_class = info.relations[attr].model_field.rel.through
+                    through_class = field.rel.through
                     through_instance = through_class()
-                    existing_through_instances = through_class.objects.filter(**{
-                        info.relations[attr].model_field.m2m_field_name()+"_id": instance.id
-                    }).filter(**{
-                        info.relations[attr].model_field.m2m_reverse_field_name()+"_id": related_instance.id
-                    })
+                    existing_through_instances = through_class.objects\
+                        .filter(**{field.m2m_field_name()+"_id": instance.id})\
+                        .filter(**{field.m2m_reverse_field_name()+"_id": related_instance.id})
                     if existing_through_instances.exists():
                         continue
-                    setattr(through_instance, info.relations[attr].model_field.m2m_field_name(), instance)
-                    setattr(through_instance, info.relations[attr].model_field.m2m_reverse_field_name(), related_instance)
+                    setattr(through_instance, field.m2m_field_name(), instance)
+                    setattr(through_instance, field.m2m_reverse_field_name(), related_instance)
                     through_instance.save()
 
             elif attr in info.relations and info.relations[attr].to_many:
                 set_many(instance, attr, value)
+
             else:
                 setattr(instance, attr, value)
+
         instance.save()
 
         return instance
