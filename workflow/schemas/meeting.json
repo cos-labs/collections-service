@@ -104,7 +104,8 @@
             "title": "title-widget",
             "fileData": "file-data",
             "fileName": "file-name",
-            "metadata": "metadata"
+            "metadata": "metadata",
+            "node": "node"
           }
         }
       ]
