@@ -133,7 +133,6 @@ class ItemSerializer(serializers.Serializer):
             validated_data['group'] = Group.objects.get(id=group_id)
 
         validated_data['status'] = status
-        validated_data['date_created'] = timezone.now()
         validated_data['date_submitted'] = timezone.now()
         item = Item.objects.create(
             created_by=user,
@@ -240,6 +239,8 @@ class CollectionSerializer(serializers.Serializer):
     title = serializers.CharField(required=True)
     description = serializers.CharField(required=False, allow_blank=True)
     tags = serializers.CharField(required=False, allow_blank=True)
+    address = serializers.CharField(required=False, allow_blank=True)
+    location = serializers.CharField(required=False, allow_blank=True)
     settings = serializers.JSONField(required=False)
     submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
@@ -273,7 +274,9 @@ class CollectionSerializer(serializers.Serializer):
             'description',
             'tags',
             'created_by',
-            'workflow'
+            'workflow',
+            'location',
+            'address'
         ]
 
     class JSONAPIMeta:
