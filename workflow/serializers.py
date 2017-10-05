@@ -164,7 +164,7 @@ class ParameterStub(ModelSerializer):
 class Parameter(ModelSerializer):
 
     properties = JSONField(required=False)
-    value = JSONField(required=False)
+    value = JSONField(required=False, allow_null=True)
 
     cases = ResourceRelatedField(
         queryset=models.Case.objects.all(),
