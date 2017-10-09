@@ -2,7 +2,6 @@ import factory
 from api import models
 import pytz
 import random
-from . import resources
 
 meeting_groups = ('OSF', 'Labs', 'COS')
 meeting_suffixes = ('Con', 'Convention')

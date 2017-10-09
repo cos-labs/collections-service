@@ -15,11 +15,10 @@ os.chdir(proj_path)
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
-from tests import factories
+from tests import factories, resources
 from api import models
 import datetime
 import pytz
-from faker import Faker
 
 
 owner = models.User.objects.get(pk=3)
