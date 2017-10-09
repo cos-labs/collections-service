@@ -35,7 +35,8 @@ class ItemSearchSerializer(HaystackSerializer):
             'title',
             'description',
             'created_by',
-            'collection'
+            'collection',
+            'category'
         ]
 
 
@@ -83,7 +84,7 @@ class UserSerializer(serializers.ModelSerializer):
         return token
 
 
-class ItemSerializer(serializers.Serializer):
+class ItemSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
     type = serializers.ChoiceField(
@@ -105,6 +106,11 @@ class ItemSerializer(serializers.Serializer):
 
     class Meta:
         model = Item
+        fields = (
+            'id', 'title', 'type', 'description', 'status', 'source_id', 'url', 'created_by', 'metadata',
+            'date_created', 'date_submitted', 'date_accepted', 'location', 'start_time', 'end_time', 'category',
+            'file_link'
+        )
 
     class JSONAPIMeta:
         resource_name = 'items'

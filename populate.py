@@ -19,7 +19,6 @@ from tests import factories
 from api import models
 import datetime
 import pytz
-from faker import Faker
 
 
 owner = models.User.objects.get(pk=3)

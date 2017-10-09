@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
+from tests import resources
 
 
 class User(AbstractUser):
@@ -11,6 +12,7 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return self.first_name + " " + self.last_name
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=200)
