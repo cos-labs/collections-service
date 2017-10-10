@@ -235,26 +235,16 @@ class GroupSerializer(serializers.Serializer):
         return group
 
 
-class CollectionSerializer(serializers.Serializer):
+class CollectionSerializer(serializers.ModelSerializer):
 
     included_serializers = {
         'workflow': 'workflow.serializers.Workflow'
     }
-
-    id = serializers.CharField(read_only=True)
-    title = serializers.CharField(required=True)
-    description = serializers.CharField(required=False, allow_blank=True)
-    tags = serializers.CharField(required=False, allow_blank=True)
-    address = serializers.CharField(required=False, allow_blank=True)
-    location = serializers.CharField(required=False, allow_blank=True)
-    settings = serializers.JSONField(required=False)
-    submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
     created_by = RelationshipField(
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
     )
-    collection_type = serializers.CharField()
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
     groups = RelationshipField(
@@ -274,16 +264,24 @@ class CollectionSerializer(serializers.Serializer):
 
     class Meta:
         model = Collection
-        fields = [
+        fields = (
             'id',
             'title',
             'description',
             'tags',
             'created_by',
+            'created_by_org',
+            'collection_type',
+            'date_created',
+            'date_updated',
             'workflow',
             'location',
-            'address'
-        ]
+            'address',
+            'groups',
+            'items',
+            'settings',
+            'submission_settings'
+        )
 
     class JSONAPIMeta:
         resource_name = 'collections'
