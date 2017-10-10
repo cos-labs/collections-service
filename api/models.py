@@ -55,15 +55,6 @@ class Collection(models.Model):
         )
 
 
-class Group(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
-    collection = models.ForeignKey(to='Collection', related_name='groups')
-    created_by = models.ForeignKey(User)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
-
-
 class Item(models.Model):
     TYPES = (
         ('none', 'none'),
@@ -93,7 +84,6 @@ class Item(models.Model):
     source_id = models.CharField(null=True, blank=True, max_length=200)
     url = models.URLField(null=True, blank=True)
     collection = models.ForeignKey(to='Collection', related_name='items')
-    group = models.ForeignKey(to='Group', null=True, blank=True, default=None, related_name='items')
     created_by = models.ForeignKey(User)
     metadata = JSONField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)

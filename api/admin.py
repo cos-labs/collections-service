@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.helpers import ActionForm
-from api.models import Collection, Group, Item
+from api.models import Collection, Item
 from guardian.shortcuts import get_objects_for_user, assign_perm
 
 
@@ -26,10 +26,6 @@ class AdminForm(ActionForm):
     collection_id = forms.CharField()
 
 
-class GroupAdmin(admin.ModelAdmin):
-    list_display = ('title', 'collection')
-
-
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('title', 'collection', 'type', 'created_by', 'status')
     actions = [approve_item]
@@ -49,6 +45,5 @@ class OSFUserAdmin(UserAdmin):
 
 
 admin.site.register(Collection)
-admin.site.register(Group, GroupAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(get_user_model(), OSFUserAdmin)

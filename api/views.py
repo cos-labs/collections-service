@@ -8,10 +8,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from api.serializers import CollectionSerializer, CollectionSearchSerializer, \
-    GroupSerializer, ItemSerializer, ItemSearchSerializer, \
+    ItemSerializer, ItemSearchSerializer, \
     UserSerializer, UserSearchSerializer
-from api.models import Collection, Group, Item, User
-from api.permissions import CanEditCollection, CanEditItem, CanEditGroup
+from api.models import Collection, Item, User
+from api.permissions import CanEditCollection, CanEditItem
 
 from drf_haystack.viewsets import HaystackViewSet
 
@@ -117,10 +117,6 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
 
     ##Relationships
 
-    ### Groups
-
-    List of groups that belong to this collection.
-
     ### Items
 
     List of top-level items that belong to this collection.
@@ -177,182 +173,6 @@ class CollectionDetail(generics.RetrieveUpdateDestroyAPIView):
         except ObjectDoesNotExist:
             raise drf_exceptions.NotFound
         return collection
-
-
-class CollectionGroupList(generics.ListCreateAPIView):
-    """ View list of groups in a given collection/meeting, or create a new group in a given collection/meeting.
-
-    ## Group Attributes
-
-        name                          type                    description
-        =================================================================================================================
-        title                         string                  group title
-        description                   string                  group description
-        date_created                  iso8601 timestamp       date/time when the group was created
-        date_updated                  iso8601 timestamp       date/time when the group was last updated
-
-    ## Actions
-
-    ### Creating New Groups
-
-            Method:        POST
-            URL:           /api/collections/<collection_id>/groups OR /api/meetings/<meeting_id>/groups
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "groups",                 # required
-                               "attributes": {
-                                 "title":        {title},        # required
-                                 "description":  {description},  # optional
-                               }
-                             }
-                           }
-            Success:       201 CREATED + group representation
-
-    #This Request/Response
-
-    """
-    permission_classes = (
-        drf_permissions.IsAuthenticatedOrReadOnly,
-        CanEditGroup
-    )
-
-    def get_serializer_class(self):
-        return GroupSerializer
-
-    def get_queryset(self):
-        return Group.objects.filter(collection=self.kwargs['pk'])
-
-
-class GroupList(generics.ListCreateAPIView):
-    """ View list of all groups, or create a new group in a collection or meeting.
-
-    ## Group Attributes
-
-        name                          type                    description
-        =================================================================================================================
-        title                         string                  group title
-        description                   string                  group description
-        date_created                  iso8601 timestamp       date/time when the group was created
-        date_updated                  iso8601 timestamp       date/time when the group was last updated
-
-    ## Actions
-
-    ### Creating New Groups
-
-            Method:        POST
-            URL:           /api/groups
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "groups",                          # required
-                               "attributes": {
-                                 "title":        {title},                 # required
-                                 "description":  {description}            # optional
-                               },
-                               "relationships": {
-                                 "collection": {
-                                    "data": {
-                                      "type": "meetings" | "collections"  # required
-                                      "id": {collection_id}               # required
-                                    }
-                                 }
-                               }
-                             }
-                           }
-            Success:       201 CREATED + group representation
-
-    Note: Since the route does not include the collection or meeting id, it must be specified in the payload.
-
-    #This Request/Response
-
-    """
-    serializer_class = GroupSerializer
-    permission_classes = (
-        drf_permissions.IsAuthenticatedOrReadOnly,
-        CanEditGroup
-    )
-
-    def get_serializer_context(self):
-        context = super(GroupList, self).get_serializer_context()
-        collection = self.request.data.get('collection', None)
-        if collection:
-            context.update({'collection_id': collection['id']})
-        return context
-
-    def get_queryset(self):
-        return Group.objects.all()
-
-
-class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
-    """ Details about a given group.
-
-    ## Group Attributes
-
-        name                          type                    description
-        =================================================================================================================
-        title                         string                  group title
-        description                   string                  group description
-        date_created                  iso8601 timestamp       date/time when the group was created
-        date_updated                  iso8601 timestamp       date/time when the group was last updated
-
-    ##Relationships
-
-    ### Items
-
-    List of items that belong to this group.
-
-    ### Created By
-
-    User who created this group.
-
-    ## Actions
-
-    ###Update
-
-            Method:        PUT / PATCH
-            URL:           /api/collections/<collection_id>/groups/<group_id> OR
-                           /api/meetings/<meeting_id>/groups/<group_id> OR
-                           /api/groups/<group_id>
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "groups",                            # required
-                               "id":   {group_id},                          # required
-                               "attributes": {
-                                 "title":               {title},            # required
-                                 "description":         {description}       # optional
-                               }
-                             }
-                           }
-            Success:       200 OK + group representation
-
-    Note: The `title` is required with PUT requests and optional with PATCH requests.
-
-    ###Delete
-            Method:   DELETE
-            URL:      /api/collections/<collection_id>/groups/<group_id> OR
-                      /api/meetings/<meeting_id>/groups/<group_id> OR
-                      /api/groups/<group_id>
-            Params:   <none>
-            Success:  204 No Content
-
-    #This Request/Response
-
-    """
-    serializer_class = GroupSerializer
-    queryset = Group.objects.all()
-    permission_classes = (
-        drf_permissions.IsAuthenticatedOrReadOnly,
-        CanEditGroup
-    )
-
-    def get_object(self):
-        try:
-            group = Group.objects.get(id=self.kwargs['group_id'])
-        except ObjectDoesNotExist:
-            raise drf_exceptions.NotFound
-        return group
 
 
 class CollectionItemList(generics.ListCreateAPIView):
@@ -418,84 +238,14 @@ class CollectionItemList(generics.ListCreateAPIView):
         user = self.request.user
         collection_id = self.kwargs['pk']
         collection = Collection.objects.get(id=collection_id)
-        queryset = Item.objects.filter(collection=collection_id, group=None)
-        if user.id == collection.created_by_id:
-            return queryset
-        return queryset.filter(Q(status='approved') | Q(created_by=user.id))
-
-
-class GroupItemList(generics.ListCreateAPIView):
-    """ View list of items or create a new item in a given group.
-
-    ## Item Attributes
-
-        name                          type                    description
-        ================================================================================================================
-        title                         string                  item title
-        description                   string                  item description
-        type                          string                  type of item (e.g. 'project', 'presentation', etc.)
-        status                        string                  moderation status ('approved', 'pending', 'rejected')
-        source_id                     string                  guid of associated OSF object (e.g. node_id for an OSF project)
-        url                           string                  url of associated OSF object (e.g. project url)
-        metadata                      object                  additional information about the item
-        date_created                  iso8601 timestamp       date/time when the item was created
-        date_submitted                iso8601 timestamp       date/time when the item was submitted
-        date_accepted                 iso8601 timestamp       date/time when the item was accepted
-        location                      string                  location of the event item
-        start_time                    iso8601 timestamp       date/time when the event item begins
-        end_time                      iso8601 timestamp       date/time when the event item ends
-        category                      string                  item category (e.g. 'talk', 'poster')
-
-    ## Actions
-
-    ### Creating New Items
-
-            Method:        POST
-            URL:           /api/collections/<collection_id>/groups/<group_id>/items OR
-                           /api/meetings/<meeting_id>/groups/<group_id>/items
-            Query Params:  <none>
-            Body (JSON):   {
-                             "data": {
-                               "type": "items",                  # required
-                               "attributes": {
-                                 "title":       {title},         # required
-                                 "description": {description},   # optional
-                                 "type":        {type},          # required
-                                 "status":      {status},        # required
-                                 "source_id":   {source_id},     # optional
-                                 "url":         {url},           # optional
-                                 "metadata":    {metadata},      # optional
-                                 "location":    {location},      # optional
-                                 "start_time":  {start_time},    # optional
-                                 "end_time":    {end_time},      # optional
-                                 "category":    {category}       # required
-                               }
-                             }
-                           }
-            Success:       201 CREATED + item representation
-
-    Note: Items added by the collection creator will automatically have the status "approved". If "approve_all" is true
-    in collection.settings, items added by other users will automatically have the status "approved", otherwise
-    they will be "pending".
-
-    #This Request/Response
-    """
-
-    serializer_class = ItemSerializer
-    permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        user = self.request.user
-        collection_id = self.kwargs['pk']
-        collection = Collection.objects.get(id=collection_id)
-        queryset = Item.objects.filter(group=self.kwargs['group_id'])
+        queryset = Item.objects.filter(collection=collection_id)
         if user.id == collection.created_by_id:
             return queryset
         return queryset.filter(Q(status='approved') | Q(created_by=user.id))
 
 
 class ItemList(generics.ListCreateAPIView):
-    """ View list of all items, or create a new item in a collection/meeting or group.
+    """ View list of all items, or create a new item in a collection.
 
     ## Item Attributes
 
@@ -545,12 +295,6 @@ class ItemList(generics.ListCreateAPIView):
                                       "type": "meetings" | "collections"  # required
                                       "id": {collection_id}               # required
                                     }
-                                 },
-                                 "group": {
-                                   "data": {
-                                     "type": "groups",                    # optional
-                                     "id": {group_id}                     # optional
-                                   }
                                  }
                                }
                              }
@@ -559,7 +303,7 @@ class ItemList(generics.ListCreateAPIView):
 
 
     ### Notes:
-    - Since the route does not include the collection/meeting id or a group id, they must be specified in the payload.
+    - Since the route does not include the collection/meeting id, they must be specified in the payload.
 
     - Items added by the collection creator will automatically have the status "approved". If "approve_all" is true
     in collection.settings, items added by other users will automatically have the status "approved", otherwise
@@ -574,9 +318,6 @@ class ItemList(generics.ListCreateAPIView):
         collection = self.request.data.get('collection', None)
         if collection:
             context.update({'collection_id': collection['id']})
-        group = self.request.data.get('group', None)
-        if group:
-            context.update({'group_id': group['id']})
         return context
 
     def get_queryset(self):
@@ -617,8 +358,7 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     ###Update
 
             Method:        PUT / PATCH
-            URL:           /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
-                           /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id> OR
+            URL:           /api/collections/<collection_id>/items/<item_id> OR
                            /api/items/<item_id>
             Query Params:  <none>
             Body (JSON):   {
@@ -645,9 +385,8 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
     ###Delete
             Method:   DELETE
-            URL:      /api/collections/<collection_id>/groups/<group_id>/items/<item_id> OR
-                      /api/meetings/<meeting_id>/groups/<group_id>/items/<item_id> OR
-                      /api/items/<item_id>
+            URL:           /api/collections/<collection_id>/items/<item_id> OR
+                           /api/items/<item_id>
             Params:   <none>
             Success:  204 No Content
 
@@ -666,11 +405,6 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
         collection = self.request.data.get('collection', None)
         if collection:
             context.update({'collection_id': collection['id']})
-        group = self.request.data.get('group', None)
-        if group:
-            context.update({'group_id': group['id']})
-        else:
-            context.update({'group_id': None})
 
         return context
 
@@ -762,8 +496,6 @@ class UserList(generics.ListAPIView):
     """
     serializer_class = UserSerializer
 
-    # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
-
     def get_queryset(self):
         return User.objects.all()
 
@@ -819,8 +551,6 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     #This Request/Response
     """
     serializer_class = UserSerializer
-
-    # permission_classes = (drf_permissions.IsAuthenticatedOrReadOnly, )
 
     def get_object(self):
         try:

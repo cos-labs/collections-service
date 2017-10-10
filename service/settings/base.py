@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'osf_oauth2_adapter',
+    'imagekit'
 ]
 
 MIDDLEWARE_CLASSES = [
