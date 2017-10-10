@@ -21,6 +21,11 @@ meeting_json = {
             }
         },
         {
+            "sectionHeader": "File Grid",
+            "component": "dataset-file-grid",
+            "settings": {}
+        },
+        {
             "sectionHeader": "Splash Image",
             "component": "landing-splash-image",
             "settings": {}

@@ -170,7 +170,6 @@ class ItemSerializer(serializers.ModelSerializer):
         return item
 
 
-
 class CollectionSerializer(serializers.ModelSerializer):
 
     included_serializers = {
