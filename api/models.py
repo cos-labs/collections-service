@@ -22,11 +22,11 @@ class Collection(models.Model):
     created_by_org = models.CharField(null=True, blank=True, max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    settings = JSONField(default={}, blank=True)
-    submission_settings = JSONField(default={}, blank=True)
+    settings = JSONField(default={}, blank=True, null=True)
+    submission_settings = JSONField(default={}, blank=True, null=True)
     collection_type = models.CharField(max_length=50)
-    location = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
 
@@ -53,15 +53,6 @@ class Collection(models.Model):
         permissions = (
             ('approve_collection_items', 'Approve collection items'),
         )
-
-
-class Group(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
-    collection = models.ForeignKey(to='Collection', related_name='groups')
-    created_by = models.ForeignKey(User)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
 
 class Item(models.Model):
@@ -93,7 +84,6 @@ class Item(models.Model):
     source_id = models.CharField(null=True, blank=True, max_length=200)
     url = models.URLField(null=True, blank=True)
     collection = models.ForeignKey(to='Collection', related_name='items')
-    group = models.ForeignKey(to='Group', null=True, blank=True, default=None, related_name='items')
     created_by = models.ForeignKey(User)
     metadata = JSONField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)

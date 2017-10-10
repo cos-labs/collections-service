@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework_json_api import serializers
-from api.models import Collection, Group, Item, User
+from api.models import Collection, Item, User
 from api.base.serializers import RelationshipField
 from guardian.shortcuts import assign_perm
 from allauth.socialaccount.models import SocialAccount, SocialToken
@@ -85,24 +85,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True)
-    title = serializers.CharField()
     type = serializers.ChoiceField(
         choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
-    description = serializers.CharField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
-    source_id = serializers.CharField(required=False, allow_null=True)
-    url = serializers.URLField(required=False, allow_null=True)
     created_by = UserSerializer(read_only=True)
-    metadata = serializers.JSONField(required=False, allow_null=True)
     date_created = serializers.DateTimeField(read_only=True)
     date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
     date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
-    location = serializers.CharField(allow_null=True, required=False)
-    start_time = serializers.DateTimeField(allow_null=True, required=False)
-    end_time = serializers.DateTimeField(allow_null=True, required=False)
     category = serializers.ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
-    file_link = serializers.CharField(allow_null=True, allow_blank=True, required=False)
 
     class Meta:
         model = Item
@@ -128,15 +118,11 @@ class ItemSerializer(serializers.ModelSerializer):
         if collection_type and validated_data['type'] != collection_type:
             raise ValueError('Collection only accepts items of type ' + collection_type)
 
-        status = 'pending'
         if user.has_perm('api.approve_collection_items', collection) or allow_all:
             status = 'approved'
             validated_data['date_accepted'] = timezone.now()
-
-        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get(
-            'group_id', None)
-        if group_id:
-            validated_data['group'] = Group.objects.get(id=group_id)
+        else:
+            status = 'pending'
 
         validated_data['status'] = status
         validated_data['date_submitted'] = timezone.now()
@@ -162,20 +148,12 @@ class ItemSerializer(serializers.ModelSerializer):
         elif user.id != item.created_by_id and validated_data.keys() != ['status']:
             raise exceptions.PermissionDenied(detail='Cannot update another user\'s submission.')
 
-        group_id = self.context.get('group_id', None) or self.context['request'].parser_context['kwargs'].get(
-            'group_id', None)
-        if group_id:
-            group = Group.objects.get(id=group_id)
-        else:
-            group = None
-
         item_type = validated_data.get('type', item.type)
         if collection.settings:
             collection_type = collection.settings.get('type', None)
             if collection_type and item_type != collection_type:
                 raise ValueError('Collection only accepts items of type ' + collection_type)
 
-        item.group = group
         item.source_id = validated_data.get('source_id', item.source_id)
         item.title = validated_data.get('title', item.title)
         item.description = validated_data.get('description', item.description)
@@ -192,75 +170,19 @@ class ItemSerializer(serializers.ModelSerializer):
         return item
 
 
-class GroupSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
-    title = serializers.CharField(required=True)
-    description = serializers.CharField(allow_blank=True, required=False)
-    created_by = UserSerializer(read_only=True)
-    date_created = serializers.DateTimeField(read_only=True)
-    date_updated = serializers.DateTimeField(read_only=True)
-    items = RelationshipField(
-        related_view='group-item-list',
-        related_view_kwargs={'pk': '<collection.id>', 'group_id': '<pk>'}
-    )
-    items = serializers.HyperlinkedRelatedField(
-        many=True,
-        read_only=True,
-        view_name='track-detail'
-    )
 
-    class Meta:
-        model = Group
-
-    class JSONAPIMeta:
-        resource_name = 'groups'
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
-            'pk', None)
-        collection = Collection.objects.get(id=collection_id)
-        return Group.objects.create(
-            created_by=user,
-            collection=collection,
-            **validated_data
-        )
-
-    def update(self, group, validated_data):
-        group.title = validated_data.get('title', None)
-        description = validated_data.get('description', None)
-        if description:
-            group.description = description
-        group.save()
-        return group
-
-
-class CollectionSerializer(serializers.Serializer):
+class CollectionSerializer(serializers.ModelSerializer):
 
     included_serializers = {
         'workflow': 'workflow.serializers.Workflow'
     }
-
-    id = serializers.CharField(read_only=True)
-    title = serializers.CharField(required=True)
-    description = serializers.CharField(required=False, allow_blank=True)
-    tags = serializers.CharField(required=False, allow_blank=True)
-    address = serializers.CharField(required=False, allow_blank=True)
-    location = serializers.CharField(required=False, allow_blank=True)
-    settings = serializers.JSONField(required=False)
-    submission_settings = serializers.JSONField(required=False)
     created_by_org = serializers.CharField(allow_blank=True, required=False)
     created_by = RelationshipField(
         related_view='user-detail',
         related_view_kwargs={'user_id': '<created_by.pk>'},
     )
-    collection_type = serializers.CharField()
     date_created = serializers.DateTimeField(read_only=True)
     date_updated = serializers.DateTimeField(read_only=True)
-    groups = RelationshipField(
-        related_view='collection-group-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
     items = RelationshipField(
         related_view='collection-item-list',
         related_view_kwargs={'pk': '<pk>'}
@@ -274,16 +196,23 @@ class CollectionSerializer(serializers.Serializer):
 
     class Meta:
         model = Collection
-        fields = [
+        fields = (
             'id',
             'title',
             'description',
             'tags',
             'created_by',
+            'created_by_org',
+            'collection_type',
+            'date_created',
+            'date_updated',
             'workflow',
             'location',
-            'address'
-        ]
+            'address',
+            'items',
+            'settings',
+            'submission_settings'
+        )
 
     class JSONAPIMeta:
         resource_name = 'collections'

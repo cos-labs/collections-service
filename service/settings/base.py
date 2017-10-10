@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'osf_oauth2_adapter',
+    'osf_oauth2_adapter'
 ]
 
 MIDDLEWARE_CLASSES = [
