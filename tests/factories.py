@@ -152,14 +152,6 @@ class ItemFactory(factory.Factory):
     source_id = 'xrfye'
 
 
-class GroupFactory(factory.Factory):
-    class Meta:
-        model = models.Group
-
-    title = factory.Faker('text', max_nb_chars=25)
-    description = factory.Faker('text', max_nb_chars=125)
-
-
 class CollectionFactory(factory.Factory):
     class Meta:
         model = models.Collection
