@@ -396,6 +396,7 @@ class Case(ModelSerializer):
             'widgets',
             'parameter_aliases',
             'parameters',
+            "collection",
             'stubs'
         ]
 
