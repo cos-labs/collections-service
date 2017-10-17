@@ -83,12 +83,14 @@ class Case(viewsets.ModelViewSet):
         queryset = self.queryset
         collection_id = self.request.query_params.get('collection')
         if collection_id:
-            queryset = queryset.filter(workflow__collections=collection_id).order_by('-id')
+            queryset = queryset.filter(collection=collection_id).order_by('-id')
         return queryset
 
     # This logic belongs in workflow.models maybe?
     def perform_create(self, serializer):
         case = serializer.save()
+        if not case.collection:
+            case.collection = self.request.query_params.get('collection')
         for stub in case.workflow.parameter_stubs.all():
             case_stub = models.CaseStub()
             case_stub.case = case
