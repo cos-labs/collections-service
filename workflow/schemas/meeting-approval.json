@@ -37,7 +37,7 @@
         {
           "label": "Approve or Deny",
           "description": "Select the resolution \"Approve\" or \"Deny\"",
-          "widgetType": "choice-widget",
+          "widgetType": "choice-picker",
           "parameters": {
             "choices": "event-approval-choices"
           }
