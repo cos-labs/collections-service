@@ -6,7 +6,7 @@ from rest_framework.serializers import CharField, ModelSerializer, JSONField, ra
 from rest_framework.utils import model_meta
 from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
 from django.contrib.auth.models import User, Group
-
+from api import models as collection_models
 from workflow import models
 
 
@@ -379,6 +379,13 @@ class Case(ModelSerializer):
         required=False
     )
 
+    collection = ResourceRelatedField(
+        queryset=collection_models.Collection.objects.all(),
+        many=False,
+        required=False,
+        allow_null=False
+    )
+
     class Meta:
         resource_name = 'cases'
         model = models.Case
@@ -389,6 +396,7 @@ class Case(ModelSerializer):
             'widgets',
             'parameter_aliases',
             'parameters',
+            "collection",
             'stubs'
         ]
 

@@ -2,6 +2,9 @@
   "title": "Meeting Submission Form",
   "description": "The meeting submission form allows users to submit information about their talks",
   "initialParameters": {
+    "next-workflow": {
+        "value": 22
+    },
     "event-creation-choices": {
       "value": [
         {
@@ -105,7 +108,8 @@
             "fileData": "file-data",
             "fileName": "file-name",
             "metadata": "metadata",
-            "node": "node"
+            "node": "node",
+            "nextWorkflow": "next-workflow"
           }
         }
       ]
