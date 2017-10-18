@@ -2,6 +2,7 @@ from django.conf.urls import url, include
 import api.views
 from rest_framework.routers import DefaultRouter
 
+from api.routers import collection_router
 from workflow.routers import workflow_router, case_router
 
 router = DefaultRouter()
@@ -12,18 +13,9 @@ router.register("users/search", api.views.UserSearchView, base_name="user-search
 urlpatterns = [
 
     url(r'^$', api.views.api_root),
+    url(r'', include(collection_router.urls)),
     url(r'', include(router.urls)),
     url(r'', include(workflow_router.urls)),
     url(r'', include(case_router.urls)),
-    url(r'^collections/$', api.views.CollectionList.as_view(), name='collection-list'),
-    url(r'^collections/(?P<pk>\w+)/$', api.views.CollectionDetail.as_view(), name='collection-detail'),
-    url(r'^collections/(?P<pk>\w+)/items/$', api.views.CollectionItemList.as_view(), name='collection-item-list'),
-    url(r'^collections/(?P<pk>\w+)/items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='collection-item-detail'),
 
-    url(r'^items/$', api.views.ItemList.as_view(), name='item-list'),
-    url(r'^items/(?P<item_id>\w+)/$', api.views.ItemDetail.as_view(), name='item-detail'),
-
-    url(r'^userinfo/$', api.views.CurrentUser.as_view(), name='current-user'),
-    url(r'^users/$', api.views.UserList.as_view(), name='user-list'),
-    url(r'^users/(?P<user_id>\w+)/$', api.views.UserDetail.as_view(), name='user-detail'),
 ]
