@@ -1,17 +1,294 @@
-from django.utils import timezone
-from rest_framework import exceptions
-from rest_framework_json_api import serializers
-from api.models import Collection, Item, User
-from api.base.serializers import RelationshipField
-from guardian.shortcuts import assign_perm
-from allauth.socialaccount.models import SocialAccount, SocialToken
+# Library Imports
+# #############################################################################
+
+
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from api import search_indexes
+from rest_framework.utils import model_meta
+from rest_framework.serializers import (
+    ModelSerializer,
+    JSONField,
+    ChoiceField,
+    raise_errors_on_nested_writes
+)
+from rest_framework_json_api.serializers import (
+    Serializer,
+    CharField,
+    DateTimeField,
+    SerializerMethodField
+)
+from rest_framework_json_api.relations import (
+    ResourceRelatedField,
+)
+from allauth.socialaccount.models import SocialAccount, SocialToken
 from drf_haystack.serializers import HaystackSerializer
 
+
+# App Imports
+# #############################################################################
+
+
+from api.models import (
+    Collection,
+    Item,
+    User
+)
+
+# TODO Use app import so `Workflow` doesn't need to be imported here.
 from workflow.models import Workflow
 
-from rest_framework_json_api.relations import ResourceRelatedField, SerializerMethodResourceRelatedField
+from api import search_indexes
+
+
+# Model Serializers
+# #############################################################################
+
+class CollectionModelSerializer(ModelSerializer):
+    def create(self, validated_data):
+        """
+        We have a bit of extra checking around this in order to provide
+        descriptive messages when something goes wrong, but this method is
+        essentially just:
+            return ExampleModel.objects.create(**validated_data)
+        If there are many to many fields present on the instance then they
+        cannot be set until the model is instantiated, in which case the
+        implementation is like so:
+            example_relationship = validated_data.pop('example_relationship')
+            instance = ExampleModel.objects.create(**validated_data)
+            instance.example_relationship = example_relationship
+            return instance
+        The default implementation also does not handle nested relationships.
+        If you want to support writable nested relationships you'll need
+        to write an explicit `.create()` method.
+        """
+        raise_errors_on_nested_writes('create', self, validated_data)
+
+        ModelClass = self.Meta.model
+
+        # Remove many-to-many relationships from validated_data.
+        # They are not valid arguments to the default `.create()` method,
+        # as they require that the instance has already been saved.
+        info = model_meta.get_field_info(ModelClass)
+        many_to_many = {}
+        for field_name, relation_info in info.relations.items():
+            if relation_info.to_many and (field_name in validated_data):
+                many_to_many[field_name] = validated_data.pop(field_name)
+
+        try:
+            instance = ModelClass.objects.create(**validated_data)
+        except TypeError:
+            tb = traceback.format_exc()
+            msg = (
+                'Got a `TypeError` when calling `%s.objects.create()`. '
+                'This may be because you have a writable field on the '
+                'serializer class that is not a valid argument to '
+                '`%s.objects.create()`. You may need to make the field '
+                'read-only, or override the %s.create() method to handle '
+                'this correctly.\nOriginal exception was:\n %s' %
+                (
+                    ModelClass.__name__,
+                    ModelClass.__name__,
+                    self.__class__.__name__,
+                    tb
+                )
+            )
+            raise TypeError(msg)
+
+        # Save many-to-many relationships after the instance is created.
+        if many_to_many:
+            for field_name, value in many_to_many.items():
+
+                # If the m2m has a model defined as a through table, then
+                # relations cannot be added by that relationship's .add() method,
+                # but should be created using the model's constructor.
+                # This loop checks to ensure that if the relation does not exist
+                # it is created. The way this is set up now, it requires the relation
+                # to be unique.
+                if field_name in info.relations and info.relations[field_name].has_through_model:
+                    field = info.relations[field_name].model_field
+                    for related_instance in value:
+                        through_class = field.rel.through
+                        through_instance = through_class()
+                        existing_through_instances = through_class.objects\
+                            .filter(**{field.m2m_field_name()+"_id": instance.id})\
+                            .filter(**{field.m2m_reverse_field_name()+"_id": related_instance.id})
+                        if existing_through_instances.exists():
+                            continue
+                        setattr(through_instance, field.m2m_field_name(), instance)
+                        setattr(through_instance, field.m2m_reverse_field_name(), related_instance)
+                        through_instance.save()
+
+                else:
+                    field = getattr(instance, field_name)
+                    field.set(value)
+        return instance
+
+    def update(self, instance, validated_data):
+        raise_errors_on_nested_writes('update', self, validated_data)
+        info = model_meta.get_field_info(instance)
+
+        # Simply set each attribute on the instance, and then save it.
+        # Note that unlike `.create()` we don't need to treat many-to-many
+        # relationships as being a special case. During updates we already
+        # have an instance pk for the relationships to be associated with.
+        for attr, value in validated_data.items():
+
+            # If the m2m has a model defined as a through table, then
+            # relations cannot be added by that relationship's .add() method,
+            # but should be created using the model's constructor.
+            # This loop checks to ensure that if the relation does not exist
+            # it is created. The way this is set up now, it requires the relation
+            # to be unique.
+            if attr in info.relations and info.relations[attr].has_through_model:
+                field = info.relations[attr].model_field
+                for related_instance in value:
+                    through_class = field.rel.through
+                    through_instance = through_class()
+                    existing_through_instances = through_class.objects\
+                        .filter(**{field.m2m_field_name()+"_id": instance.id})\
+                        .filter(**{field.m2m_reverse_field_name()+"_id": related_instance.id})
+                    if existing_through_instances.exists():
+                        continue
+                    setattr(through_instance, field.m2m_field_name(), instance)
+                    setattr(through_instance, field.m2m_reverse_field_name(), related_instance)
+                    through_instance.save()
+
+            elif attr in info.relations and info.relations[attr].to_many:
+                field = getattr(instance, attr)
+                field.set(value)
+
+            else:
+                setattr(instance, attr, value)
+
+        instance.save()
+
+        return instance
+
+
+class CollectionSerializer(CollectionModelSerializer):
+
+    included_serializers = {
+        'workflow': 'workflow.serializers.Workflow'
+    }
+
+    id = CharField(read_only=True)
+    title = CharField(required=True)
+    description = CharField(required=False, allow_blank=True)
+    tags = CharField(required=False, allow_blank=True)
+    address = CharField(required=False, allow_blank=True)
+    location = CharField(required=False, allow_blank=True)
+    settings = JSONField(required=False)
+    submission_settings = JSONField(required=False)
+    created_by_org = CharField(allow_blank=True, required=False)
+    created_by = ResourceRelatedField(
+        queryset=User.objects.all(),
+        many=False,
+        required=True
+    )
+    collection_type = CharField()
+    date_created = DateTimeField(read_only=True)
+    date_updated = DateTimeField(read_only=True)
+    items = ResourceRelatedField(
+        queryset=Item.objects.all(),
+        many=True,
+        required=False
+    )
+    workflow = ResourceRelatedField(
+        queryset=Workflow.objects.all(),
+        many=False,
+        required=True
+    )
+
+    class Meta:
+        model = Collection
+        fields = [
+            'id',
+            'title',
+            'description',
+            'tags',
+            'created_by',
+            'workflow',
+            'location',
+            'address',
+            'collection_type',
+            'settings',
+            'created_by_org',
+            'submission_settings',
+            'date_updated',
+            'items',
+            'date_created'
+        ]
+
+    class JSONAPIMeta:
+        resource_name = 'collections'
+        included_resources = [
+            'workflow',
+        ]
+
+
+class ItemSerializer(CollectionModelSerializer):
+    type = ChoiceField(
+        choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
+    status = ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
+    created_by = ResourceRelatedField(
+        queryset=User.objects.all(),
+        many=False,
+    )
+    date_created = DateTimeField(read_only=True)
+    date_submitted = DateTimeField(read_only=True, allow_null=True)
+    date_accepted = DateTimeField(read_only=True, allow_null=True)
+    category = ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
+
+    class Meta:
+        model = Item
+        fields = (
+            'id', 'title', 'type', 'description', 'status', 'source_id', 'url', 'created_by', 'metadata',
+            'date_created', 'date_submitted', 'date_accepted', 'location', 'start_time', 'end_time', 'category',
+            'file_link'
+        )
+
+    class JSONAPIMeta:
+        resource_name = 'items'
+
+
+class UserSerializer(CollectionModelSerializer):
+    token = SerializerMethodField()
+
+    #collection = ResourceRelatedField(
+    #    queryset=Collection.objects.all(),
+    #    many=False,
+    #    required=False
+    #)
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'date_joined',
+            'last_login',
+            'is_active',
+            'gravatar',
+            'token'
+            #"collection"
+        ]
+
+    class JSONAPIMeta:
+        resource_name = 'users'
+
+    def get_token(self, obj):
+        if not obj.id:
+            return None
+        try:
+            account = SocialAccount.objects.get(user=obj)
+            token = SocialToken.objects.get(account=account).token
+        except ObjectDoesNotExist:
+            return None
+        return token
+
 
 class UserSearchSerializer(HaystackSerializer):
 
@@ -51,186 +328,3 @@ class CollectionSearchSerializer(HaystackSerializer):
             'created_by'
         ]
 
-
-class UserSerializer(serializers.ModelSerializer):
-    token = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = [
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'date_joined',
-            'last_login',
-            'is_active',
-            'gravatar',
-            'token'
-        ]
-
-    class JSONAPIMeta:
-        resource_name = 'users'
-
-    def get_token(self, obj):
-        if not obj.id:
-            return None
-        try:
-            account = SocialAccount.objects.get(user=obj)
-            token = SocialToken.objects.get(account=account).token
-        except ObjectDoesNotExist:
-            return None
-        return token
-
-
-class ItemSerializer(serializers.ModelSerializer):
-    type = serializers.ChoiceField(
-        choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
-    status = serializers.ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
-    created_by = UserSerializer(read_only=True)
-    date_created = serializers.DateTimeField(read_only=True)
-    date_submitted = serializers.DateTimeField(read_only=True, allow_null=True)
-    date_accepted = serializers.DateTimeField(read_only=True, allow_null=True)
-    category = serializers.ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
-
-    class Meta:
-        model = Item
-        fields = (
-            'id', 'title', 'type', 'description', 'status', 'source_id', 'url', 'created_by', 'metadata',
-            'date_created', 'date_submitted', 'date_accepted', 'location', 'start_time', 'end_time', 'category',
-            'file_link'
-        )
-
-    class JSONAPIMeta:
-        resource_name = 'items'
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
-            'pk', None)
-        collection = Collection.objects.get(id=collection_id)
-
-        allow_all = None
-        if collection.settings:
-            allow_all = collection.settings.get('allow_all', None)
-        collection_type = collection.collection_type
-        if collection_type and validated_data['type'] != collection_type:
-            raise ValueError('Collection only accepts items of type ' + collection_type)
-
-        if user.has_perm('api.approve_collection_items', collection) or allow_all:
-            status = 'approved'
-            validated_data['date_accepted'] = timezone.now()
-        else:
-            status = 'pending'
-
-        validated_data['status'] = status
-        validated_data['date_submitted'] = timezone.now()
-        item = Item.objects.create(
-            created_by=user,
-            collection=collection,
-            **validated_data
-        )
-        return item
-
-    def update(self, item, validated_data):
-        user = self.context['request'].user
-        status = validated_data.get('status', item.status)
-        collection_id = self.context.get('collection_id', None) or self.context['request'].parser_context['kwargs'].get(
-            'pk', None)
-        if collection_id:
-            collection = Collection.objects.get(id=collection_id)
-        else:
-            collection = item.collection
-
-        if status != item.status and user.has_perm('api.approve_collection_items', collection):
-            raise exceptions.PermissionDenied(detail='Cannot change submission status.')
-        elif user.id != item.created_by_id and validated_data.keys() != ['status']:
-            raise exceptions.PermissionDenied(detail='Cannot update another user\'s submission.')
-
-        item_type = validated_data.get('type', item.type)
-        if collection.settings:
-            collection_type = collection.settings.get('type', None)
-            if collection_type and item_type != collection_type:
-                raise ValueError('Collection only accepts items of type ' + collection_type)
-
-        item.source_id = validated_data.get('source_id', item.source_id)
-        item.title = validated_data.get('title', item.title)
-        item.description = validated_data.get('description', item.description)
-        item.type = item_type
-        item.status = status
-        item.url = validated_data.get('url', item.url)
-        item.metadata = validated_data.get('metadata', item.metadata)
-        item.location = validated_data.get('location', item.location)
-        item.start_time = validated_data.get('start_time', item.start_time)
-        item.end_time = validated_data.get('end_time', item.end_time)
-        item.category = validated_data.get('category', item.category)
-        item.file_link = validated_data.get('file_link', item.file_link)
-        item.save()
-        return item
-
-
-class CollectionSerializer(serializers.ModelSerializer):
-
-    included_serializers = {
-        'workflow': 'workflow.serializers.Workflow'
-    }
-    created_by_org = serializers.CharField(allow_blank=True, required=False)
-    created_by = RelationshipField(
-        related_view='user-detail',
-        related_view_kwargs={'user_id': '<created_by.pk>'},
-    )
-    date_created = serializers.DateTimeField(read_only=True)
-    date_updated = serializers.DateTimeField(read_only=True)
-    items = RelationshipField(
-        related_view='collection-item-list',
-        related_view_kwargs={'pk': '<pk>'}
-    )
-
-    workflow = ResourceRelatedField(
-        queryset=Workflow.objects.all(),
-        many=False,
-        required=True
-    )
-
-    class Meta:
-        model = Collection
-        fields = (
-            'id',
-            'title',
-            'description',
-            'tags',
-            'created_by',
-            'created_by_org',
-            'collection_type',
-            'date_created',
-            'date_updated',
-            'workflow',
-            'location',
-            'address',
-            'items',
-            'settings',
-            'submission_settings'
-        )
-
-    class JSONAPIMeta:
-        resource_name = 'collections'
-        included_resources = [
-            'workflow',
-        ]
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        collection = Collection.objects.create(created_by=user, **validated_data)
-        assign_perm('api.approve_collection_items', user, collection)
-        return collection
-
-    def update(self, collection, validated_data):
-        collection.title = validated_data.get('title', collection.title)
-        collection.description = validated_data.get('description', collection.description)
-        collection.tags = validated_data.get('tags', collection.tags)
-        collection.settings = validated_data.get('settings', collection.settings)
-        collection.submission_settings = validated_data.get('submission_settings', collection.submission_settings)
-        collection.created_by_org = validated_data.get('created_by_org', collection.created_by_org)
-        collection.save()
-        return collection

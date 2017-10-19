@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import (
+    AbstractUser,
+    Group
+)
 from django.contrib.postgres.fields import JSONField
 from tests import resources
 
@@ -12,6 +15,17 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return self.first_name + " " + self.last_name
+
+    def save(self, *args, **kwargs):
+        try:
+            public_group = Group.objects.get(pk=1)
+        except:
+            public_group = Group()
+            public_group.pk = 1
+            public_group.name = "public"
+            public_group.save()
+        self.groups.add(public_group)
+        super().save(*args, **kwargs)
 
 
 class Collection(models.Model):
