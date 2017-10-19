@@ -130,10 +130,6 @@ class Item(models.Model):
     category = models.CharField(choices=CATEGORIES, null=True, blank=True, max_length=200)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
 
-    @property
-    def approved(self):
-        return True if self.status == "approved" else False
-
     class Meta:
         permissions = (
             ("edit", "Edit this item"),

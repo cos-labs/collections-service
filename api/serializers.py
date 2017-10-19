@@ -9,6 +9,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     JSONField,
     ChoiceField,
+    BooleanField,
     raise_errors_on_nested_writes
 )
 from rest_framework_json_api.serializers import (

@@ -165,7 +165,7 @@ class ItemViewSet(ModelViewSet):
         if not user.has_perm('add_item', item["collection"]):
             return HttpResponse('Unauthorized', status=401)
 
-        if item["approved"] and not user.has_perm('approve_collection_items', item["collection"]):
+        if item["status"] == "approved" and not user.has_perm('approve_collection_items', item["collection"]):
             return HttpResponse('Unauthorized', status=401)
 
         item["created_by"] = user
@@ -174,9 +174,9 @@ class ItemViewSet(ModelViewSet):
 
         assign_perm('edit', user, item)
         assign_perm('edit', user, item)
-        assign_perm('view', item["collection"].admins, item)
-        assign_perm('view', item["collection"].admins, item)
-        assign_perm('approve', item["collection"].admins, item)
+        assign_perm('view', item.collection.admins, item)
+        assign_perm('view', item.collection.admins, item)
+        assign_perm('approve', item.collection.admins, item)
 
     def perform_update(self, serializer):
 
@@ -185,9 +185,9 @@ class ItemViewSet(ModelViewSet):
         initial_data = serializer.initial_data
         validated_data = serializer.validated_data
 
-        if initial_data.approved:
+        if initial_data["status"] == approved:
             validated_data.approved = False
-        elif not validated_data.approved and not user.has_perm('approve_collection_items', collection):
+        elif not validated_data["status"] == approved and not user.has_perm('approve_collection_items', collection):
             return HttpResponse('Unauthorized', status=401)
 
         serializer.save()
