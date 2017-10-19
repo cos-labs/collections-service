@@ -17,7 +17,6 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_json_api import pagination
 from rest_framework import exceptions as drf_exceptions
 from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
@@ -39,6 +38,7 @@ from api.serializers import (
     ItemSearchSerializer,
     UserSearchSerializer
 )
+from api.pagination import LargeResultsSetPagination
 
 
 # Views
@@ -197,12 +197,6 @@ class ItemSearchView(HaystackViewSet):
 class UserSearchView(HaystackViewSet):
     index_models = [User]
     serializer_class = UserSearchSerializer
-
-
-class LargeResultsSetPagination(pagination.PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
 
 
 # EOF
