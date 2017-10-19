@@ -183,7 +183,7 @@ class CollectionSerializer(CollectionModelSerializer):
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
-        required=True
+        required=False
     )
     collection_type = CharField()
     date_created = DateTimeField(read_only=True)
@@ -233,19 +233,40 @@ class ItemSerializer(CollectionModelSerializer):
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
+        required=False
     )
     date_created = DateTimeField(read_only=True)
     date_submitted = DateTimeField(read_only=True, allow_null=True)
     date_accepted = DateTimeField(read_only=True, allow_null=True)
+    collection = ResourceRelatedField(
+        queryset=Collection.objects.all(),
+        many=False,
+        required=True
+    )
     category = ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
 
     class Meta:
         model = Item
-        fields = (
-            'id', 'title', 'type', 'description', 'status', 'source_id', 'url', 'created_by', 'metadata',
-            'date_created', 'date_submitted', 'date_accepted', 'location', 'start_time', 'end_time', 'category',
+        fields = [
+            'id',
+            'title',
+            'type',
+            'description',
+            'status',
+            'source_id',
+            'url',
+            'created_by',
+            'metadata',
+            'date_created',
+            'date_submitted',
+            'date_accepted',
+            'location',
+            'start_time',
+            'end_time',
+            'category',
+            'collection',
             'file_link'
-        )
+        ]
 
     class JSONAPIMeta:
         resource_name = 'items'

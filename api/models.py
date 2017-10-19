@@ -18,7 +18,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         try:
-            public_group = Group.objects.get(pk=1)
+            public_group = Group.objects.get(id=1)
         except:
             public_group = Group()
             public_group.pk = 1
@@ -44,6 +44,13 @@ class Collection(models.Model):
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
 
+    admins = models.ForeignKey(
+        Group,
+        null=True,
+        blank=True,
+        related_name="collection"
+    )
+
     workflow = models.ForeignKey(
         'workflow.Workflow',
         null=True,
@@ -53,19 +60,33 @@ class Collection(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # if this is the first save, set default settings based on collection_type
+
+        if not self.pk:  # If this is the first save
+
             if self.collection_type == 'meeting':
                 self.settings = resources.meeting_json
             elif self.collection_type == 'dataset':
                 self.settings = resources.dataset_json
-        super().save(*args, **kwargs)
+
+            super().save(*args, **kwargs)
+
+            if not getattr(self, "admins", None):
+                admin_group = Group()
+                admin_group.name = self.title + "("+str(self.id)+")" + " Admin Group"
+                admin_group.save(force_insert=True)
+                self.admins = admin_group
+                self.save(force_update=True)
+
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
         permissions = (
-            ('approve_collection_items', 'Approve collection items'),
+            ("view_collection", "View this collection"),
+            ("add_item", "Add a item to the collection")
         )
 
 
@@ -108,3 +129,14 @@ class Item(models.Model):
     end_time = models.DateTimeField(null=True, blank=True, default=None)
     category = models.CharField(choices=CATEGORIES, null=True, blank=True, max_length=200)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
+
+    @property
+    def approved(self):
+        return True if self.status == "approved" else False
+
+    class Meta:
+        permissions = (
+            ("edit", "Edit this item"),
+            ("view", "View this item"),
+            ("approve", "Approve this item")
+        )
