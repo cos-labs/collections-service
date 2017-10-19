@@ -136,6 +136,7 @@ class ItemViewSet(ModelViewSet):
 
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         queryset = self.queryset
