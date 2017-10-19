@@ -14,6 +14,7 @@
 
 from django.http import HttpResponse
 from django.db.models import Q
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
@@ -23,7 +24,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from drf_haystack.viewsets import HaystackViewSet
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import (
+    assign_perm,
+    get_objects_for_user
+)
+
 
 from api.models import (
     Collection,
@@ -98,11 +103,13 @@ class CollectionViewSet(ModelViewSet):
 
     def get_queryset(self):
 
+        user = self.request.user
         queryset = Collection.objects.all().order_by('-date_created')
 
         user_id = self.request.query_params.get('user')
         username = self.request.query_params.get('username')
         org_name = self.request.query_params.get("org")
+
 
         if user_id:
             queryset = queryset.filter(created_by_id=user_id)
@@ -111,22 +118,26 @@ class CollectionViewSet(ModelViewSet):
         if org_name:
             queryset = queryset.filter(created_by_org=org_name)
 
+        queryset = get_objects_for_user(user, 'view_collection', klass=queryset)
+
         return queryset
 
     def perform_create(self, serializer):
         user = self.request.user
+        collection = serializer.validated_data
+        collection["created_by"] = user
         collection = serializer.save()
-        assign_perm('api.approve_collection_items', user, collection)
-        assign_perm('view', user, collection)
+        assign_perm('view_collection', collection.admins, collection)
+        assign_perm('add_item', collection.admins, collection)
+        user.groups.add(collection.admins)
+        user.save()
 
     def retrieve(self, request, *args, **kwargs):
         collection = self.get_object()
-        #if request.user.has_perm("view", collection):
-            #serializer = self.get_serializer(collection)
-            #return Response(serializer.data)
-        serializer = self.get_serializer(collection)
-        return Response(serializer.data)
-        #return HttpResponse('Not Found', status=404)
+        if request.user.has_perm("view_collection", collection):
+            serializer = self.get_serializer(collection)
+            return Response(serializer.data)
+        return HttpResponse('Not Found', status=404)
 
 
 class ItemViewSet(ModelViewSet):
@@ -144,23 +155,51 @@ class ItemViewSet(ModelViewSet):
         collection = self.request.data.get('collection')
         if collection:
             queryset = queryset.filter(collection_id=collection)
-        return queryset.filter(Q(status='approved') | Q(created_by=user.id) | Q(collection__created_by=user.id))
+        queryset = get_objects_for_user(user, 'view', klass=queryset)
+        return queryset
 
     def perform_create(self, serializer):
+
         user = self.request.user
-        collection = Collection.objects.get(self.request.data.get("collection"))
-        if not user.has_perm('collection.AddItem', collection):
+        item = serializer.validated_data
+
+        if not user.has_perm('add_item', item["collection"]):
             return HttpResponse('Unauthorized', status=401)
+
+        if item["status"] == "approved" and not user.has_perm('approve_collection_items', item["collection"]):
+            return HttpResponse('Unauthorized', status=401)
+
+        item["created_by"] = user
+
+        item = serializer.save()
+
+        assign_perm('edit', user, item)
+        assign_perm('edit', user, item)
+        assign_perm('view', item.collection.admins, item)
+        assign_perm('view', item.collection.admins, item)
+        assign_perm('approve', item.collection.admins, item)
+
+    def perform_update(self, serializer):
+
+        user = self.request.user
+
+        initial_data = serializer.initial_data
+        validated_data = serializer.validated_data
+
+        if initial_data["status"] == approved:
+            validated_data.approved = False
+        elif not validated_data["status"] == approved and not user.has_perm('approve_collection_items', collection):
+            return HttpResponse('Unauthorized', status=401)
+
         serializer.save()
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        #if request.user.has_perm("view", instance):
-            #serializer = self.get_serializer(instance)
-            #return Response(serializer.data)
+        if request.user.has_perm("view", instance):
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-        #return HttpResponse('Not Found', status=404)
+        return HttpResponse('Not Found', status=404)
 
 
 class UserViewSet(ModelViewSet):
