@@ -2,6 +2,7 @@
 # #############################################################################
 
 
+from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import model_meta
@@ -12,14 +13,24 @@ from rest_framework.serializers import (
     BooleanField,
     raise_errors_on_nested_writes
 )
+from rest_framework.relations import (
+    ManyRelatedField,
+    MANY_RELATION_KWARGS
+)
 from rest_framework_json_api.serializers import (
     Serializer,
     CharField,
     DateTimeField,
-    SerializerMethodField
+    SerializerMethodField,
+    HyperlinkedModelSerializer
 )
+from guardian.shortcuts import (
+    assign_perm,
+    get_objects_for_user
+)
+
 from rest_framework_json_api.relations import (
-    ResourceRelatedField,
+    ResourceRelatedField
 )
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from drf_haystack.serializers import HaystackSerializer
@@ -44,7 +55,48 @@ from api import search_indexes
 # Model Serializers
 # #############################################################################
 
-class CollectionModelSerializer(ModelSerializer):
+
+class ProtectedManyRelatedField(ManyRelatedField):
+
+    def to_representation(self, iterable):
+        import ipdb; ipdb.set_trace()
+        if type(iterable) == QuerySet:
+            iterable = self.child_relation.get_queryset()
+        return [
+            self.child_relation.to_representation(value)
+            for value in iterable
+        ]
+
+
+class ItemField(ResourceRelatedField):
+
+    def get_queryset(self):
+        user = self.context['request'].user
+        queryset = get_objects_for_user(user, 'view', klass=self.queryset)
+        return queryset
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        This method handles creating a parent `ManyRelatedField` instance
+        when the `many=True` keyword argument is passed.
+        Typically you won't need to override this method.
+        Note that we're over-cautious in passing most arguments to both parent
+        and child classes in order to try to cover the general case. If you're
+        overriding this method you'll probably want something much simpler, eg:
+        @classmethod
+        def many_init(cls, *args, **kwargs):
+            kwargs['child'] = cls()
+            return CustomManyRelatedField(*args, **kwargs)
+        """
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs.keys():
+            if key in MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return ProtectedManyRelatedField(**list_kwargs)
+
+
+class CollectionModelSerializer(HyperlinkedModelSerializer):
     def create(self, validated_data):
         """
         We have a bit of extra checking around this in order to provide
@@ -182,24 +234,22 @@ class CollectionSerializer(CollectionModelSerializer):
     submission_settings = JSONField(required=False)
     created_by_org = CharField(allow_blank=True, required=False)
     created_by = ResourceRelatedField(
-        queryset=User.objects.all(),
+        queryset=User.objects,
         many=False,
         required=False
     )
     collection_type = CharField()
     date_created = DateTimeField(read_only=True)
     date_updated = DateTimeField(read_only=True)
-    items = ResourceRelatedField(
+    items = ItemField(
         queryset=Item.objects.all(),
-        many=True,
-        required=False
+        many=True
     )
     workflow = ResourceRelatedField(
         queryset=Workflow.objects.all(),
         many=False,
         required=True
     )
-
     class Meta:
         model = Collection
         fields = [

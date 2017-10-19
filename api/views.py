@@ -41,7 +41,8 @@ from api.serializers import (
     UserSerializer,
     CollectionSearchSerializer,
     ItemSearchSerializer,
-    UserSearchSerializer
+    UserSearchSerializer,
+    
 )
 from api.pagination import LargeResultsSetPagination
 
@@ -100,6 +101,16 @@ class CollectionViewSet(ModelViewSet):
 
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+
+    #def get_serializer(self, *args, **kwargs):
+    #    parent = super(SecuredFieldMixin, self).get_serializer(*args, **kwargs)
+    #    for secured_field in self.secured_fields:
+    #        if secured_field in parent.fields:
+    #            parent.fields[secured_field].queryset = self.filter_queryset(parent.fields[secured_field].queryset)
+    #    return parent
+
+    #def get_serializer(self, *args, **kwargs):
+    #    import ipdb; ipdb.set_trace()
 
     def get_queryset(self):
 
