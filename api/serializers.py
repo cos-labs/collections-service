@@ -71,7 +71,7 @@ class ProtectedManyRelatedField(ManyRelatedField):
         ]
 
 
-class ItemField(ResourceRelatedField):
+class ProtectedResourceRelatedField(ResourceRelatedField):
 
     def get_queryset(self):
         user = self.context['request'].user
@@ -244,7 +244,7 @@ class CollectionSerializer(CollectionModelSerializer):
     collection_type = CharField()
     date_created = DateTimeField(read_only=True)
     date_updated = DateTimeField(read_only=True)
-    items = ItemField(
+    items = ProtectedResourceRelatedField(
         queryset=Item.objects.all(),
         many=True
     )
