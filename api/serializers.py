@@ -231,8 +231,8 @@ class CollectionSerializer(CollectionModelSerializer):
     title = CharField(required=True)
     description = CharField(required=False, allow_blank=True)
     tags = CharField(required=False, allow_blank=True)
-    address = CharField(required=False, allow_blank=True)
-    location = CharField(required=False, allow_blank=True)
+    address = CharField(required=False, allow_blank=True, allow_null=True)
+    location = CharField(required=False, allow_blank=True, allow_null=True)
     settings = JSONField(required=False)
     submission_settings = JSONField(required=False)
     created_by_org = CharField(allow_blank=True, required=False)
@@ -246,7 +246,8 @@ class CollectionSerializer(CollectionModelSerializer):
     date_updated = DateTimeField(read_only=True)
     items = ProtectedResourceRelatedField(
         queryset=Item.objects.all(),
-        many=True
+        many=True,
+        required=False
     )
     workflow = ResourceRelatedField(
         queryset=Workflow.objects.all(),
