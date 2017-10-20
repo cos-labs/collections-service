@@ -1,0 +1,51 @@
+{
+  "title": "Make A Proposal",
+  "description": "Make a proposal for a research project.",
+  "initialParameters": {
+    "event-approval-choices": {
+      "value": [
+        {
+          "label": "Approve",
+          "parameter": "event-approved"
+        },
+        {
+          "label": "Deny",
+          "parameter": "event-denied"
+        }
+      ]
+    }
+  },
+  "sections": [
+    {
+      "label": "Proposal Information",
+      "Description": "Describe the research idea",
+      "widgets": [
+        {
+          "label": "Topic",
+          "description": "What area of research does this proposal apply to?",
+          "widgetType": "text-field",
+          "parameters": {
+            "value": "topic"
+          }
+        },
+        {
+          "label": "Premise",
+          "description": "Describe the basic premise behind the idea.",
+          "widgetType": "text-area",
+          "parameters": {
+            "value": "premise"
+          }
+        },
+        {
+          "label": "Submit",
+          "description": "Submit this proposal",
+          "widgetType": "proposal-submit",
+          "parameters": {
+            "premis": "premise",
+            "topic": "topic"
+          }
+        }
+      ]
+    }
+  ]
+}

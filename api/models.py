@@ -7,10 +7,15 @@ from django.contrib.auth.models import (
 from django.contrib.postgres.fields import JSONField
 from tests import resources
 
+import datetime
+
+
+
+
 
 class User(AbstractUser):
     id = models.AutoField(primary_key=True)
-    gravatar = models.URLField(blank=True)
+    gravatar = models.URLField(blank=True, null=True)
 
     @property
     def full_name(self):
@@ -24,8 +29,13 @@ class User(AbstractUser):
             public_group.pk = 1
             public_group.name = "public"
             public_group.save()
-        self.groups.add(public_group)
-        super().save(*args, **kwargs)
+        if not self.pk:
+            super().save(*args, **kwargs)
+            self.groups.add(public_group)
+            self.save()
+
+def get_anonymous_user_instance(User):
+    return User(username="anonymous")
 
 
 class Collection(models.Model):

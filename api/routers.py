@@ -29,7 +29,7 @@ from api.views import (
 # #############################################################################
 
 
-collection_router = routers.DefaultRouter(trailing_slash=False)
+collection_router = routers.DefaultRouter(trailing_slashes=False)
 
 collection_router.register(r'collections', CollectionViewSet)
 collection_router.register(r'items', ItemViewSet)
