@@ -59,7 +59,10 @@ from api import search_indexes
 class ProtectedManyRelatedField(ManyRelatedField):
 
     def to_representation(self, iterable):
-        import ipdb; ipdb.set_trace()
+        """
+        Override `to_representation` in order to handle filtering of relation
+        by user permissions. The if statement is the change from the original
+        """
         if type(iterable) == QuerySet:
             iterable = self.child_relation.get_queryset()
         return [
@@ -234,7 +237,7 @@ class CollectionSerializer(CollectionModelSerializer):
     submission_settings = JSONField(required=False)
     created_by_org = CharField(allow_blank=True, required=False)
     created_by = ResourceRelatedField(
-        queryset=User.objects,
+        queryset=User.objects.all(),
         many=False,
         required=False
     )

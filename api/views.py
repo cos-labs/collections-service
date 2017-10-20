@@ -102,15 +102,24 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
 
-    #def get_serializer(self, *args, **kwargs):
-    #    parent = super(SecuredFieldMixin, self).get_serializer(*args, **kwargs)
-    #    for secured_field in self.secured_fields:
-    #        if secured_field in parent.fields:
-    #            parent.fields[secured_field].queryset = self.filter_queryset(parent.fields[secured_field].queryset)
-    #    return parent
+    # TODO
+    # Monkeypatch fields from view so permission logic stays in the view
 
+    #protected_fields = [
+    #   "items"
+    #]
+    #
+    #def get_related_items_queryset():
+    #    user = self.context['request'].user
+    #    queryset = get_objects_for_user(user, 'view', klass=self.queryset)
+    #    return queryset
+    #
     #def get_serializer(self, *args, **kwargs):
-    #    import ipdb; ipdb.set_trace()
+    #    parent = super(ProtectedFieldMixin, self).get_serializer(*args, **kwargs)
+    #    for protected_field in self.protected_fields:
+    #        if protected_field in parent.fields:
+    #            parent.fields[protected_field].queryset = self.filter_queryset(parent.fields[protected_field].queryset)
+    #    return parent
 
     def get_queryset(self):
 
