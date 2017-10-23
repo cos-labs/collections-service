@@ -3,7 +3,7 @@ import api.views
 from rest_framework.routers import DefaultRouter
 
 from api.routers import collection_router
-from workflow.routers import workflow_router, case_router
+from workflow.routers import workflow_router
 
 router = DefaultRouter()
 router.register("collections/search", api.views.CollectionSearchView, base_name="collection-search")
@@ -16,6 +16,5 @@ urlpatterns = [
     url(r'', include(collection_router.urls)),
     url(r'', include(router.urls)),
     url(r'', include(workflow_router.urls)),
-    url(r'', include(case_router.urls)),
 
 ]
