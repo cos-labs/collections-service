@@ -173,8 +173,6 @@ class ItemViewSet(ModelViewSet):
         queryset = self.queryset
         user = self.request.user
         collection = self.request.data.get('collection')
-        #if collection:
-        #    queryset = queryset.filter(collection_id=collection)
         queryset = get_objects_for_user(user, 'view', klass=queryset)
         return queryset
 

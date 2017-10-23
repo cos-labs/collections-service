@@ -87,8 +87,6 @@ class Parameter(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        #case = models.Case.objects.get(id=2)
-        #queryset = queryset.filter(cases__id=case.id)
         return queryset
 
 
