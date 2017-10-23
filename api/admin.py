@@ -32,8 +32,7 @@ class ItemAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         user = request.user
-        collections = get_objects_for_user(user, 'api.approve_collection_items')
-        meetings = get_objects_for_user(user, 'api.approve_meeting_items')
+        collections = get_objects_for_user(user, 'view')
         can_moderate = list(collections) + list(meetings)
         return self.model.objects.filter(collection__in=can_moderate), True
 

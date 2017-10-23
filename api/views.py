@@ -42,7 +42,7 @@ from api.serializers import (
     CollectionSearchSerializer,
     ItemSearchSerializer,
     UserSearchSerializer,
-    
+
 )
 from api.pagination import LargeResultsSetPagination
 
