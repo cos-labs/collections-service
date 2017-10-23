@@ -64,7 +64,7 @@ class ProtectedManyRelatedField(ManyRelatedField):
         by user permissions. The if statement is the change from the original
         """
         if type(iterable) == QuerySet:
-            iterable = self.child_relation.get_queryset()
+            iterable = self.child_relation.get_queryset(iterable)
         return [
             self.child_relation.to_representation(value)
             for value in iterable
@@ -73,9 +73,9 @@ class ProtectedManyRelatedField(ManyRelatedField):
 
 class ProtectedResourceRelatedField(ResourceRelatedField):
 
-    def get_queryset(self):
+    def get_queryset(self, iterable):
         user = self.context['request'].user
-        queryset = get_objects_for_user(user, 'view', klass=self.queryset)
+        queryset = get_objects_for_user(user, 'view', klass=iterable)
         return queryset
 
     @classmethod
@@ -100,6 +100,9 @@ class ProtectedResourceRelatedField(ResourceRelatedField):
 
 
 class CollectionModelSerializer(HyperlinkedModelSerializer):
+
+
+
     def create(self, validated_data):
         """
         We have a bit of extra checking around this in order to provide
@@ -219,6 +222,7 @@ class CollectionModelSerializer(HyperlinkedModelSerializer):
         instance.save()
 
         return instance
+
 
 
 class CollectionSerializer(CollectionModelSerializer):
