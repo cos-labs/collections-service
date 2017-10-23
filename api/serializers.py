@@ -11,7 +11,6 @@ from rest_framework.serializers import (
     JSONField,
     ChoiceField,
     BooleanField,
-    ListSerializer,
     raise_errors_on_nested_writes
 )
 from rest_framework.relations import (
@@ -23,8 +22,7 @@ from rest_framework_json_api.serializers import (
     CharField,
     DateTimeField,
     SerializerMethodField,
-    HyperlinkedModelSerializer,
-    LIST_SERIALIZER_KWARGS
+    HyperlinkedModelSerializer
 )
 from guardian.shortcuts import (
     assign_perm,
