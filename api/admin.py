@@ -32,10 +32,9 @@ class ItemAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         user = request.user
-        collections = get_objects_for_user(user, 'view')
+        collections = get_objects_for_user(user, 'view_collection')
         can_moderate = list(collections) + list(meetings)
         return self.model.objects.filter(collection__in=can_moderate), True
-
 
 class OSFUserAdmin(UserAdmin):
     model = get_user_model()
