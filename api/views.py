@@ -173,8 +173,6 @@ class ItemViewSet(ModelViewSet):
         queryset = self.queryset
         user = self.request.user
         collection = self.request.data.get('collection')
-        if collection:
-            queryset = queryset.filter(collection_id=collection)
         queryset = get_objects_for_user(user, 'view', klass=queryset)
         return queryset
 
@@ -205,10 +203,9 @@ class ItemViewSet(ModelViewSet):
 
         initial_data = serializer.initial_data
         validated_data = serializer.validated_data
-
-        if initial_data["status"] == approved:
-            validated_data.approved = False
-        elif not validated_data["status"] == approved and not user.has_perm('approve_collection_items', collection):
+        collection = validated_data["collection"]
+        if validated_data["status"] == "approved" and\
+                not user.has_perm('approve', serializer.instance):
             return HttpResponse('Unauthorized', status=401)
 
         serializer.save()

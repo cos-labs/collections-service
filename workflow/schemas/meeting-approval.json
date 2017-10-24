@@ -47,6 +47,7 @@
           "description": "Submit this talk",
           "widgetType": "approval-submit",
           "parameters": {
+            "item": "item",
             "approve": "event-approved",
             "deny": "event-denied"
           }

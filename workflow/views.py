@@ -1,3 +1,5 @@
+
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
@@ -58,20 +60,33 @@ class Parameter(viewsets.ModelViewSet):
     queryset = models.Parameter.objects.all()
     serializer_class = serializers.Parameter
 
-    def retrieve(self, request, pk=None, case_pk=None):
+    def retrieve(self, request, pk=None):
+        case_id = self.request.query_params.get("case")
+        parameter_name = self.request.query_params.get("name")
         if not pk:
             try:
-                pk = self.queryset.filter(cases__id=case_pk).get(name=self.request.query_params['name']).id
+                pk = self.queryset.filter(cases__id=case_id)\
+                    .get(name=parameter_name).id
                 self.kwargs['pk'] = pk
-            except:
-                return Response({"data": None}, status=404)
+            except MultipleObjectsReturned:
+                return Response({"errors": [{
+                    "status": "400",
+                    "title": "Record not unique",
+                    "detail": "The query does not uniquely identify a record;\
+                    multiple records were found to match the request. Specify\
+                    query parameters that uniquely identify one record, or use\
+                    the \"parameter-list\" endpoint."
+                }]}, status=400)
+            except ObjectDoesNotExist:
+                return Response({"errors": [{
+                    "status": "404",
+                    "title": "Not found",
+                    "detail": "No objects were found that match the query."
+                }]}, status=404)
         return super().retrieve(request, pk=pk)
 
     def get_queryset(self):
         queryset = self.queryset
-        if self.kwargs['case_pk']:
-            case = models.Case.objects.get(id=self.kwargs['case_pk'])
-            queryset = queryset.filter(cases__id=case.id)
         return queryset
 
 
