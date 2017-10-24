@@ -21,10 +21,10 @@ class CollectionIndex(indexes.SearchIndex, indexes.Indexable):
 class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     title = indexes.CharField(model_attr='title')
-    description = indexes.CharField(model_attr='description')
-    created_by = indexes.CharField(model_attr='created_by__full_name')
+    description = indexes.CharField(model_attr='description', null=True)
+    created_by = indexes.CharField(model_attr='created_by__full_name', null=True)
     collection = indexes.CharField(model_attr='collection__pk')
-    category = indexes.CharField(model_attr='category')
+    category = indexes.CharField(model_attr='category', null=True)
 
     def get_model(self):
         return Item
