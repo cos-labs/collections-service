@@ -109,18 +109,15 @@ class Item(models.Model):
         ('presentation', 'presentation'),
         ('website', 'website'),
         ('event', 'event'),
-        ('meeting', 'meeting')
+        ('meeting', 'meeting'),
+        ("talk", "talk"),
+        ("poster", "poster")
     )
     STATUS = (
         ('none', 'none'),
         ('approved', 'approved'),
         ('pending', 'pending'),
         ('rejected', 'rejected')
-    )
-    CATEGORIES = (
-        ('none', 'none'),
-        ('talk', 'talk'),
-        ('poster', 'poster')
     )
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
@@ -137,7 +134,6 @@ class Item(models.Model):
     location = models.CharField(null=True, blank=True, default=None, max_length=200)
     start_time = models.DateTimeField(null=True, blank=True, default=None)
     end_time = models.DateTimeField(null=True, blank=True, default=None)
-    category = models.CharField(choices=CATEGORIES, null=True, blank=True, max_length=200)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
 
     class Meta:

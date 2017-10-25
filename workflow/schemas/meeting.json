@@ -108,6 +108,7 @@
             "fileData": "file-data",
             "fileName": "file-name",
             "metadata": "metadata",
+            "type": "event-type",
             "node": "node",
             "nextWorkflow": "next-workflow"
           }
