@@ -135,6 +135,7 @@ class Item(models.Model):
     start_time = models.DateTimeField(null=True, blank=True, default=None)
     end_time = models.DateTimeField(null=True, blank=True, default=None)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
+    file_name = models.CharField(null=True, blank=True, max_length=1000)
 
     class Meta:
         permissions = (

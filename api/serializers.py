@@ -101,8 +101,6 @@ class ProtectedResourceRelatedField(ResourceRelatedField):
 
 class CollectionModelSerializer(HyperlinkedModelSerializer):
 
-
-
     def create(self, validated_data):
         """
         We have a bit of extra checking around this in order to provide
@@ -224,7 +222,6 @@ class CollectionModelSerializer(HyperlinkedModelSerializer):
         return instance
 
 
-
 class CollectionSerializer(CollectionModelSerializer):
 
     included_serializers = {
@@ -324,7 +321,8 @@ class ItemSerializer(CollectionModelSerializer):
             'end_time',
             'category',
             'collection',
-            'file_link'
+            'file_link',
+            'file_name'
         ]
 
     class JSONAPIMeta:
