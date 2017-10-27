@@ -25,7 +25,7 @@
       "Description": "Add basic information about this meeting event",
       "widgets": [
         {
-          "label": "Event Kind",
+          "label": "What kind of meeting event is this?",
           "description": "Select the kind of event that is being submitted. Events may be \"talk\" or \"poster\"",
           "widgetType": "text-field",
           "parameters": {
@@ -46,20 +46,6 @@
           "widgetType": "text-area",
           "parameters": {
             "value": "event-description"
-          }
-        }
-      ]
-    },
-    {
-      "label": "Speakers",
-      "description": "Add the names of the speakers for this talk",
-      "widgets": [
-        {
-          "label": "Speakers",
-          "description": "Select the names of the people that will be spealing at the talk or are authors of the poster",
-          "widgetType": "osf-user-picker",
-          "parameters": {
-            "users": "event-speakers"
           }
         }
       ]
