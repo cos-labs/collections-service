@@ -42,8 +42,25 @@ Using a package manager like brew is recommended.
 
     $ brew services postgres start
     $ cd {collections}/
-    $ ./manage.py makemigrations
+
+#### Set up `local.py` settings
+
+```
+SA_CLIENT_ID = "55b229c83f6946fe8c16b86217781028"
+SA_CLIENT_SECRET = "70z9QBGWmYlFoXUr6HYZoi3QPr4ksafSEbJvTyNr"
+SA_APPLICATION_NAME = "Collections"
+SA_SITE_ID = 1
+SA_PROVIDER_NAME = "osf"
+
+SU_USERNAME = "admin"
+SU_PASSWORD = "password"
+SU_EMAIL = ""
+```
+
+#### Run migrations, create SocialApp login rewuirements
+
     $ ./manage.py migrate
+    $ ./reset
 
 #### Run the service
 
