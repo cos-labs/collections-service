@@ -284,21 +284,15 @@ class CollectionSerializer(CollectionModelSerializer):
 
 
 class ItemSerializer(CollectionModelSerializer):
-    kind = ChoiceField(
+    kind = ChoiceField(choices=ITEM_KINDS)
+    status = ChoiceField(
         choices=[
-            'none',
-            'project',
-            'preprint',
-            'registration',
-            'presentation',
-            'website',
-            'event',
-            'meeting',
-            "poster",
-            "talk"
+            "none",
+            "approved",
+            "pending",
+            "rejected"
         ]
     )
-    status = ChoiceField(ITEM_KINDS=['none', 'approved', 'pending', 'rejected'])
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
