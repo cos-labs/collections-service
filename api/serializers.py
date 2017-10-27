@@ -43,7 +43,8 @@ from drf_haystack.serializers import HaystackSerializer
 from api.models import (
     Collection,
     Item,
-    User
+    User,
+    ITEM_KINDS
 )
 
 # TODO Use app import so `Workflow` doesn't need to be imported here.
@@ -283,9 +284,15 @@ class CollectionSerializer(CollectionModelSerializer):
 
 
 class ItemSerializer(CollectionModelSerializer):
-    type = ChoiceField(
-        choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
-    status = ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
+    kind = ChoiceField(choices=ITEM_KINDS)
+    status = ChoiceField(
+        choices=[
+            "none",
+            "approved",
+            "pending",
+            "rejected"
+        ]
+    )
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
@@ -299,14 +306,13 @@ class ItemSerializer(CollectionModelSerializer):
         many=False,
         required=True
     )
-    category = ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
 
     class Meta:
         model = Item
         fields = [
             'id',
             'title',
-            'type',
+            'kind',
             'description',
             'status',
             'source_id',
@@ -319,7 +325,6 @@ class ItemSerializer(CollectionModelSerializer):
             'location',
             'start_time',
             'end_time',
-            'category',
             'collection',
             'file_link',
             'file_name'
@@ -391,7 +396,7 @@ class ItemSearchSerializer(HaystackSerializer):
             'description',
             'created_by',
             'collection',
-            'category'
+            'kind'
         ]
 
 

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+psql << END
+\c collections
+drop schema public cascade;
+create schema public;
+\q
+END
+
+./manage.py migrate
+./populate.py

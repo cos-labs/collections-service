@@ -31,6 +31,36 @@
       ]
     },
     {
+        "label": "Event Logisitics",
+        "description": "Set the time and roomfor the event",
+        "widgets": [
+            {
+                "label": "Room",
+                "description": "What room is the event going to be in?",
+                "widgetType": "text-field",
+                "parameters": {
+                    "value": "event-room"
+                }
+            },
+            {
+                "label": "Start Time",
+                "description": "When does the event start?",
+                "widgetType": "datetime-field",
+                "parameters": {
+                    "date": "start-time"
+                }
+            },
+            {
+                "label": "End Time",
+                "description": "When does the event end?",
+                "widgetType": "datetime-field",
+                "parameters": {
+                    "date": "end-time"
+                }
+            }
+        ]
+    },
+    {
       "label": "Resolution",
       "description": "Approve or Deny submission of this talk to the meeting",
       "widgets": [
@@ -49,7 +79,10 @@
           "parameters": {
             "item": "item",
             "approve": "event-approved",
-            "deny": "event-denied"
+            "deny": "event-denied",
+            "startDate": "start-time",
+            "endDate": "end-time",
+            "room": "event-room"
           }
         }
       ]

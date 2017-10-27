@@ -1,11 +1,31 @@
 #!/usr/bin/env python
+
+"""
+A population script. Populates the database with the minimum needed database
+entries required in order to run, in addition to populating the database with
+basic example data; 10 collections with each 100 items.
+"""
+
+
+
+# Python Imports
+# ##############################################################################
+
 import os
 import sys
 import random
+import json
+import datetime
+import pytz
+from pprint import pprint
 
-proj_path = "."
+
+# Setup needed for Django
+# ##############################################################################
+
 # This is so Django knows where to find stuff.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "service.settings.dev")
+proj_path = "."
 sys.path.append(proj_path)
 
 # This is so my local_settings.py gets loaded.
@@ -15,15 +35,208 @@ os.chdir(proj_path)
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
+
+# Library Imports
+# ##############################################################################
+
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
+from guardian.shortcuts import (
+    assign_perm,
+    get_objects_for_user
+)
+from allauth.socialaccount.models import SocialApp
+
+
+# Local Imports
+# ##############################################################################
+
+from api.models import (
+    Collection,
+    Item,
+    User
+)
+from workflow.models import (
+    Workflow,
+    Section,
+    Widget,
+    Parameter,
+    ParameterStub,
+    ParameterAlias
+)
 from tests import factories
-from api import models
-import datetime
-import pytz
 
 
-owner = models.User.objects.get(pk=3)
+# Populate data
+# ##############################################################################
 
-meetings = factories.MeetingFactory.build_batch(10, created_by=owner)
+
+# Make a superuser
+try:
+    su = User.objects.get(id=2)
+except:
+    su = User.objects.create_superuser(
+        settings.SU_USERNAME,
+        settings.SU_EMAIL,
+        settings.SU_PASSWORD
+    )
+
+    su.save()
+
+
+# Set up `Site` correctly
+
+site = Site.objects.get(id=3) # Why is it 3? I dono.... bcuz....
+site.domain_name = "localhost:8000"
+site.display_name = "localhost"
+site.save()
+
+
+# Set up the `SocialApp`
+
+try:
+    sa = SocialApp.models.get(
+        provider=settings.SA_PROVIDER_NAME,
+        sites__id=site.id
+    )
+except:
+    sa = SocialApp()
+    sa.provider = settings.SA_PROVIDER_NAME
+    sa.name = settings.SA_APPLICATION_NAME
+    sa.client_id = settings.SA_CLIENT_ID
+    sa.secret = settings.SA_CLIENT_SECRET
+    sa.save(force_insert=True)
+    sa.sites.add(site)
+    sa.save()
+
+
+# Make a public group
+
+try:
+    public_group = Group.objects.get(name="public")
+except:
+    public_group = Group()
+    public_group.name = "public"
+    public_group.save()
+
+
+# Setup Workflows
+# ##############################################################################
+
+# Workflows need to happen before the collections so that collections can have a
+# submission workflow associated with them.
+
+# Load the needed workflows. `workflows` is modified here.
+workflows = {
+    "meeting": "meeting.json",
+    "approval": "meeting-approval.json"
+}
+
+for workflow_name, workflow_schema in workflows.items():
+
+    with open('workflow/schemas/' + workflow_schema) as data_file:
+        wf_config = json.load(data_file)
+
+    workflow = Workflow()
+    workflow.title = wf_config.get("title", "")
+    workflow.description = wf_config.get("description", "")
+    workflow.initialization_values = wf_config.get("initialParameters", {})
+    workflow.save()
+
+    for name, value in wf_config.get("initialParameters", {}).items():
+
+        try:
+            parameter_stub = ParameterStub.objects\
+                .filter(workflow_id=workflow.id).get(name=name)
+        except:
+            parameter_stub = ParameterStub()
+
+        parameter_stub.name = name
+        parameter_stub.scope = "WORKFLOW"
+        parameter_stub.workflow = workflow
+        parameter_stub.save()
+
+        parameter = Parameter()
+        parameter.name = name
+        parameter.value = value.get('value', None)
+        parameter.properties = value.get('properties', None)
+        parameter.stub = parameter_stub
+        parameter.workflow = workflow
+        parameter.save()
+
+
+
+    section_index = 0
+    for section_config in wf_config.get("sections", []):
+        section_index += 1
+
+        section = Section()
+        section.label = section_config.get("label", "")
+        section.description = section_config.get("description", "")
+        section.index = section_index
+        section.workflow = workflow
+
+        section.save()
+
+        widget_index = 0
+        for widget_config in section_config.get("widgets", []):
+            widget_index += 1
+
+            widget = Widget()
+            widget.label = widget_config.get("label", "")
+            widget.description = widget_config.get("description", "")
+            widget.widget_type = widget_config.get("widgetType", "")
+            widget.index = widget_index
+            widget.workflow = workflow
+            widget.section = section
+
+            widget.save()
+
+            for alias, parameter_name in\
+                widget_config.get("parameters", {}).items():
+
+                parameter_alias = ParameterAlias()
+
+                try:
+                    parameter_stub = ParameterStub.objects\
+                        .filter(workflow_id=workflow.id)\
+                        .get(name=parameter_name)
+                except:
+                    parameter_stub = ParameterStub()
+                    parameter_stub.scope = "CASE"
+
+                parameter_alias.alias = alias
+                parameter_alias.workflow = workflow
+                parameter_alias.widget = widget
+
+                parameter_stub.name = parameter_name
+                parameter_stub.workflow = workflow
+                parameter_stub.save()
+
+                parameter_alias.parameter_stub = parameter_stub
+                parameter_alias.save()
+
+                parameter_stub.aliases.add(parameter_alias)
+
+            section.widgets.add(widget)
+
+        workflow.sections.add(section)
+
+    workflows[workflow_name] = workflow
+
+
+nwparam = workflows["meeting"].parameters.get(name="next-workflow")
+nwparam.value = workflows["approval"].id
+nwparam.save()
+
+# Create Collections
+# ##############################################################################
+
+
+# Create the meetings and talks/posters in them
+
+meetings = factories.MeetingFactory.build_batch(10, created_by=su)
 
 names = []
 
@@ -35,8 +248,11 @@ with open('tests/diverse_names.txt') as name_file:
 
 for m in meetings:
     m.save()
+    m.workflow = workflows["meeting"]
+    assign_perm("view_collection", public_group, m)
+    assign_perm("add_item", public_group, m)
     print("New meeting: " + m.title)
-    users = [owner]
+    users = [su]
     for x in range(0,9):
         name = random.choice(names)
         f_name = name[0]
@@ -44,26 +260,47 @@ for m in meetings:
         users.append(factories.UserFactory(first_name=f_name, last_name=l_name))
     ctr = 0
     for u in users:
-        if not models.User.objects.all().filter(username=u.username).exists():
+        if not User.objects.all().filter(username=u.username).exists():
             print("new user: " + u.username)
             u.save()
         else:
-            u = models.User.objects.get(username=u.username)
+            u = User.objects.get(username=u.username)
         items = factories.ItemFactory.build_batch(10, collection=m, created_by=u)
         for i in items:
             print("new item: " + i.title)
-            i.status = random.choice(
-                ['approved', 'approved', 'approved', 'approved', 'pending', 'pending', 'rejected'])
+            # Multiples of each status are to generate more appproved that other
+            # statuses
+            i.status = random.choice([
+                'approved',
+                'approved',
+                'approved',
+                'approved',
+                'pending',
+                'pending',
+                'rejected'
+            ])
             i.category = 'presentation'
-            i.type = 'event'
-            i.start_time = m.start_datetime + datetime.timedelta(0, 0, 0, 0, 0, ctr)
-            i.end_time = i.start_time + datetime.timedelta(0, 0, 0, 0, 0, 1)
-            i.location = 'Room ' + random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'])
-            i.date_submitted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
-            i.date_accepted = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+            i.kind = 'event'
+            i.start_time = m.start_datetime +\
+                datetime.timedelta(0, 0, 0, 0, 0, ctr)
+            i.end_time = i.start_time +\
+                datetime.timedelta(0, 0, 0, 0, 0, 1)
+            i.location = 'Room ' + random.choice([
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'
+            ])
+            i.date_submitted = datetime.datetime\
+                .now(tz=pytz.timezone('US/Eastern'))
+            i.date_accepted = datetime.datetime\
+                .now(tz=pytz.timezone('US/Eastern'))
 
             i.save()
+            assign_perm("view", public_group, i)
             if ctr == 10:
                 ctr = 0
             else:
                 ctr += 1
+    m.save()
+
+
+# EOF
+# ##############################################################################
