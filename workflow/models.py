@@ -15,6 +15,7 @@ class Workflow(models.Model):
     description = models.TextField(null=False, blank=True)
     initialization_values = JSONField(default={})
     workflow_config = JSONField(default={})
+    case_description = models.TextField(null=False, blank=True, default="")
 
     class JSONAPIMeta:
         resource_name = 'workflows'
