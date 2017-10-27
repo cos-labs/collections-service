@@ -50,20 +50,6 @@
       ]
     },
     {
-      "label": "Speakers",
-      "description": "Add the names of the speakers for this talk",
-      "widgets": [
-        {
-          "label": "Speakers",
-          "description": "Select the names of the people that will be spealing at the talk or are authors of the poster",
-          "widgetType": "osf-user-picker",
-          "parameters": {
-            "users": "event-speakers"
-          }
-        }
-      ]
-    },
-    {
       "label": "Materials",
       "description": "Upload the materials that are related to this meeting event",
       "widgets": [
