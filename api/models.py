@@ -10,7 +10,25 @@ from tests import resources
 import datetime
 
 
+ITEM_KINDS = [
+    ('none', 'none'),
+    ('project', 'project'),
+    ('preprint', 'preprint'),
+    ('registration', 'registration'),
+    ('presentation', 'presentation'),
+    ('website', 'website'),
+    ('event', 'event'),
+    ('meeting', 'meeting'),
+    ("talk", "talk"),
+    ("poster", "poster")
+]
 
+ITEM_STATUSES = [
+    ('none', 'none'),
+    ('approved', 'approved'),
+    ('pending', 'pending'),
+    ('rejected', 'rejected')
+]
 
 
 class User(AbstractUser):
@@ -23,10 +41,9 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         try:
-            public_group = Group.objects.get(id=1)
+            public_group = Group.objects.get(name="public")
         except:
             public_group = Group()
-            public_group.pk = 1
             public_group.name = "public"
             public_group.save()
         if not self.pk:
@@ -39,10 +56,10 @@ def get_anonymous_user_instance(User):
 
 
 class Collection(models.Model):
+
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     tags = models.TextField(null=True, blank=True)
-    created_by = models.ForeignKey(User)
     created_by_org = models.CharField(null=True, blank=True, max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -53,6 +70,8 @@ class Collection(models.Model):
     address = models.CharField(max_length=200, null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
+
+    created_by = models.ForeignKey(User)
 
     admins = models.ForeignKey(
         Group,
@@ -101,32 +120,13 @@ class Collection(models.Model):
 
 
 class Item(models.Model):
-    TYPES = (
-        ('none', 'none'),
-        ('project', 'project'),
-        ('preprint', 'preprint'),
-        ('registration', 'registration'),
-        ('presentation', 'presentation'),
-        ('website', 'website'),
-        ('event', 'event'),
-        ('meeting', 'meeting'),
-        ("talk", "talk"),
-        ("poster", "poster")
-    )
-    STATUS = (
-        ('none', 'none'),
-        ('approved', 'approved'),
-        ('pending', 'pending'),
-        ('rejected', 'rejected')
-    )
+
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    type = models.CharField(choices=TYPES, max_length=200)
-    status = models.CharField(choices=STATUS, null=True, max_length=200)
+    kind = models.CharField(choices=ITEM_KINDS, max_length=200)
+    status = models.CharField(choices=ITEM_STATUSES, null=True, max_length=200)
     source_id = models.CharField(null=True, blank=True, max_length=200)
     url = models.URLField(null=True, blank=True)
-    collection = models.ForeignKey(to='Collection', related_name='items')
-    created_by = models.ForeignKey(User)
     metadata = JSONField(null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_submitted = models.DateTimeField(null=True, blank=True, default=None)
@@ -136,6 +136,9 @@ class Item(models.Model):
     end_time = models.DateTimeField(null=True, blank=True, default=None)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
     file_name = models.CharField(null=True, blank=True, max_length=1000)
+
+    collection = models.ForeignKey('Collection', related_name='items')
+    created_by = models.ForeignKey(User)
 
     class Meta:
         permissions = (

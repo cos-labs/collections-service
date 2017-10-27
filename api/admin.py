@@ -27,7 +27,7 @@ class AdminForm(ActionForm):
 
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'collection', 'type', 'created_by', 'status')
+    list_display = ('title', 'collection', 'kind', 'created_by', 'status')
     actions = [approve_item]
 
     def get_search_results(self, request, queryset, search_term):

@@ -24,7 +24,7 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
     description = indexes.CharField(model_attr='description', null=True)
     created_by = indexes.CharField(model_attr='created_by__full_name', null=True)
     collection = indexes.CharField(model_attr='collection__pk')
-    category = indexes.CharField(model_attr='category', null=True)
+    kind = indexes.CharField(model_attr='kind', null=True)
 
     def get_model(self):
         return Item

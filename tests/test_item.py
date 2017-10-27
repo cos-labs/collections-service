@@ -23,7 +23,7 @@ class ItemTest(TestBase):
         # try to post a collection
         response = self.client.post(reverse('collection-item-list', args=[self.collection.id]),
                                     {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': '',
-                                     'category': 'none', 'status': 'pending', 'type': 'preprint'})
+                                     'category': 'none', 'status': 'pending', 'kind': 'preprint'})
         self.assertEqual(response.status_code, 201)
 
     def test_cannot_post_item_without_being_logged_in(self):
@@ -31,7 +31,7 @@ class ItemTest(TestBase):
         # try to post a collection
         response = self.client.post(reverse('collection-item-list', args=[self.collection.id]),
                                     {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': '',
-                                     'category': 'none', 'status': 'pending', 'type': 'preprint'})
+                                     'category': 'none', 'status': 'pending', 'kind': 'preprint'})
         self.assertEqual(response.status_code, 401)
 
     def test_non_collection_owner_cannot_change_item_status(self):
@@ -63,7 +63,7 @@ class ItemTest(TestBase):
         c.save()
         response = self.client.post(reverse('collection-item-list', args=[c.id]),
                                     {'title': 't', 'description': 'd', 'source': 'mst3k', 'tags': '',
-                                     'category': 'none', 'status': 'pending', 'type': 'preprint'})
+                                     'category': 'none', 'status': 'pending', 'kind': 'preprint'})
         self.assertEqual(response.data['status'], "approved")
 
     # owner of a collection can delete items not theirs from collection

@@ -283,8 +283,20 @@ class CollectionSerializer(CollectionModelSerializer):
 
 
 class ItemSerializer(CollectionModelSerializer):
-    type = ChoiceField(
-        choices=['none', 'project', 'preprint', 'registration', 'presentation', 'website', 'event', 'meeting'])
+    kind = ChoiceField(
+        choices=[
+            'none',
+            'project',
+            'preprint',
+            'registration',
+            'presentation',
+            'website',
+            'event',
+            'meeting',
+            "poster",
+            "talk"
+        ]
+    )
     status = ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
@@ -299,14 +311,13 @@ class ItemSerializer(CollectionModelSerializer):
         many=False,
         required=True
     )
-    category = ChoiceField(choices=['none', 'talk', 'poster'], allow_null=True, required=False)
 
     class Meta:
         model = Item
         fields = [
             'id',
             'title',
-            'type',
+            'kind',
             'description',
             'status',
             'source_id',
@@ -319,7 +330,6 @@ class ItemSerializer(CollectionModelSerializer):
             'location',
             'start_time',
             'end_time',
-            'category',
             'collection',
             'file_link',
             'file_name'
@@ -391,7 +401,7 @@ class ItemSearchSerializer(HaystackSerializer):
             'description',
             'created_by',
             'collection',
-            'category'
+            'kind'
         ]
 
 
