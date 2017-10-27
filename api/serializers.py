@@ -43,7 +43,8 @@ from drf_haystack.serializers import HaystackSerializer
 from api.models import (
     Collection,
     Item,
-    User
+    User,
+    ITEM_KINDS
 )
 
 # TODO Use app import so `Workflow` doesn't need to be imported here.
@@ -297,7 +298,7 @@ class ItemSerializer(CollectionModelSerializer):
             "talk"
         ]
     )
-    status = ChoiceField(choices=['none', 'approved', 'pending', 'rejected'])
+    status = ChoiceField(ITEM_KINDS=['none', 'approved', 'pending', 'rejected'])
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
