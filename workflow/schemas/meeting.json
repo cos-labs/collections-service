@@ -24,7 +24,7 @@
       "Description": "Add basic information about this meeting event",
       "widgets": [
         {
-          "label": "Event Kind",
+          "label": "What kind of meeting event is this?",
           "description": "Select the kind of event that is being submitted. Events may be \"talk\" or \"poster\"",
           "widgetType": "text-field",
           "parameters": {
