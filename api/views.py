@@ -186,14 +186,11 @@ class ItemViewSet(ModelViewSet):
 
         if item["status"] == "approved" and not user.has_perm('approve_collection_items', item["collection"]):
             return HttpResponse('Unauthorized', status=401)
-
-        item["created_by"] = user
-
-        item = serializer.save()
+        item = serializer.save(created_by=user)
 
         assign_perm('edit', user, item)
-        assign_perm('edit', user, item)
-        assign_perm('view', item.collection.admins, item)
+        assign_perm('view', user, item)
+        assign_perm('edit', item.collection.admins, item)
         assign_perm('view', item.collection.admins, item)
         assign_perm('approve', item.collection.admins, item)
 

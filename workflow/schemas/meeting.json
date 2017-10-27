@@ -24,11 +24,11 @@
       "Description": "Add basic information about this meeting event",
       "widgets": [
         {
-          "label": "Event Type",
-          "description": "Select the type of event that is being submitted. Events may be \"talk\" or \"poster\"",
+          "label": "Event Kind",
+          "description": "Select the kind of event that is being submitted. Events may be \"talk\" or \"poster\"",
           "widgetType": "text-field",
           "parameters": {
-            "value": "event-type"
+            "value": "event-kind"
           }
         },
         {
@@ -108,7 +108,7 @@
             "fileData": "file-data",
             "fileName": "file-name",
             "metadata": "metadata",
-            "type": "event-type",
+            "kind": "event-kind",
             "description": "event-description",
             "node": "node",
             "nextWorkflow": "next-workflow"

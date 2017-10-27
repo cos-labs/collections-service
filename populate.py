@@ -111,6 +111,16 @@ except:
     sa.save()
 
 
+# Make a public group
+
+try:
+    public_group = Group.objects.get(name="public")
+except:
+    public_group = Group()
+    public_group.name = "public"
+    public_group.save()
+
+
 # Setup Workflows
 # ##############################################################################
 
@@ -216,6 +226,10 @@ for workflow_name, workflow_schema in workflows.items():
     workflows[workflow_name] = workflow
 
 
+nwparam = workflows["meeting"].parameters.get(name="next-workflow")
+nwparam.value = workflows["approval"].id
+nwparam.save()
+
 # Create Collections
 # ##############################################################################
 
@@ -235,7 +249,8 @@ with open('tests/diverse_names.txt') as name_file:
 for m in meetings:
     m.save()
     m.workflow = workflows["meeting"]
-    assign_perm("view_collection", Group.objects.get(id=1), m)
+    assign_perm("view_collection", public_group, m)
+    assign_perm("add_item", public_group, m)
     print("New meeting: " + m.title)
     users = [su]
     for x in range(0,9):
@@ -279,7 +294,7 @@ for m in meetings:
                 .now(tz=pytz.timezone('US/Eastern'))
 
             i.save()
-            assign_perm("view", Group.objects.get(id=1), i)
+            assign_perm("view", public_group, i)
             if ctr == 10:
                 ctr = 0
             else:
