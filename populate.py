@@ -141,6 +141,7 @@ for workflow_name, workflow_schema in workflows.items():
     workflow = Workflow()
     workflow.title = wf_config.get("title", "")
     workflow.description = wf_config.get("description", "")
+    workflow.case_description = wf_config.get("case_description", "")
     workflow.initialization_values = wf_config.get("initialParameters", {})
     workflow.save()
 

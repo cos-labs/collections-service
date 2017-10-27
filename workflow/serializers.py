@@ -36,6 +36,7 @@ class Workflow(ModelSerializer):
             'widgets',
             'parameter_aliases',
             'parameter_stubs',
+            "case_description",
             'parameters',
             'cases'
         ]
