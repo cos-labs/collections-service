@@ -177,7 +177,7 @@ CORS_ORIGIN_WHITELIST = (
 AUTH_USER_MODEL = 'api.User'
 GUARDIAN_GET_INIT_ANONYMOUS_USER = 'api.models.get_anonymous_user_instance'
 
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 FIXTURE_DIRS = (
    '/api/fixtures/',
