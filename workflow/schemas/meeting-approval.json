@@ -24,7 +24,7 @@
         {
           "label": "",
           "description": "",
-          "widgetType": "item-display",
+          "widgetType": "widget-item-display",
           "parameters": {
             "value": "item"
           }
@@ -32,13 +32,13 @@
       ]
     },
     {
-        "label": "Event Logisitics",
+        "label": "Event Logistics",
         "description": "Set the time and roomfor the event",
         "widgets": [
             {
                 "label": "Room",
                 "description": "What room is the event going to be in?",
-                "widgetType": "text-field",
+                "widgetType": "widget-text-field",
                 "parameters": {
                     "value": "event-room"
                 }
@@ -46,7 +46,7 @@
             {
                 "label": "Start Time",
                 "description": "When does the event start?",
-                "widgetType": "datetime-field",
+                "widgetType": "widget-datetime-field",
                 "parameters": {
                     "date": "start-time"
                 }
@@ -54,7 +54,7 @@
             {
                 "label": "End Time",
                 "description": "When does the event end?",
-                "widgetType": "datetime-field",
+                "widgetType": "widget-datetime-field",
                 "parameters": {
                     "date": "end-time"
                 }
@@ -68,7 +68,7 @@
         {
           "label": "Approve or Deny",
           "description": "Select the resolution \"Approve\" or \"Deny\"",
-          "widgetType": "choice-picker",
+          "widgetType": "widget-choice-picker",
           "parameters": {
             "choices": "event-approval-choices"
           }
@@ -76,7 +76,7 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "approval-submit",
+          "widgetType": "widget-approval-submit",
           "parameters": {
             "item": "item",
             "approve": "event-approved",

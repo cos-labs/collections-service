@@ -22,7 +22,7 @@
         {
           "label": "Upload a file",
           "description": "Select the file to upload",
-          "widgetType": "file-uploader",
+          "widgetType": "widget-file-uploader",
           "parameters": {
             "fileData": "file-data",
             "fileName": "file-name"
@@ -31,7 +31,7 @@
         {
           "label": "Title",
           "description": "Enter the title of the file.",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "title-widget"
           }
@@ -45,7 +45,7 @@
         {
           "label": "Metadata",
           "desciption": "Enter the metadata for the file that is being uploaded",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "metadata"
           }
@@ -59,7 +59,7 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "meeting-submit",
+          "widgetType": "widget-meeting-submit",
           "parameters": {
             "title": "title-widget",
             "fileData": "file-data",

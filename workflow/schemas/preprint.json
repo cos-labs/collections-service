@@ -23,7 +23,7 @@
         {
           "label": "Preprint Title",
           "description": "Add the title of the preprint",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "title"
           }
@@ -31,7 +31,7 @@
         {
           "label": "Abstract",
           "description": "Enter the abstract of the preprint",
-          "widgetType": "text-area",
+          "widgetType": "widget-text-area",
           "parameters": {
             "value": "abstract"
           }
@@ -39,7 +39,7 @@
         {
           "label": "DOI",
           "description": "If this preprint has a DOI, enter it.",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "doi"
           }
@@ -53,7 +53,7 @@
         {
           "label": "Speakers",
           "description": "Select the names of the people that will be speaking at the talk or are authors of the poster.",
-          "widgetType": "osf-user-picker",
+          "widgetType": "widget-user-picker",
           "parameters": {
             "users": "authors"
           }
@@ -67,7 +67,7 @@
         {
           "label": "Use an existing node",
           "description": "Any materials related to this talk are stored in an OSF Project. Files are automatically uploaded to a new project. If a project containing the materials that are related to this talk already exists, that project may be selected instead of creating a new one. Click here to learn more about OSF projects. (This link will open in a new window.)",
-          "widgetType": "choice-picker",
+          "widgetType": "widget-choice-picker",
           "parameters": {
             "choices": "event-creation-choices"
           }
@@ -75,7 +75,7 @@
         {
           "label": "Node Create",
           "description": "Creates the node when its parameter 'enable' is set to true",
-          "widgetType": "node-creator",
+          "widgetType": "widget-node-creator",
           "parameters": {
             "enable": "create-new-node",
             "node": "node"
@@ -84,7 +84,7 @@
         {
           "label": "Upload Materials",
           "description": "Select the file to upload",
-          "widgetType": "file-uploader",
+          "widgetType": "widget-file-uploader",
           "parameters": {
             "fileData": "file-data",
             "fileName": "file-name"
@@ -99,7 +99,7 @@
         {
           "label": "Disciplines",
           "description": "Select the relevant disciplines. To remove a discipline, press the 'x' on the discipline plaquard.",
-          "widgetType": "subject-picker",
+          "widgetType": "widget-subject-picker",
           "parameters": {
             "subjects": "disciplines"
           }
@@ -113,7 +113,7 @@
         {
           "label": "License Type",
           "description": "Choose the license this preprint should be available under",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "license-type"
           }
@@ -121,7 +121,7 @@
         {
           "label": "Copyright Year",
           "description": "Select the year of copyright",
-          "widgetType": "text-field",
+          "widgetType": "widgettext-field",
           "parameters": {
             "value": "copyright-year"
           }
@@ -129,7 +129,7 @@
         {
           "label": "Copyright Holders",
           "description": "Enter the copyright holders for the preprint's license",
-          "widgetType": "text-field",
+          "widgetType": "widgettext-field",
           "parameters": {
             "value": "copyright-holders"
           }
@@ -143,7 +143,7 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "preprint-submit",
+          "widgetType": "widget-preprint-submit",
           "parameters": {
             "title": "title-widget",
             "abstract": "abstract",

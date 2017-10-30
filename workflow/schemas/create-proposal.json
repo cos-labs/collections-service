@@ -23,7 +23,7 @@
         {
           "label": "Topic",
           "description": "What area of research does this proposal apply to?",
-          "widgetType": "text-field",
+          "widgetType": "widget-text-field",
           "parameters": {
             "value": "topic"
           }
@@ -31,7 +31,7 @@
         {
           "label": "Premise",
           "description": "Describe the basic premise behind the idea.",
-          "widgetType": "text-area",
+          "widgetType": "widget-text-area",
           "parameters": {
             "value": "premise"
           }
@@ -39,7 +39,7 @@
         {
           "label": "Submit",
           "description": "Submit this proposal",
-          "widgetType": "proposal-submit",
+          "widgetType": "widget-proposal-submit",
           "parameters": {
             "premis": "premise",
             "topic": "topic"
