@@ -89,7 +89,7 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "meeting-submit",
+          "widgetType": "widget-meeting-submit",
           "parameters": {
             "title": "title-widget",
             "fileData": "file-data",
