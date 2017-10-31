@@ -5,6 +5,8 @@ from django.contrib.auth.models import (
     Group
 )
 from django.contrib.postgres.fields import JSONField
+from guardian.mixins import GuardianUserMixin
+
 from tests import resources
 
 import datetime
@@ -31,7 +33,7 @@ ITEM_STATUSES = [
 ]
 
 
-class User(AbstractUser):
+class User(AbstractUser, GuardianUserMixin):
     id = models.AutoField(primary_key=True)
     gravatar = models.URLField(blank=True, null=True)
 

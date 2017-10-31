@@ -175,7 +175,9 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 AUTH_USER_MODEL = 'api.User'
+GAURDIAN_MONKEY_PATCH = False
 GUARDIAN_GET_INIT_ANONYMOUS_USER = 'api.models.get_anonymous_user_instance'
+ANONYMOUS_USER_NAME = "anonymous"
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
