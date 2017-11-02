@@ -4,10 +4,10 @@ from django.contrib.auth.models import User
 
 
 class CollectionIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
-    title = indexes.CharField(model_attr='title')
-    description = indexes.CharField(model_attr='title')
-    created_by = indexes.CharField(model_attr='created_by')
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    title = indexes.EdgeNgramField(model_attr='title')
+    description = indexes.EdgeNgramField(model_attr='title')
+    created_by = indexes.EdgeNgramField(model_attr='created_by')
 
     def get_model(self):
         return Collection

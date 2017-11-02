@@ -45,7 +45,8 @@ from api.serializers import (
 
 )
 from api.pagination import LargeResultsSetPagination
-
+from haystack.query import SearchQuerySet
+from haystack.inputs import AutoQuery
 
 # Views
 # #############################################################################
@@ -126,6 +127,7 @@ class CollectionViewSet(ModelViewSet):
         user = self.request.user
         queryset = Collection.objects.all().order_by('-date_created')
 
+        query = self.request.query_params.get('q')
         user_id = self.request.query_params.get('user')
         username = self.request.query_params.get('username')
         org_name = self.request.query_params.get("org")
@@ -138,7 +140,16 @@ class CollectionViewSet(ModelViewSet):
         if org_name:
             queryset = queryset.filter(created_by_org=org_name)
 
+
+        if query:
+            queryset = queryset.filter(id__in=[instance.pk for instance in SearchQuerySet()\
+                .models(Collection)\
+                .filter(content=AutoQuery(query))])
+
+
         queryset = get_objects_for_user(user, 'view_collection', klass=queryset)
+
+
 
         return queryset
 
