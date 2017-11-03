@@ -18,6 +18,7 @@ ITEM_KINDS = [
     ('preprint', 'preprint'),
     ('registration', 'registration'),
     ('presentation', 'presentation'),
+    ("dataset", "dataset"),
     ('website', 'website'),
     ('event', 'event'),
     ('meeting', 'meeting'),
