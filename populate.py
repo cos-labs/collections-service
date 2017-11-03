@@ -306,11 +306,11 @@ for c in meetings + datasets:
                     .now(tz=pytz.timezone('US/Eastern'))
                 i.date_accepted = datetime.datetime\
                     .now(tz=pytz.timezone('US/Eastern'))
-                i.filename = "test" + str(random.randint(0,100000)) + "." + \
+                i.file_name = "test" + str(random.randint(0,100000)) + "." + \
                              random.choice(["pdf", "png", "docx", "ppx", "odt"])
 
             if c.collection_type == "dataset":
-                i.filename = "test." + str(random.randint(0,100000)) + "." + \
+                i.file_name = "test." + str(random.randint(0,100000)) + "." + \
                              random.choice(["pdf", "png", "docx", "ppx", "odt", "tif", "jpg", "zip"])
 
             i.save()
