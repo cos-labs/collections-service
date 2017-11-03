@@ -32,7 +32,7 @@ meeting_json = {
 
         },
         {
-            "sectionHeader": "Splash Image",
+            "sectionHeader": "Contributors",
             "component": "section-contributors",
             "settings": {
                 "background-color": "#fff"
@@ -183,34 +183,59 @@ meeting_json = {
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 dataset_json = {
-    "branding": {
-        "colors": {
-            "primary": "#444",
-            "secondary": "#fff",
-            "background": "#000",
-            "text": "#fff"
-        }
+  "data": {},
+  "layers": [
+    {
+      "settings": {
+        "tagline": "Opening up scientific data to the world.",
+        "title": "Figverse"
+      },
+      "component": "section-title",
+      "section-header": "Landing Title"
     },
-    "layout": [
-        {
-            "type": "section-title",
-        },
-        {
-            "type": "section-paragraph",
-            "body": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
-        },
-        {
-            "type": "section-splash-image"
-        },
-        {
-            "type": "section-contributors",
-            "data": "speakers",
-            "background-color": "#fff"
-        },
-        {
-            "type": "section-item-table",
-            "header-color": "#444",
-            "text-color": "#fff"
-        }
-    ]
+    {
+      "settings": {
+        "body": "As governments and funders of research see the benefit of open content, the creation of recommendations, mandates and enforcement of mandates are coming thick and fast. figshare has always led the way in enabling academics, publishers and institutions to easily adhere to these principles in the most intuitive and efficient manner."
+      },
+      "component": "section-paragraph",
+      "section-header": "Paragraph"
+    },
+    {
+      "settings": {},
+      "component": "section-file-grid",
+      "section-header": "File Grid"
+    },
+    {
+      "settings": {
+        "img-url": "https://web-static.figshare.com/assets/7b717f16e9612c0b722a84908088638703888247/public/homepage/img/institutions_bg.jpg"
+      },
+      "component": "section-splash-image",
+      "section-header": "Splash Image"
+    },
+    {
+      "settings": {
+        "background-color": "#fff"
+      },
+      "component": "section-contributors",
+      "section-header": "Contributors"
+    },
+    {
+      "settings": {
+        "body": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
+        "title": "About Our Organization",
+        "text-color": "#fff",
+        "background-color": "#c44b38"
+      },
+      "component": "section-paragraph",
+      "section-header": "Code of Conduct"
+    }
+  ],
+  "branding": {
+    "colors": {
+      "text": "#fff",
+      "primary": "#444",
+      "secondary": "#fff",
+      "background": "#c44b38"
+    }
+  }
 }
