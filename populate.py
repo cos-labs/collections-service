@@ -87,7 +87,7 @@ except:
 
 # Set up `Site` correctly
 
-site = Site.objects.get(id=14)  # Why is it 3? I dono.... bcuz....
+site = Site.objects.get(id=3)  # Why is it 3? I dono.... bcuz....
 site.domain_name = "localhost:8000"
 site.display_name = "localhost"
 site.save()
