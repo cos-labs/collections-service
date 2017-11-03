@@ -172,3 +172,7 @@ class MeetingFactory(CollectionFactory):
                                    tzinfo=pytz.timezone('US/Eastern'))
     end_datetime = factory.Faker('date_time_between', start_date="+1d", end_date="+1w",
                                  tzinfo=pytz.timezone('US/Eastern'))
+
+
+class DatasetFactory(CollectionFactory):
+    collection_type = "dataset"

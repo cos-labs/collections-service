@@ -87,7 +87,7 @@ except:
 
 # Set up `Site` correctly
 
-site = Site.objects.get(id=3) # Why is it 3? I dono.... bcuz....
+site = Site.objects.get(id=14)  # Why is it 3? I dono.... bcuz....
 site.domain_name = "localhost:8000"
 site.display_name = "localhost"
 site.save()
@@ -130,7 +130,12 @@ except:
 # Load the needed workflows. `workflows` is modified here.
 workflows = {
     "meeting": "meeting.json",
-    "approval": "meeting-approval.json"
+    "meeting-approval": "meeting-approval.json",
+    "dataset": "dataset.json"
+
+    # TODO: Add dataset approval schema
+    # "dataset": "dataset.json",
+    # "dataset-approval": "dataset-approval.json"
 }
 
 for workflow_name, workflow_schema in workflows.items():
@@ -165,8 +170,6 @@ for workflow_name, workflow_schema in workflows.items():
         parameter.stub = parameter_stub
         parameter.workflow = workflow
         parameter.save()
-
-
 
     section_index = 0
     for section_config in wf_config.get("sections", []):
@@ -227,9 +230,14 @@ for workflow_name, workflow_schema in workflows.items():
     workflows[workflow_name] = workflow
 
 
-nwparam = workflows["meeting"].parameters.get(name="next-workflow")
-nwparam.value = workflows["approval"].id
-nwparam.save()
+meetings_next_workflow_param = workflows["meeting"].parameters.get(name="next-workflow")
+meetings_next_workflow_param.value = workflows["meeting-approval"].id
+meetings_next_workflow_param.save()
+
+# TODO: add dataset approval schema
+# datasets_next_workflow_param = workflows["dataset"].parameters.get(name="next-workflow")
+# datasets_next_workflow_param.value = workflows["dataset-approval"].id
+# datasets_next_workflow_param.save()
 
 # Create Collections
 # ##############################################################################
@@ -237,8 +245,8 @@ nwparam.save()
 
 # Create the meetings and talks/posters in them
 
-meetings = factories.MeetingFactory.build_batch(10, created_by=su)
-
+meetings = factories.MeetingFactory.build_batch(5, created_by=su)
+datasets = factories.DatasetFactory.build_batch(5, created_by=su)
 names = []
 
 with open('tests/diverse_names.txt') as name_file:
@@ -247,12 +255,15 @@ with open('tests/diverse_names.txt') as name_file:
     names = [(x.split(' ')[0], ' '.join(x.split(' ')[1:])) for x in content]
 
 
-for m in meetings:
-    m.save()
-    m.workflow = workflows["meeting"]
-    assign_perm("view_collection", public_group, m)
-    assign_perm("add_item", public_group, m)
-    print("New meeting: " + m.title)
+for c in meetings + datasets:
+    c.save()
+    if c.collection_type == "meeting":
+        c.workflow = workflows["meeting"]
+    elif c.collection_type == "dataset":
+        c.workflow = workflows["dataset"]
+    assign_perm("view_collection", public_group, c)
+    assign_perm("add_item", public_group, c)
+    print("New " + c.collection_type + ": " + c.title)
     users = [su]
     for x in range(0,9):
         name = random.choice(names)
@@ -266,7 +277,7 @@ for m in meetings:
             u.save()
         else:
             u = User.objects.get(username=u.username)
-        items = factories.ItemFactory.build_batch(10, collection=m, created_by=u)
+        items = factories.ItemFactory.build_batch(10, collection=c, created_by=u)
         for i in items:
             print("new item: " + i.title)
             # Multiples of each status are to generate more appproved that other
@@ -280,19 +291,27 @@ for m in meetings:
                 'pending',
                 'rejected'
             ])
-            i.category = 'presentation'
-            i.kind = 'event'
-            i.start_time = m.start_datetime +\
-                datetime.timedelta(0, 0, 0, 0, 0, ctr)
-            i.end_time = i.start_time +\
-                datetime.timedelta(0, 0, 0, 0, 0, 1)
-            i.location = 'Room ' + random.choice([
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'
-            ])
-            i.date_submitted = datetime.datetime\
-                .now(tz=pytz.timezone('US/Eastern'))
-            i.date_accepted = datetime.datetime\
-                .now(tz=pytz.timezone('US/Eastern'))
+            if c.collection_type == "meeting":
+                i.category = 'presentation'
+                i.kind = 'event'
+
+                # import ipdb; ipdb.set_trace()
+                i.start_time = c.start_datetime + datetime.timedelta(0, 0, 0, 0, 0, ctr)
+                i.start_time = i.start_time.replace(hour=8, minute=0)
+                i.end_time = i.start_time + datetime.timedelta(0, 0, 0, 0, 0, 1)
+                i.location = 'Room ' + random.choice([
+                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'
+                ])
+                i.date_submitted = datetime.datetime\
+                    .now(tz=pytz.timezone('US/Eastern'))
+                i.date_accepted = datetime.datetime\
+                    .now(tz=pytz.timezone('US/Eastern'))
+                i.filename = "test" + str(random.randint(0,100000)) + "." + \
+                             random.choice(["pdf", "png", "docx", "ppx", "odt"])
+
+            if c.collection_type == "dataset":
+                i.filename = "test." + str(random.randint(0,100000)) + "." + \
+                             random.choice(["pdf", "png", "docx", "ppx", "odt", "tif", "jpg", "zip"])
 
             i.save()
             assign_perm("view", public_group, i)
@@ -300,7 +319,7 @@ for m in meetings:
                 ctr = 0
             else:
                 ctr += 1
-    m.save()
+    c.save()
 
 
 # EOF
