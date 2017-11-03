@@ -2,15 +2,18 @@
   "title": "Dataset Submission Form",
   "description": "The dataset submission form allows users to submit data to a data repository.",
   "initialParameters": {
+    "next-workflow": {
+        "value": "22"
+    },
     "event-creation-choices": {
       "value": [
         {
           "label": "Use an existing node",
-          "parameter": "useExistingNode"
+          "parameter": "use-existing-node"
         },
         {
           "label": "Create a new node",
-          "parameter": "createNewNode"
+          "parameter": "create-new-node"
         }
       ]
     }
@@ -19,6 +22,24 @@
     {
       "label": "Upload Data",
       "widgets": [
+        {
+          "label": "Use an existing node",
+          "description": "Any materials related to this talk are stored in an OSF Project. Files are automatically uploaded to a new project. If a project containing the materials that are related to this talk already exists, that project may be selected instead of creating a new one. Click here to learn more about OSF projects. (This link will open in a new window.)",
+          "widgetType": "widget-choice-picker",
+          "parameters": {
+            "choices": "event-creation-choices"
+          }
+        },
+        {
+          "label": "Node Create",
+          "description": "Creates the node when its parameter 'enable' is set to true",
+          "widgetType": "widget-node-creator",
+          "parameters": {
+            "enable": "create-new-node",
+            "node": "node"
+          }
+        },
+
         {
           "label": "Upload a file",
           "description": "Select the file to upload",
@@ -37,6 +58,18 @@
           }
         }
       ]
+    },
+    {
+        "label": "Description",
+        "description": "Add a brief description of the data.",
+        "widgets": [{
+            "label": "Description",
+            "description": "Add a description",
+            "widgetType": "widget-text-area",
+            "parameters": {
+                "value": "description"
+            }
+        }]
     },
     {
       "label": "File Metadata",
@@ -59,12 +92,15 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "widget-meeting-submit",
+          "widgetType": "widget-dataset-submit",
           "parameters": {
             "title": "title-widget",
+            "description": "description",
             "fileData": "file-data",
             "fileName": "file-name",
-            "metadata": "metadata"
+            "node": "node",
+            "metadata": "metadata",
+            "nextWorkflow": "next-workflow"
           }
         }
       ]
