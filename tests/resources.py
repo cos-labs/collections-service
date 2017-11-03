@@ -192,8 +192,8 @@ dataset_json = {
   "layers": [
     {
       "settings": {
-        "tagline": "Opening up scientific data to the world.",
-        "title": "Figverse"
+        "title": "Open Data Repository",
+        "tagline": "To customize the title and description, click Edit in the top-right-hand corner."
       },
       "component": "section-title",
       "section-header": "Landing Title"
