@@ -149,7 +149,7 @@ class ItemFactory(factory.Factory):
     title = factory.LazyFunction(science_sentence)
     description = factory.LazyFunction(science_description)
     status = 'approved'
-    source_id = 'xrfye'
+    source_id = '3hgm5'
 
 
 class CollectionFactory(factory.Factory):
