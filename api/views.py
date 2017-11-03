@@ -125,13 +125,13 @@ class CollectionViewSet(ModelViewSet):
     def get_queryset(self):
 
         user = self.request.user
-        queryset = Collection.objects.all().order_by('-date_created')
-
         query = self.request.query_params.get('q')
+        kind = self.request.query_params.get('filter[kind]')
         user_id = self.request.query_params.get('user')
         username = self.request.query_params.get('username')
         org_name = self.request.query_params.get("org")
 
+        queryset = Collection.objects.all().order_by('-date_created')
 
         if user_id:
             queryset = queryset.filter(created_by_id=user_id)
@@ -139,17 +139,14 @@ class CollectionViewSet(ModelViewSet):
             queryset = queryset.filter(created_by__username=username)
         if org_name:
             queryset = queryset.filter(created_by_org=org_name)
-
-
+        if kind:
+            queryset = queryset.filter(collection_type=kind)
         if query:
             queryset = queryset.filter(id__in=[instance.pk for instance in SearchQuerySet()\
                 .models(Collection)\
                 .filter(content=AutoQuery(query))])
 
-
         queryset = get_objects_for_user(user, 'view_collection', klass=queryset)
-
-
 
         return queryset
 
