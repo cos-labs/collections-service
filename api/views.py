@@ -178,10 +178,22 @@ class ItemViewSet(ModelViewSet):
     pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
-        queryset = self.queryset
+
         user = self.request.user
-        collection = self.request.data.get('collection')
+        query = self.request.query_params.get("q")
+        collection_id = self.request.data.get('filter[collection]')
+
+        queryset = self.queryset
+
+        if collection_id:
+            queryset = queryset.filter(collection_id=collection_id)
+        if query:
+            queryset = queryset.filter(id__in=[instance.pk for instance in SearchQuerySet()\
+                .models(Item)\
+                .filter(content=AutoQuery(query))])
+
         queryset = get_objects_for_user(user, 'view', klass=queryset)
+
         return queryset
 
     def perform_create(self, serializer):
