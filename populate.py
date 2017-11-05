@@ -82,7 +82,10 @@ except:
         settings.SU_PASSWORD
     )
 
-    su.save()
+# TODO: figure out why these 2 lines won't successfully set the SU's name
+su.first_name = "Super"
+su.last_name = "User"
+su.save()
 
 
 # Set up `Site` correctly
@@ -265,7 +268,7 @@ for c in meetings + datasets:
     assign_perm("add_item", public_group, c)
     print("New " + c.collection_type + ": " + c.title)
     users = [su]
-    for x in range(0,9):
+    for x in range(0,19):
         name = random.choice(names)
         f_name = name[0]
         l_name = name[1]
@@ -277,7 +280,7 @@ for c in meetings + datasets:
             u.save()
         else:
             u = User.objects.get(username=u.username)
-        items = factories.ItemFactory.build_batch(10, collection=c, created_by=u)
+        items = factories.ItemFactory.build_batch(2, collection=c, created_by=u)
         for i in items:
             print("new item: " + i.title)
             # Multiples of each status are to generate more appproved that other
