@@ -199,6 +199,11 @@ dataset_json = {
       "section-header": "Landing Title"
     },
     {
+        "sectionHeader": "menu",
+        "component": "section-menu",
+        "settings": {}
+    },
+    {
       "settings": {
         "body": "As governments and funders of research see the benefit of open content, the creation of recommendations, mandates and enforcement of mandates are coming thick and fast. figshare has always led the way in enabling academics, publishers and institutions to easily adhere to these principles in the most intuitive and efficient manner."
       },

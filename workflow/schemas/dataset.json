@@ -3,7 +3,7 @@
   "description": "The dataset submission form allows users to submit data to a data repository.",
   "initialParameters": {
     "next-workflow": {
-        "value": "22"
+        "value": "4"
     },
     "event-creation-choices": {
       "value": [

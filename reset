@@ -9,3 +9,4 @@ END
 
 ./manage.py migrate
 ./populate.py
+./manage.py rebuild_index
