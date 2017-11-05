@@ -131,11 +131,8 @@ except:
 workflows = {
     "meeting": "meeting.json",
     "meeting-approval": "meeting-approval.json",
-    "dataset": "dataset.json"
-
-    # TODO: Add dataset approval schema
-    # "dataset": "dataset.json",
-    # "dataset-approval": "dataset-approval.json"
+    "dataset": "dataset.json",
+    "dataset-approval": "dataset-approval.json"
 }
 
 for workflow_name, workflow_schema in workflows.items():
@@ -234,10 +231,9 @@ meetings_next_workflow_param = workflows["meeting"].parameters.get(name="next-wo
 meetings_next_workflow_param.value = workflows["meeting-approval"].id
 meetings_next_workflow_param.save()
 
-# TODO: add dataset approval schema
-# datasets_next_workflow_param = workflows["dataset"].parameters.get(name="next-workflow")
-# datasets_next_workflow_param.value = workflows["dataset-approval"].id
-# datasets_next_workflow_param.save()
+datasets_next_workflow_param = workflows["dataset"].parameters.get(name="next-workflow")
+datasets_next_workflow_param.value = workflows["dataset-approval"].id
+datasets_next_workflow_param.save()
 
 # Create Collections
 # ##############################################################################

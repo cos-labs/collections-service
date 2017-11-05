@@ -1,0 +1,62 @@
+{
+  "title": "Meeting Approval Form",
+  "description": "The meeting approval form allows admins to approve the submissions that are made to meetings.",
+  "case_description": "Approval request for item {{parameters.item}}.",
+  "initialParameters": {
+    "event-approval-choices": {
+      "value": [
+        {
+          "label": "Approve",
+          "parameter": "event-approved"
+        },
+        {
+          "label": "Deny",
+          "parameter": "event-denied"
+        }
+      ]
+    }
+  },
+  "sections": [
+    {
+      "label": "Event Information",
+      "description": "Basic information about this dataset",
+      "widgets": [
+        {
+          "label": "",
+          "description": "",
+          "widgetType": "widget-item-display",
+          "parameters": {
+            "value": "item"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Resolution",
+      "description": "Approve or Deny submission of this dataset to the repository",
+      "widgets": [
+        {
+          "label": "Approve or Deny",
+          "description": "Select the resolution \"Approve\" or \"Deny\"",
+          "widgetType": "widget-choice-picker",
+          "parameters": {
+            "choices": "event-approval-choices"
+          }
+        },
+        {
+          "label": "Submit",
+          "description": "Submit this approval",
+          "widgetType": "widget-approval-submit",
+          "parameters": {
+            "item": "item",
+            "approve": "event-approved",
+            "deny": "event-denied",
+            "startDate": "start-time",
+            "endDate": "end-time",
+            "room": "event-room"
+          }
+        }
+      ]
+    }
+  ]
+}
