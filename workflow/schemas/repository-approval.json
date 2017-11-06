@@ -19,7 +19,7 @@
   "sections": [
     {
       "label": "Event Information",
-      "description": "Basic information about this dataset",
+      "description": "Basic information about this repository",
       "widgets": [
         {
           "label": "",
@@ -33,7 +33,7 @@
     },
     {
       "label": "Resolution",
-      "description": "Approve or Deny submission of this dataset to the repository",
+      "description": "Approve or Deny submission of this repository to the repository",
       "widgets": [
         {
           "label": "Approve or Deny",

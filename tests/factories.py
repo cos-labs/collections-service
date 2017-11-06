@@ -175,4 +175,4 @@ class MeetingFactory(CollectionFactory):
 
 
 class DatasetFactory(CollectionFactory):
-    collection_type = "dataset"
+    collection_type = "repository"
