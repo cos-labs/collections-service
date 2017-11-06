@@ -17,6 +17,12 @@ class Workflow(models.Model):
     workflow_config = JSONField(default={})
     case_description = models.TextField(null=False, blank=True, default="")
 
+    class Meta:
+        permissions = [
+            ("read", "read"),
+            ("execute", "execute")
+        ]
+
     class JSONAPIMeta:
         resource_name = 'workflows'
 
@@ -260,6 +266,12 @@ class Case(models.Model):
         related_name='collection',
         null=True
     )
+
+    class Meta:
+        permissions = [
+            ("read", "read"),
+            ("execute", "execute")
+        ]
 
     class JSONAPIMeta:
         resource_name = 'cases'

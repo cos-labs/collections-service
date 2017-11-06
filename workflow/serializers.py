@@ -9,6 +9,53 @@ from django.contrib.auth.models import User, Group
 from api import models as collection_models
 from workflow import models
 
+from rest_framework.relations import (
+    ManyRelatedField,
+    MANY_RELATION_KWARGS
+)
+
+class ProtectedManyRelatedField(ManyRelatedField):
+
+    def to_representation(self, iterable):
+        """
+        Override `to_representation` in order to handle filtering of relation
+        by user permissions. The if statement is the change from the original
+        """
+        if type(iterable) == QuerySet:
+            iterable = self.child_relation.get_queryset(iterable)
+        return [
+            self.child_relation.to_representation(value)
+            for value in iterable
+        ]
+
+
+class ProtectedResourceRelatedField(ResourceRelatedField):
+
+    def get_queryset(self, iterable):
+        user = self.context['request'].user
+        queryset = get_objects_for_user(user, 'view', klass=iterable)
+        return queryset
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        This method handles creating a parent `ManyRelatedField` instance
+        when the `many=True` keyword argument is passed.
+        Typically you won't need to override this method.
+        Note that we're over-cautious in passing most arguments to both parent
+        and child classes in order to try to cover the general case. If you're
+        overriding this method you'll probably want something much simpler, eg:
+        @classmethod
+        def many_init(cls, *args, **kwargs):
+            kwargs['child'] = cls()
+            return CustomManyRelatedField(*args, **kwargs)
+        """
+        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        for key in kwargs.keys():
+            if key in MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return ProtectedManyRelatedField(**list_kwargs)
+
 
 class Workflow(ModelSerializer):
 
@@ -50,6 +97,7 @@ class Workflow(ModelSerializer):
             'parameters',
             'parameter_stub'
         ]
+
 
 class Section(ModelSerializer):
 

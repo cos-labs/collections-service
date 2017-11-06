@@ -5,6 +5,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from guardian.shortcuts import (
+    assign_perm,
+    get_objects_for_user
+)
+
+from api.models import CollectionWorkflow
 
 from workflow import models
 from workflow import serializers
@@ -95,10 +101,12 @@ class Case(viewsets.ModelViewSet):
     serializer_class = serializers.Case
 
     def get_queryset(self):
+        user = self.request.user
         queryset = self.queryset
         collection_id = self.request.query_params.get('collection')
         if collection_id:
             queryset = queryset.filter(collection=collection_id).order_by('-id')
+        queryset = get_objects_for_user(user, "read", klass=queryset)
         return queryset
 
     # This logic belongs in workflow.models maybe?
@@ -136,3 +144,10 @@ class Case(viewsets.ModelViewSet):
         for parameter_alias in case.workflow.parameter_aliases.all():
             parameter_alias.cases.add(case)
             parameter_alias.save()
+        cw = CollectionWorkflow.objects.get(
+            collection_id=case.collection_id,
+            workflow_id=case.workflow_id
+        )
+        for ag in cw.authorized_groups.all():
+            assign_perm("read", ag, case)
+            assign_perm("execute", ag, case)

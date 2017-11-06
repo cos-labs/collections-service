@@ -92,7 +92,7 @@ su.save()
 
 # Set up `Site` correctly
 
-site = Site.objects.get(id=14)  # Why is it 3? I dono.... bcuz....
+site = Site.objects.get(id=3)  # Why is it 3? I dono.... bcuz....
 site.domain_name = "localhost:8000"
 site.display_name = "localhost"
 site.save()
@@ -258,6 +258,10 @@ with open('tests/diverse_names.txt') as name_file:
 
 for c in meetings + repositories:
     c.save()
+    admins = Group.objects.create(
+        name=c.title + " Admin Group"
+    )
+    c.admins = admins
     print("New " + c.collection_type + ": " + c.title)
     users = [su]
     for x in range(0,19):
@@ -316,20 +320,42 @@ for c in meetings + repositories:
                 ctr += 1
 
     if c.collection_type == "meeting":
-        CollectionWorkflow.objects.create(
+        cw = CollectionWorkflow.objects.create(
             role="submission",
             collection=c,
             workflow=workflows["meeting"],
-            #authorized_groups=public_group
         )
+        cw.authorized_groups.add(public_group)
+        assign_perm("read", public_group, workflows["meeting"])
+        assign_perm("execute", public_group, workflows["meeting"])
+
+        cw = CollectionWorkflow.objects.create(
+            role="approval",
+            collection=c,
+            workflow=workflows["meeting-approval"],
+        )
+        cw.authorized_groups.add(c.admins)
+        assign_perm("read", c.admins, workflows["meeting"])
+        assign_perm("execute", c.admins, workflows["meeting"])
 
     elif c.collection_type == "repository":
-        CollectionWorkflow.objects.create(
+        cw = CollectionWorkflow.objects.create(
             role="submission",
             collection=c,
             workflow = workflows["repository"],
-            #authorized_groups=public_group
         )
+        cw.authorized_groups.add(public_group)
+        assign_perm("read", public_group, workflows["repository"])
+        assign_perm("execute", public_group, workflows["repository"])
+
+        cw = CollectionWorkflow.objects.create(
+            role="approval",
+            collection=c,
+            workflow=workflows["repository-approval"],
+        )
+        cw.authorized_groups.add(c.admins)
+        assign_perm("read", c.admins, workflows["meeting"])
+        assign_perm("execute", c.admins, workflows["meeting"])
 
     assign_perm("view_collection", public_group, c)
     assign_perm("add_item", public_group, c)
