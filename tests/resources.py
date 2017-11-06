@@ -49,14 +49,6 @@ meeting_json = {
             "settings": {}
         },
         {
-            "sectionHeader": "Browse Events",
-            "component": "section-item-table",
-            "settings": {
-                "header-color": "#444",
-                "text-color": "#fff"
-            }
-        },
-        {
             "sectionHeader": "Sponsors",
             "component": "section-sponsors",
             "settings": {
