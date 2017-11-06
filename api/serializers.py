@@ -4,6 +4,7 @@
 
 from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import model_meta
 from rest_framework.serializers import (
@@ -42,6 +43,8 @@ from drf_haystack.serializers import HaystackSerializer
 
 from api.models import (
     Collection,
+    CollectionGroup,
+    CollectionWorkflow,
     Item,
     User,
     ITEM_KINDS
@@ -226,34 +229,45 @@ class CollectionModelSerializer(HyperlinkedModelSerializer):
 class CollectionSerializer(CollectionModelSerializer):
 
     included_serializers = {
-        'workflow': 'workflow.serializers.Workflow'
+        'workflows': 'workflow.serializers.Workflow',
+        "collection_workflows": "api.serializers.CollectionWorkflowSerializer"
     }
 
     id = CharField(read_only=True)
     title = CharField(required=True)
     description = CharField(required=False, allow_blank=True)
     tags = CharField(required=False, allow_blank=True)
+    collection_type = CharField()
     address = CharField(required=False, allow_blank=True, allow_null=True)
     location = CharField(required=False, allow_blank=True, allow_null=True)
     settings = JSONField(required=False)
     submission_settings = JSONField(required=False)
+    date_created = DateTimeField(read_only=True)
+    date_updated = DateTimeField(read_only=True)
     created_by_org = CharField(allow_blank=True, required=False)
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
         required=False
     )
-    collection_type = CharField()
-    date_created = DateTimeField(read_only=True)
-    date_updated = DateTimeField(read_only=True)
+    collection_workflows = ResourceRelatedField(
+        queryset=CollectionWorkflow.objects.all(),
+        many=True,
+        required=False
+    )
+    collection_groups = ResourceRelatedField(
+        queryset=CollectionGroup.objects.all(),
+        many=True,
+        required=False
+    )
     items = ProtectedResourceRelatedField(
         queryset=Item.objects.all(),
         many=True,
         required=False
     )
-    workflow = ResourceRelatedField(
+    workflows = ResourceRelatedField(
         queryset=Workflow.objects.all(),
-        many=False,
+        many=True,
         required=True
     )
     class Meta:
@@ -264,8 +278,10 @@ class CollectionSerializer(CollectionModelSerializer):
             'description',
             'tags',
             'created_by',
-            'workflow',
+            'workflows',
             'location',
+            'collection_workflows',
+            'collection_groups',
             'address',
             'collection_type',
             'settings',
@@ -279,8 +295,69 @@ class CollectionSerializer(CollectionModelSerializer):
     class JSONAPIMeta:
         resource_name = 'collections'
         included_resources = [
-            'workflow',
+            'workflows',
+            "collection_workflows"
         ]
+
+
+class CollectionGroupSerializer(CollectionModelSerializer):
+
+    role = CharField(required=False, allow_null=True, allow_blank=True)
+    collection = ResourceRelatedField(
+        queryset=Collection.objects.all(),
+        many=False,
+        required=True
+    )
+    group = ResourceRelatedField(
+        queryset=Group.objects.all(),
+        many=False,
+        required=True
+    )
+
+    class Meta:
+        model = CollectionGroup
+        fields = [
+            'role',
+            'collection',
+            'group'
+        ]
+
+    class JSONAPIMeta:
+        resource_name = 'collection-groups'
+        included_resources = []
+
+
+class CollectionWorkflowSerializer(CollectionModelSerializer):
+
+    role = CharField(required=False, allow_null=True, allow_blank=True)
+    collection = ResourceRelatedField(
+        queryset=Collection.objects.all(),
+        many=False,
+        required=True
+    )
+    workflow = ResourceRelatedField(
+        queryset=Workflow.objects.all(),
+        many=False,
+        required=True
+    )
+    authorized_groups = ResourceRelatedField(
+        queryset=Group.objects.all(),
+        many=True,
+        required=True
+    )
+
+    class Meta:
+        model = CollectionWorkflow
+        fields = [
+            "role",
+            "collection",
+            "workflow",
+            "authorized_groups"
+        ]
+
+    class JSONAPIMeta:
+        resource_name = 'collection-workflows'
+        included_resources = []
 
 
 class ItemSerializer(CollectionModelSerializer):
