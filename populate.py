@@ -295,8 +295,8 @@ for c in meetings + datasets:
                 i.kind = 'event'
 
                 # import ipdb; ipdb.set_trace()
-                i.start_time = c.start_datetime + datetime.timedelta(0, 0, 0, 0, 0, ctr)
-                i.start_time = i.start_time.replace(hour=8, minute=0)
+                i.start_time = c.start_datetime.replace(hour=8, minute=4)
+                i.start_time = i.start_time + datetime.timedelta(0, 0, 0, 0, 0, ctr)
                 i.end_time = i.start_time + datetime.timedelta(0, 0, 0, 0, 0, 1)
                 i.location = 'Room ' + random.choice([
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'
