@@ -25,8 +25,8 @@
       "Description": "Add basic information about this meeting event",
       "widgets": [
         {
-          "label": "What kind of meeting event is this?",
-          "description": "Select the kind of event that is being submitted. Events may be \"talk\" or \"poster\"",
+          "label": "What kind of presentation is this?",
+          "description": "Select the kind of presentation that is being submitted. Events may be \"talk\" or \"poster\"",
           "widgetType": "widget-text-field",
           "parameters": {
             "value": "event-kind"
@@ -34,7 +34,7 @@
         },
         {
           "label": "Title",
-          "description": "Enter the title of the file.",
+          "description": "Enter the title of your presentation.",
           "widgetType": "widget-text-field",
           "parameters": {
             "value": "title-widget"
