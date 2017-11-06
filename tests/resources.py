@@ -37,13 +37,6 @@ meeting_json = {
 
         },
         {
-            "sectionHeader": "Contributors",
-            "component": "section-contributors",
-            "settings": {
-                "background-color": "#fff"
-            }
-        },
-        {
             "sectionHeader": "Schedule",
             "component": "section-schedule",
             "settings": {}
@@ -213,13 +206,6 @@ repository_json = {
       },
       "component": "section-splash-image",
       "section-header": "Splash Image"
-    },
-    {
-      "settings": {
-        "background-color": "#fff"
-      },
-      "component": "section-contributors",
-      "section-header": "Contributors"
     },
     {
       "settings": {
