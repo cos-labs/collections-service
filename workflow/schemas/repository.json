@@ -51,7 +51,7 @@
         },
         {
           "label": "Title",
-          "description": "Enter the title of the file.",
+          "description": "Enter the title of your upload.",
           "widgetType": "widget-text-field",
           "parameters": {
             "value": "title-widget"
