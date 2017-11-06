@@ -1,6 +1,6 @@
 {
   "title": "Dataset Submission Form",
-  "description": "The dataset submission form allows users to submit data to a data repository.",
+  "description": "The repository submission form allows users to submit data to a data repository.",
   "initialParameters": {
     "next-workflow": {
         "value": "4"
@@ -92,7 +92,7 @@
         {
           "label": "Submit",
           "description": "Submit this talk",
-          "widgetType": "widget-dataset-submit",
+          "widgetType": "widget-repository-submit",
           "parameters": {
             "title": "title-widget",
             "description": "description",

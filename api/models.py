@@ -18,7 +18,7 @@ ITEM_KINDS = [
     ('preprint', 'preprint'),
     ('registration', 'registration'),
     ('presentation', 'presentation'),
-    ("dataset", "dataset"),
+    ("repository", "repository"),
     ('website', 'website'),
     ('event', 'event'),
     ('meeting', 'meeting'),
@@ -102,8 +102,8 @@ class Collection(models.Model):
 
             if self.collection_type == 'meeting':
                 self.settings = resources.meeting_json
-            elif self.collection_type == 'dataset':
-                self.settings = resources.dataset_json
+            elif self.collection_type == 'repository':
+                self.settings = resources.repository_json
 
             super().save(*args, **kwargs)
 

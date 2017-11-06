@@ -49,14 +49,6 @@ meeting_json = {
             "settings": {}
         },
         {
-            "sectionHeader": "Browse Events",
-            "component": "section-item-table",
-            "settings": {
-                "header-color": "#444",
-                "text-color": "#fff"
-            }
-        },
-        {
             "sectionHeader": "Sponsors",
             "component": "section-sponsors",
             "settings": {
@@ -187,13 +179,13 @@ meeting_json = {
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 
-dataset_json = {
+repository_json = {
   "data": {},
   "layers": [
     {
       "settings": {
-        "tagline": "Opening up scientific data to the world.",
-        "title": "Figverse"
+        "title": "Open Data Repository",
+        "tagline": "To customize the title and description, click Edit in the top-right-hand corner."
       },
       "component": "section-title",
       "section-header": "Landing Title"
