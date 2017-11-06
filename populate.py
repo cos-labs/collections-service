@@ -90,7 +90,7 @@ su.save()
 
 # Set up `Site` correctly
 
-site = Site.objects.get(id=3)  # Why is it 3? I dono.... bcuz....
+site = Site.objects.get(id=14)  # Why is it 3? I dono.... bcuz....
 site.domain_name = "localhost:8000"
 site.display_name = "localhost"
 site.save()
@@ -134,8 +134,8 @@ except:
 workflows = {
     "meeting": "meeting.json",
     "meeting-approval": "meeting-approval.json",
-    "dataset": "dataset.json",
-    "dataset-approval": "dataset-approval.json"
+    "repository": "repository.json",
+    "repository-approval": "repository-approval.json"
 }
 
 for workflow_name, workflow_schema in workflows.items():
@@ -234,9 +234,9 @@ meetings_next_workflow_param = workflows["meeting"].parameters.get(name="next-wo
 meetings_next_workflow_param.value = workflows["meeting-approval"].id
 meetings_next_workflow_param.save()
 
-datasets_next_workflow_param = workflows["dataset"].parameters.get(name="next-workflow")
-datasets_next_workflow_param.value = workflows["dataset-approval"].id
-datasets_next_workflow_param.save()
+repositories_next_workflow_param = workflows["repository"].parameters.get(name="next-workflow")
+repositories_next_workflow_param.value = workflows["repository-approval"].id
+repositories_next_workflow_param.save()
 
 # Create Collections
 # ##############################################################################
@@ -245,7 +245,7 @@ datasets_next_workflow_param.save()
 # Create the meetings and talks/posters in them
 
 meetings = factories.MeetingFactory.build_batch(5, created_by=su)
-datasets = factories.DatasetFactory.build_batch(5, created_by=su)
+repositories = factories.DatasetFactory.build_batch(5, created_by=su)
 names = []
 
 with open('tests/diverse_names.txt') as name_file:
@@ -254,12 +254,12 @@ with open('tests/diverse_names.txt') as name_file:
     names = [(x.split(' ')[0], ' '.join(x.split(' ')[1:])) for x in content]
 
 
-for c in meetings + datasets:
+for c in meetings + repositories:
     c.save()
     if c.collection_type == "meeting":
         c.workflow = workflows["meeting"]
-    elif c.collection_type == "dataset":
-        c.workflow = workflows["dataset"]
+    elif c.collection_type == "repository":
+        c.workflow = workflows["repository"]
     assign_perm("view_collection", public_group, c)
     assign_perm("add_item", public_group, c)
     print("New " + c.collection_type + ": " + c.title)
@@ -308,7 +308,7 @@ for c in meetings + datasets:
                 i.file_name = "test" + str(random.randint(0,100000)) + "." + \
                              random.choice(["pdf", "png", "docx", "ppx", "odt"])
 
-            if c.collection_type == "dataset":
+            if c.collection_type == "repository":
                 i.file_name = "test." + str(random.randint(0,100000)) + "." + \
                              random.choice(["pdf", "png", "docx", "ppx", "odt", "tif", "jpg", "zip"])
 
