@@ -54,6 +54,8 @@ from allauth.socialaccount.models import SocialApp
 
 from api.models import (
     Collection,
+    CollectionGroup,
+    CollectionWorkflow,
     Item,
     User
 )
@@ -256,12 +258,6 @@ with open('tests/diverse_names.txt') as name_file:
 
 for c in meetings + repositories:
     c.save()
-    if c.collection_type == "meeting":
-        c.workflow = workflows["meeting"]
-    elif c.collection_type == "repository":
-        c.workflow = workflows["repository"]
-    assign_perm("view_collection", public_group, c)
-    assign_perm("add_item", public_group, c)
     print("New " + c.collection_type + ": " + c.title)
     users = [su]
     for x in range(0,19):
@@ -318,6 +314,25 @@ for c in meetings + repositories:
                 ctr = 0
             else:
                 ctr += 1
+
+    if c.collection_type == "meeting":
+        CollectionWorkflow.objects.create(
+            role="submission",
+            collection=c,
+            workflow=workflows["meeting"],
+            #authorized_groups=public_group
+        )
+
+    elif c.collection_type == "repository":
+        CollectionWorkflow.objects.create(
+            role="submission",
+            collection=c,
+            workflow = workflows["repository"],
+            #authorized_groups=public_group
+        )
+
+    assign_perm("view_collection", public_group, c)
+    assign_perm("add_item", public_group, c)
     c.save()
 
 

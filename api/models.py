@@ -83,13 +83,18 @@ class Collection(models.Model):
         related_name="collection"
     )
 
-    workflow = models.ForeignKey(
-        'workflow.Workflow',
-        null=True,
+    groups = models.ManyToManyField(
+        "CollectionGroup",
         blank=True,
-        related_name="collections",
-        on_delete=models.SET_NULL
+        related_name="authorized_collection_workflows"
     )
+
+    workflows = models.ManyToManyField(
+        "workflow.Workflow",
+        related_name="collections",
+        through='CollectionWorkflow'
+    )
+
 
     def save(self, *args, **kwargs):
 
@@ -119,6 +124,65 @@ class Collection(models.Model):
         permissions = (
             ("view_collection", "View this collection"),
             ("add_item", "Add a item to the collection")
+        )
+
+
+class CollectionGroup(models.Model):
+
+    role = models.TextField(null=True, blank=True)
+
+    collection = models.ForeignKey(
+        "Collection",
+        null=False,
+        blank=False,
+        related_name="collection_groups",
+    )
+
+    group = models.ForeignKey(
+        Group,
+        null=False,
+        blank=False,
+        related_name="collection_groups"
+    )
+
+    def __str__(self):
+        return self.collection.name + self.role
+
+    class Meta:
+        permissions = (
+            ("write", "Write priviledges"),
+        )
+
+
+class CollectionWorkflow(models.Model):
+
+    role = models.TextField(null=True, blank=True)
+
+    collection = models.ForeignKey(
+        'Collection',
+        related_name="collection_workflows"
+    )
+
+    workflow = models.ForeignKey(
+        'workflow.Workflow',
+        null=True,
+        blank=True,
+        related_name="collection_workflows",
+        on_delete=models.SET_NULL
+    )
+
+    authorized_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="authorized_collection_workflows"
+    )
+
+    def __str__(self):
+        return self.collection.name + self.workflow.title
+
+    class Meta:
+        permissions = (
+            ("write", "Write priviledges"),
         )
 
 
