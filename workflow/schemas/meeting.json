@@ -1,7 +1,7 @@
 {
-  "title": "Meeting Submission Form",
+  "title": "Meeting Submission",
   "description": "The meeting submission form allows users to submit information about their talks",
-  "case_description": "Meeting Submission Form",
+  "case_description": "Meeting Submission",
   "initialParameters": {
     "next-workflow": {
         "value": 22
