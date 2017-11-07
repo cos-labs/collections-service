@@ -30,7 +30,9 @@ ITEM_STATUSES = [
     ('none', 'none'),
     ('approved', 'approved'),
     ('pending', 'pending'),
-    ('rejected', 'rejected')
+    ('rejected', 'rejected'),
+    ("pending/visible", "pending/visible"),
+    ("pending/hidden", "pending/hidden")
 ]
 
 
