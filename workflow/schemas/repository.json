@@ -1,6 +1,6 @@
 {
   "title": "Repository Submission",
-  "description": "The repository submission form allows users to submit files to a data repository.",
+  "description": "The repository submission form allows users to submit files to a repository.",
   "case_description": "Repository Submission",
   "initialParameters": {
     "next-workflow": {
@@ -21,7 +21,7 @@
   },
   "sections": [
     {
-      "label": "Upload Data",
+      "label": "Upload Files",
       "widgets": [
         {
           "label": "Use an existing node",
