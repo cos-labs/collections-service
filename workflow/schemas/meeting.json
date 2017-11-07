@@ -3,6 +3,9 @@
   "description": "The meeting submission form allows users to submit information about their talks",
   "case_description": "Meeting Submission",
   "initialParameters": {
+    "submission-success-status": {
+        "value": "pending/visible"
+    },
     "next-workflow": {
         "value": 22
     },
@@ -95,6 +98,7 @@
             "fileData": "file-data",
             "fileName": "file-name",
             "metadata": "metadata",
+            "submissionSuccessStatus": "submission-success-status",
             "kind": "event-kind",
             "description": "event-description",
             "node": "node",
