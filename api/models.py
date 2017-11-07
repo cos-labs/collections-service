@@ -124,7 +124,7 @@ class Collection(models.Model):
 
     class Meta:
         permissions = (
-            ("view_collection", "View this collection"),
+            ("view", "View this collection"),
             ("add_item", "Add a item to the collection")
         )
 

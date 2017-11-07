@@ -150,7 +150,7 @@ class CollectionViewSet(ModelViewSet):
                 .models(Collection)\
                 .filter(content=AutoQuery(query))])
 
-        queryset = get_objects_for_user(user, 'view_collection', klass=queryset)
+        queryset = get_objects_for_user(user, 'view', klass=queryset)
 
         return queryset
 
@@ -159,14 +159,14 @@ class CollectionViewSet(ModelViewSet):
         collection = serializer.validated_data
         collection["created_by"] = user
         collection = serializer.save()
-        assign_perm('view_collection', collection.admins, collection)
+        assign_perm('view', collection.admins, collection)
         assign_perm('add_item', collection.admins, collection)
         user.groups.add(collection.admins)
         user.save()
 
     def retrieve(self, request, *args, **kwargs):
         collection = self.get_object()
-        if request.user.has_perm("view_collection", collection):
+        if request.user.has_perm("view", collection):
             serializer = self.get_serializer(collection)
             return Response(serializer.data)
         return HttpResponse('Not Found', status=404)
