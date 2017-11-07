@@ -9,6 +9,9 @@
     "submission-success-status": {
         "value": "pending-hidden"
     },
+    "create-new-node": {
+        "value": true
+    },
     "event-creation-choices": {
       "value": [
         {
@@ -26,14 +29,6 @@
     {
       "label": "Upload Files",
       "widgets": [
-        {
-          "label": "Use an existing node",
-          "description": "Any materials related to this talk are stored in an OSF Project. Files are automatically uploaded to a new project. If a project containing the materials that are related to this talk already exists, that project may be selected instead of creating a new one. Click here to learn more about OSF projects. (This link will open in a new window.)",
-          "widgetType": "widget-choice-picker",
-          "parameters": {
-            "choices": "event-creation-choices"
-          }
-        },
         {
           "label": "Node Create",
           "description": "Creates the node when its parameter 'enable' is set to true",
