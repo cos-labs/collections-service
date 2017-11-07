@@ -224,7 +224,7 @@ class ItemViewSet(ModelViewSet):
 
         assign_perm('edit', user, item)
         assign_perm('view', user, item)
-        if item.status == "pending/visible":
+        if item.status == "pending-visible":
             assign_perm("view", Group.objects.get(name="public"), item)
         assign_perm('edit', item.collection.admins, item)
         assign_perm('view', item.collection.admins, item)
@@ -242,7 +242,7 @@ class ItemViewSet(ModelViewSet):
             return HttpResponse('Unauthorized', status=401)
 
         if any([
-            (validated_data["status"] == "pending/visible"),
+            (validated_data["status"] == "pending-visible"),
             (validated_data["status"] == "approved")
         ]):
             assign_perm("view", Group.objects.get(name="public"))
