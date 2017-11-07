@@ -1,6 +1,7 @@
 {
   "title": "Dataset Submission Form",
   "description": "The repository submission form allows users to submit data to a data repository.",
+  "case_description": "Repository Dataset Submission",
   "initialParameters": {
     "next-workflow": {
         "value": "4"
