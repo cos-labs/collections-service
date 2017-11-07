@@ -2,10 +2,11 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Permission
 from django.contrib.admin.helpers import ActionForm
 from api.models import Collection, Item
 from guardian.shortcuts import get_objects_for_user, assign_perm
-
+from guardian.admin import GuardedModelAdmin
 
 def approve_item(modeladmin, request, queryset):
     queryset.update(status='approved')
@@ -26,7 +27,7 @@ class AdminForm(ActionForm):
     collection_id = forms.CharField()
 
 
-class ItemAdmin(admin.ModelAdmin):
+class ItemAdmin(GuardedModelAdmin):
     list_display = ('title', 'collection', 'kind', 'created_by', 'status')
     actions = [approve_item]
 
@@ -36,12 +37,17 @@ class ItemAdmin(admin.ModelAdmin):
         can_moderate = list(collections)
         return self.model.objects.filter(collection__in=can_moderate), True
 
+class CollectionAdmin(GuardedModelAdmin):
+    list_display = ["title", "collection_type", "description", "created_by", "created_by_org"]
+
 class OSFUserAdmin(UserAdmin):
     model = get_user_model()
     action_form = AdminForm
     actions = [add_admins]
 
 
-admin.site.register(Collection)
+admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(get_user_model(), OSFUserAdmin)
+
+admin.site.register(Permission)

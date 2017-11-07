@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from workflow.models import Workflow, Section, Widget, ParameterAlias, ParameterStub, Parameter, Case
 
+from guardian.admin import GuardedModelAdmin
 from django.contrib.admin import SimpleListFilter
 
 
@@ -92,7 +93,7 @@ class FirstCaseListFilter(SimpleListFilter):
 
 
 @admin.register(Workflow)
-class WorkflowAdmin(admin.ModelAdmin):
+class WorkflowAdmin(GuardedModelAdmin):
 
     list_display = [
         'id',

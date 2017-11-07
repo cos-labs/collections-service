@@ -6,6 +6,9 @@
     "next-workflow": {
         "value": "4"
     },
+    "submission-success-status": {
+        "value": "pending-hidden"
+    },
     "event-creation-choices": {
       "value": [
         {
@@ -99,6 +102,7 @@
             "description": "description",
             "fileData": "file-data",
             "fileName": "file-name",
+            "submissionSuccessStatus": "submission-success-status",
             "node": "node",
             "metadata": "metadata",
             "nextWorkflow": "next-workflow"

@@ -357,7 +357,7 @@ for c in meetings + repositories:
         assign_perm("read", c.admins, workflows["meeting"])
         assign_perm("execute", c.admins, workflows["meeting"])
 
-    assign_perm("view_collection", public_group, c)
+    assign_perm("view", public_group, c)
     assign_perm("add_item", public_group, c)
     c.save()
 

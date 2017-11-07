@@ -30,7 +30,9 @@ ITEM_STATUSES = [
     ('none', 'none'),
     ('approved', 'approved'),
     ('pending', 'pending'),
-    ('rejected', 'rejected')
+    ('rejected', 'rejected'),
+    ("pending-visible", "pending-visible"),
+    ("pending-hidden", "pending-hidden")
 ]
 
 
@@ -122,7 +124,7 @@ class Collection(models.Model):
 
     class Meta:
         permissions = (
-            ("view_collection", "View this collection"),
+            ("view", "View this collection"),
             ("add_item", "Add a item to the collection")
         )
 
