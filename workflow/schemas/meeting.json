@@ -4,7 +4,7 @@
   "case_description": "Meeting Submission",
   "initialParameters": {
     "submission-success-status": {
-        "value": "pending/visible"
+        "value": "pending-visible"
     },
     "next-workflow": {
         "value": 22

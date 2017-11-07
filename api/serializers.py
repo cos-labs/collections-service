@@ -47,7 +47,8 @@ from api.models import (
     CollectionWorkflow,
     Item,
     User,
-    ITEM_KINDS
+    ITEM_KINDS,
+    ITEM_STATUSES
 )
 
 # TODO Use app import so `Workflow` doesn't need to be imported here.
@@ -362,14 +363,7 @@ class CollectionWorkflowSerializer(CollectionModelSerializer):
 
 class ItemSerializer(CollectionModelSerializer):
     kind = ChoiceField(choices=ITEM_KINDS)
-    status = ChoiceField(
-        choices=[
-            "none",
-            "approved",
-            "pending",
-            "rejected"
-        ]
-    )
+    status = ChoiceField(choices=ITEM_STATUSES)
     created_by = ResourceRelatedField(
         queryset=User.objects.all(),
         many=False,
