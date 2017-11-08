@@ -100,6 +100,10 @@ def meeting_title():
            + str(random.randint(2005, 2020))
 
 
+def repository_title():
+    return random.choice(word_list).title() + ' ' + random.choice(word_list).title() + ' Repository'
+
+
 def science_word():
     return random.choice(word_list)
 
@@ -174,5 +178,6 @@ class MeetingFactory(CollectionFactory):
                                  tzinfo=pytz.timezone('US/Eastern'))
 
 
-class DatasetFactory(CollectionFactory):
+class RepositoryFactory(CollectionFactory):
     collection_type = "repository"
+    title = factory.LazyFunction(repository_title)
