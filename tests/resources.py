@@ -177,8 +177,7 @@ repository_json = {
   "layers": [
     {
       "settings": {
-        "title": "Open Data Repository",
-        "tagline": "To customize the title and description, click Edit in the top-right-hand corner."
+        "tagline": "To customize the layout of this page and remove this message, click Settings in the top-right-hand corner."
       },
       "component": "section-title",
       "section-header": "Landing Title"

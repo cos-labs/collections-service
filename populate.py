@@ -247,7 +247,7 @@ repositories_next_workflow_param.save()
 # Create the meetings and talks/posters in them
 
 meetings = factories.MeetingFactory.build_batch(5, created_by=su)
-repositories = factories.DatasetFactory.build_batch(5, created_by=su)
+repositories = factories.RepositoryFactory.build_batch(5, created_by=su)
 names = []
 
 with open('tests/diverse_names.txt') as name_file:
@@ -261,6 +261,7 @@ for c in meetings + repositories:
     admins = Group.objects.create(
         name=c.title + " Admin Group"
     )
+    admins.user_set.add(su)
     c.admins = admins
     print("New " + c.collection_type + ": " + c.title)
     users = [su]
