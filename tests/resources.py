@@ -11,12 +11,16 @@ meeting_json = {
         {
             "sectionHeader": "Landing Title",
             "component": "section-title",
-            "settings": {}
+            "settings": {
+                "hide-from-nav": True
+            }
         },
         {
             "sectionHeader": "menu",
             "component": "section-menu",
-            "settings": {}
+            "settings": {
+                "hide-from-nav": True
+            }
         },
         {
             "sectionHeader": "Overview",
@@ -33,7 +37,9 @@ meeting_json = {
         {
             "sectionHeader": "Splash Image",
             "component": "section-splash-image",
-            "settings": {}
+            "settings": {
+                "hide-from-nav": True
+            }
 
         },
         {
@@ -177,7 +183,8 @@ repository_json = {
   "layers": [
     {
       "settings": {
-        "tagline": "To customize the layout of this page and remove this message, click Settings in the top-right-hand corner."
+        "tagline": "To customize the layout, color schemes, and other options for this page, as well as to remove this message, click Settings in the top-right-hand corner.",
+        "hide-from-nav": True
       },
       "component": "section-title",
       "section-header": "Landing Title"
@@ -185,23 +192,26 @@ repository_json = {
     {
         "sectionHeader": "menu",
         "component": "section-menu",
-        "settings": {}
+        "settings": {
+            "hide-from-nav": True
+        }
     },
     {
       "settings": {
         "body": "As governments and funders of research see the benefit of open content, the creation of recommendations, mandates and enforcement of mandates are coming thick and fast. figshare has always led the way in enabling academics, publishers and institutions to easily adhere to these principles in the most intuitive and efficient manner."
       },
       "component": "section-paragraph",
-      "section-header": "Paragraph"
+      "section-header": "Why We Exist"
     },
     {
       "settings": {},
       "component": "section-file-grid",
-      "section-header": "File Grid"
+      "section-header": "Files"
     },
     {
       "settings": {
-        "img-url": "https://web-static.figshare.com/assets/7b717f16e9612c0b722a84908088638703888247/public/homepage/img/institutions_bg.jpg"
+          "hide-from-nav": True,
+          "img-url": "https://web-static.figshare.com/assets/7b717f16e9612c0b722a84908088638703888247/public/homepage/img/institutions_bg.jpg"
       },
       "component": "section-splash-image",
       "section-header": "Splash Image"
@@ -214,7 +224,7 @@ repository_json = {
         "background-color": "#c44b38"
       },
       "component": "section-paragraph",
-      "section-header": "Code of Conduct"
+      "section-header": "About Our Organization"
     }
   ],
   "branding": {
