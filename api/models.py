@@ -162,6 +162,8 @@ class CollectionWorkflow(models.Model):
 
     collection = models.ForeignKey(
         'Collection',
+        null=True,
+        blank=True,
         related_name="collection_workflows"
     )
 
@@ -175,6 +177,7 @@ class CollectionWorkflow(models.Model):
 
     authorized_groups = models.ManyToManyField(
         Group,
+        null=True,
         blank=True,
         related_name="authorized_collection_workflows"
     )
