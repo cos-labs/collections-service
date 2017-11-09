@@ -46,6 +46,7 @@ from api.serializers import (
     CollectionSearchSerializer,
     ItemSearchSerializer,
     UserSearchSerializer,
+    GroupSerializer
 
 )
 from api.pagination import LargeResultsSetPagination
@@ -274,6 +275,13 @@ class UserViewSet(ModelViewSet):
             return User.objects.get(id=pk)
         except:
             raise drf_exceptions.NotFound
+
+
+class GroupViewSet(ModelViewSet):
+
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
 
 
 # Search Views

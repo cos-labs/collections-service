@@ -269,7 +269,7 @@ class CollectionSerializer(CollectionModelSerializer):
     workflows = ResourceRelatedField(
         queryset=Workflow.objects.all(),
         many=True,
-        required=True
+        required=False
     )
     class Meta:
         model = Collection
@@ -334,17 +334,17 @@ class CollectionWorkflowSerializer(CollectionModelSerializer):
     collection = ResourceRelatedField(
         queryset=Collection.objects.all(),
         many=False,
-        required=True
+        required=False
     )
     workflow = ResourceRelatedField(
         queryset=Workflow.objects.all(),
         many=False,
-        required=True
+        required=False
     )
     authorized_groups = ResourceRelatedField(
         queryset=Group.objects.all(),
         many=True,
-        required=True
+        required=False
     )
 
     class Meta:
@@ -480,5 +480,16 @@ class CollectionSearchSerializer(HaystackSerializer):
             'title',
             'description',
             'created_by'
+        ]
+
+
+class GroupSerializer(CollectionModelSerializer):
+
+    name = CharField(required=True)
+
+    class Meta:
+        model = Group
+        fields = [
+            'name'
         ]
 
