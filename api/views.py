@@ -246,7 +246,7 @@ class ItemViewSet(ModelViewSet):
             (validated_data["status"] == "pending-visible"),
             (validated_data["status"] == "approved")
         ]):
-            assign_perm("view", Group.objects.get(name="public"))
+            assign_perm("view", Group.objects.get(name="public"), collection)
 
         serializer.save()
 
