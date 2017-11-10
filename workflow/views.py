@@ -116,7 +116,7 @@ class Case(viewsets.ModelViewSet):
             filters = []
             for cw in cws:
                 filters.append(queryset.filter(collection=cw.collection, workflow=cw.workflow))
-            reduce((lambda queryset, filter: queryset | filter), filters)
+            queryset = reduce((lambda queryset, filter: queryset | filter), filters)
         if for_item:
             queryset = queryset.filter(parameters_id=\
                 [parameter.pk for parameter in \
