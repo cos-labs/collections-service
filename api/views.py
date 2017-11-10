@@ -197,21 +197,9 @@ class ItemViewSet(ModelViewSet):
         user = self.request.user
         query = self.request.query_params.get("q")
         collection_id = self.request.data.get('filter[collection]')
-        for_item = self.request.data.get("for_item")
-        role = self.request.data.get("role")
 
         queryset = self.queryset
 
-        if role:
-            cws = CollectionWorkflow.objects.filter(role=role)
-            filters = []
-            for cw in cws:
-                filters.append(queryset.filter(collection=cw.collection, workflow=cw.workflow))
-            reduce((lambda queryset, filter: queryset | filter), filters)
-        if for_item:
-            queryset = queryset.filter(parameters_id=\
-                [parameter.pk for parameter in \
-                    Parameter.objects.filter(name="item", value=for_item)])
         if collection_id:
             queryset = queryset.filter(collection_id=collection_id)
         if query:
