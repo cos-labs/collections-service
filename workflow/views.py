@@ -12,9 +12,11 @@ from guardian.shortcuts import (
 
 from api.models import CollectionWorkflow
 
+
 from workflow import models
 from workflow import serializers
 
+from functools import reduce
 
 class Workflow(viewsets.ModelViewSet):
 
@@ -104,10 +106,78 @@ class Case(viewsets.ModelViewSet):
         user = self.request.user
         queryset = self.queryset
         collection_id = self.request.query_params.get('collection')
+        for_item = self.request.data.get("for_item")
+        role = self.request.data.get("role")
+
+        queryset = self.queryset
+
+        if role:
+            cws = CollectionWorkflow.objects.filter(role=role)
+            filters = []
+            for cw in cws:
+                filters.append(queryset.filter(collection=cw.collection, workflow=cw.workflow))
+            queryset = reduce((lambda queryset, filter: queryset | filter), filters)
+        if for_item:
+            queryset = queryset.filter(parameters_id=\
+                [parameter.pk for parameter in \
+                    Parameter.objects.filter(name="item", value=for_item)])
         if collection_id:
             queryset = queryset.filter(collection=collection_id).order_by('-id')
+
         queryset = get_objects_for_user(user, "read", klass=queryset)
+
         return queryset
+
+    def retrieve(self, request, pk=None):
+        if not pk:
+
+            try:
+                user = self.request.user
+                queryset = self.queryset
+                for_item = self.request.query_params.get("for_item")
+                role = self.request.query_params.get("role")
+                if role:
+                    cws = CollectionWorkflow.objects.filter(role=role)
+                    filters = []
+                    for cw in cws:
+                        filters.append(queryset.filter(collection=cw.collection, workflow=cw.workflow))
+                    reduce((lambda queryset, filter: queryset | filter), filters)
+                if for_item:
+                    queryset = queryset.filter(case_parameters__parameter__in=\
+                        [parameter for parameter in \
+                            models.Parameter.objects.filter(name="item", value=for_item)])
+
+                case = queryset.first()
+                if user.has_perm("execute", case):
+                    self.kwargs['pk'] = case.pk
+                else:
+                    return Response({"errors": [{
+                        "status": "401",
+                        "title": "Unauthorized",
+                        "detail": "The current user is not authorized to\
+                        execute this case. If you believe this is a mistake,\
+                        contact the system administrator."
+                    }]}, status= 401)
+
+            except MultipleObjectsReturned:
+                return Response({"errors": [{
+                    "status": "400",
+                    "title": "Record not unique",
+                    "detail": "The query does not uniquely identify a record;\
+                    multiple records were found to match the request. Specify\
+                    query parameters that uniquely identify one record, or use\
+                    the \"parameter-list\" endpoint."
+                }]}, status=400)
+
+            except ObjectDoesNotExist:
+                return Response({"errors": [{
+                    "status": "404",
+                    "title": "Not found",
+                    "detail": "No objects were found that match the query."
+                }]}, status=404)
+
+        return super().retrieve(request, pk=pk)
+
 
     # This logic belongs in workflow.models maybe?
     def perform_create(self, serializer):
