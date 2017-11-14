@@ -191,6 +191,7 @@ repository_json = {
     },
     {
         "sectionHeader": "menu",
+        "hideFromNav": True,
         "component": "section-menu",
         "settings": {
             "hide-from-nav": True

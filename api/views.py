@@ -196,7 +196,7 @@ class ItemViewSet(ModelViewSet):
 
         user = self.request.user
         query = self.request.query_params.get("q")
-        collection_id = self.request.data.get('filter[collection]')
+        collection_id = self.request.query_params.get('filter[collection]')
 
         queryset = self.queryset
 
