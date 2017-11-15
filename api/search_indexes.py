@@ -17,14 +17,13 @@ class CollectionIndex(indexes.SearchIndex, indexes.Indexable):
         """
         return self.get_model().objects.all()
 
-
 class ItemIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
-    title = indexes.CharField(model_attr='title')
-    description = indexes.CharField(model_attr='description', null=True)
-    created_by = indexes.CharField(model_attr='created_by__full_name', null=True)
-    collection = indexes.CharField(model_attr='collection__pk')
-    kind = indexes.CharField(model_attr='kind', null=True)
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    title = indexes.EdgeNgramField(model_attr='title')
+    description = indexes.EdgeNgramField (model_attr='description', null=True)
+    created_by = indexes.EdgeNgramField(model_attr='created_by__full_name', null=True)
+    collection = indexes.EdgeNgramField(model_attr='collection__pk')
+    kind = indexes.EdgeNgramField(model_attr='kind', null=True)
 
     def get_model(self):
         return Item
