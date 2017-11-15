@@ -183,7 +183,7 @@ class CollectionWorkflow(models.Model):
     )
 
     def __str__(self):
-        return self.collection.name + self.workflow.title
+        return self.collection.title + self.workflow.title
 
     class Meta:
         permissions = (
