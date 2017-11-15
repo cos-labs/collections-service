@@ -24,8 +24,8 @@ class Workflow(viewsets.ModelViewSet):
     serializer_class = serializers.Workflow
 
     def perform_create(self, serializer):
-        import ipdb; ipdb.set_trace()
-
+        pass
+   
     def get_queryset(self):
         return self.queryset
 
@@ -147,8 +147,6 @@ class Case(viewsets.ModelViewSet):
                         [parameter for parameter in \
                             models.Parameter.objects.filter(name="item", value=for_item)])
 
-                import ipdb
-                ipdb.set_trace()
                 case = queryset.first()
                 if user.has_perm("execute", case):
                     self.kwargs['pk'] = case.pk
