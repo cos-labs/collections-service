@@ -4,13 +4,13 @@
   "case_description": "Repository Submission",
   "initialParameters": {
     "next-workflow": {
-        "value": "4"
+      "value": "4"
     },
     "submission-success-status": {
-        "value": "pending-hidden"
+      "value": "pending-hidden"
     },
     "create-new-node": {
-        "value": true
+      "value": true
     },
     "event-creation-choices": {
       "value": [
@@ -59,16 +59,16 @@
       ]
     },
     {
+      "label": "Description",
+      "description": "Add a brief description of the data.",
+      "widgets": [{
         "label": "Description",
-        "description": "Add a brief description of the data.",
-        "widgets": [{
-            "label": "Description",
-            "description": "Add a description",
-            "widgetType": "widget-text-area",
-            "parameters": {
-                "value": "description"
-            }
-        }]
+        "description": "Add a description",
+        "widgetType": "widget-text-area",
+        "parameters": {
+          "value": "description"
+        }
+      }]
     },
     {
       "label": "File Metadata",
@@ -93,6 +93,7 @@
           "description": "Submit this talk",
           "widgetType": "widget-repository-submit",
           "parameters": {
+            "item": "item",
             "title": "title-widget",
             "description": "description",
             "fileData": "file-data",
