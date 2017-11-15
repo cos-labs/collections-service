@@ -24,8 +24,8 @@ class Workflow(viewsets.ModelViewSet):
     serializer_class = serializers.Workflow
 
     def perform_create(self, serializer):
-        import ipdb; ipdb.set_trace()
-
+        pass
+   
     def get_queryset(self):
         return self.queryset
 
