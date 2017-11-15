@@ -336,8 +336,8 @@ for c in meetings + repositories:
             workflow=workflows["meeting-approval"],
         )
         cw.authorized_groups.add(c.admins)
-        assign_perm("read", c.admins, workflows["meeting"])
-        assign_perm("execute", c.admins, workflows["meeting"])
+        assign_perm("read", c.admins, workflows["meeting-approval"])
+        assign_perm("execute", c.admins, workflows["meeting-approval"])
 
     elif c.collection_type == "repository":
         cw = CollectionWorkflow.objects.create(
@@ -355,8 +355,8 @@ for c in meetings + repositories:
             workflow=workflows["repository-approval"],
         )
         cw.authorized_groups.add(c.admins)
-        assign_perm("read", c.admins, workflows["meeting"])
-        assign_perm("execute", c.admins, workflows["meeting"])
+        assign_perm("read", c.admins, workflows["repository-approval"])
+        assign_perm("execute", c.admins, workflows["repository-approval"])
 
     assign_perm("view", public_group, c)
     assign_perm("add_item", public_group, c)
