@@ -6,11 +6,17 @@ from django.contrib.auth.models import (
 )
 from django.contrib.postgres.fields import JSONField
 from guardian.mixins import GuardianUserMixin
-
 from tests import resources
-
+import pypandoc
+from pdf2image import convert_from_path
 import datetime
-
+import tempfile
+import requests
+import os
+from io import BytesIO
+import copy
+from PIL import Image
+from django.core.files.base import ContentFile
 
 ITEM_KINDS = [
     ('none', 'none'),
@@ -208,7 +214,7 @@ class Item(models.Model):
     end_time = models.DateTimeField(null=True, blank=True, default=None)
     file_link = models.CharField(null=True, blank=True, max_length=1000)
     file_name = models.CharField(null=True, blank=True, max_length=1000)
-
+    file_thumbnail = models.ImageField(upload_to='thumbnails', null=True, blank=True)
     collection = models.ForeignKey('Collection', related_name='items')
     created_by = models.ForeignKey(User)
 
@@ -218,3 +224,20 @@ class Item(models.Model):
             ("view", "View this item"),
             ("approve", "Approve this item")
         )
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # download file (get link from file_link)
+            input_filename = "test.docx"
+            midput_filename = "tmp.pdf"
+            with tempfile.TemporaryDirectory() as path:
+                midput_filepath = os.path.join(path, midput_filename)
+                pypandoc.convert_file(input_filename, 'pdf', outputfile=midput_filepath)
+                image = convert_from_path(midput_filepath)[0]
+                image.thumbnail((500, 500))
+                thumb = image.crop((0, 0, image.width, 250))
+                thumb.load()
+                thumb_io = BytesIO()
+                thumb.save(thumb_io, format='PNG')
+                self.file_thumbnail.save(self.title + '.png', ContentFile(thumb_io.getvalue()), save=False)
+        super(Item, self).save(*args, **kwargs)
