@@ -1,5 +1,5 @@
 {
-  "title": "Meeting Approval Form",
+  "title": "Repository Approval Form",
   "description": "The meeting approval form allows admins to approve the submissions that are made to meetings.",
   "case_description": "Approval request for item {{parameters.item}}.",
   "initialParameters": {
