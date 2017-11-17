@@ -459,7 +459,7 @@ class Case(ModelSerializer):
             'parameter_aliases',
             'parameters',
             "collection",
-            'item'
+            'item',
             'stubs'
         ]
 
