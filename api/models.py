@@ -75,6 +75,7 @@ class Collection(models.Model):
     address = models.CharField(max_length=200, null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
+    showcased = models.BooleanField()
 
     created_by = models.ForeignKey(User)
 

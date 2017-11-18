@@ -135,9 +135,13 @@ class CollectionViewSet(ModelViewSet):
         user_id = self.request.query_params.get('user')
         username = self.request.query_params.get('username')
         org_name = self.request.query_params.get("org")
+        showcased = self.request.query_params.get('showcased')
+
 
         queryset = Collection.objects.all().order_by('-date_created')
 
+        if showcased:
+            queryset = queryset.filter(showcased=True)
         if user_id:
             queryset = queryset.filter(created_by_id=user_id)
         if username:
