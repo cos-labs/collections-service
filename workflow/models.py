@@ -140,7 +140,8 @@ class ParameterStub(models.Model):
         choices=[
             ('CASE', 'Case'),
             ('WORKFLOW', 'Workflow'),
-            ('GLOBAL', 'Global')
+            ('GLOBAL', 'Global'),
+            ('ITEM', 'Item')
         ]
     )
 
@@ -156,6 +157,7 @@ class ParameterStub(models.Model):
         related_name='parameter_stubs',
         null=False
     )
+
 
     class Meta:
         unique_together = ('workflow', 'name')
@@ -174,6 +176,13 @@ class Parameter(models.Model):
     name = models.CharField(max_length=64, blank=False)
     value = JSONField(null=True, blank=True, default=None)
     properties = JSONField(null=True, blank=True, default={})
+
+    item = models.ForeignKey(
+        'api.Item',
+        related_name="parameters",
+        null=True,
+        blank=True
+    )
 
     stub = models.ForeignKey(
         'ParameterStub',
@@ -265,6 +274,13 @@ class Case(models.Model):
         'api.Collection',
         related_name='collection',
         null=True
+    )
+
+    item = models.ForeignKey(
+        'api.Item',
+        related_name='cases',
+        null=True,
+        blank=True
     )
 
     class Meta:

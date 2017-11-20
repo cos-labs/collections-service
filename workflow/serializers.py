@@ -227,6 +227,12 @@ class Parameter(ModelSerializer):
         required=True
     )
 
+    item = ResourceRelatedField(
+        queryset=collection_models.Item.objects.all(),
+        many=False,
+        required=False
+    )
+
     stub = ResourceRelatedField(
         queryset=models.ParameterStub.objects.all(),
         required=False,
@@ -376,6 +382,7 @@ class Parameter(ModelSerializer):
             'properties',
             'aliases',
             'stub',
+            'item',
             'cases',
             'workflow'
         ]
@@ -407,6 +414,12 @@ class Case(ModelSerializer):
     widgets = ResourceRelatedField(
         queryset=models.Widget.objects.all(),
         many=True,
+        required=False
+    )
+
+    item = ResourceRelatedField(
+        queryset=collection_models.Item.objects.all(),
+        many=False,
         required=False
     )
 
@@ -446,6 +459,7 @@ class Case(ModelSerializer):
             'parameter_aliases',
             'parameters',
             "collection",
+            'item',
             'stubs'
         ]
 
@@ -456,5 +470,6 @@ class Case(ModelSerializer):
             'widgets',
             'parameter_aliases',
             'parameters',
-            'stubs'
+            'stubs',
+            'item'
         ]
