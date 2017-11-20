@@ -7,7 +7,7 @@ class CollectionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     title = indexes.EdgeNgramField(model_attr='title')
     description = indexes.EdgeNgramField(model_attr='title')
-    created_by = indexes.EdgeNgramField(model_attr='created_by')
+    created_by = indexes.EdgeNgramField(model_attr='created_by', boost=2)
 
     def get_model(self):
         return Collection

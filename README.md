@@ -33,14 +33,40 @@ Setting up a virtual environment for Python 3 is recommended.
     $ pyenv virtualenv 3.6.0 osf-collections
     $ pip install -r requirements.txt
 
+#### Set Up Postgres:
+
+##### OSX
+
+    $ brew install postgres
+    $ createdb
+    $ brew services postgres start
+
+#### Set Up Tika
+
+Tika is an apache product that allows for scraping text from a very large
+variety of file formats. Collections uses it to provide full-text search
+on documents that are created in collections.
+
+##### OSX
+
+    $ brew install tika
+
+Note this may require installing xcode command line tools.
+
+Now that tika is installed, create a launch daemon to make starting and
+stopping tika more simple, and load it in so launchctl knows about it.
+
+    $ cp <collections-service>/apache.tika.plist /Library/LaunchDaemons/apache.tika.plist
+    $ launchctl load /Library/LaunchDaemons/apache.tika/plist
+
+Now tika can be started and stopped using
+
+    $ launchctl start apache.tika
+    $ launchctl stop apache.tika
+
 
 ## Running
 
-#### Start Postgres:
-
-Using a package manager like brew is recommended.
-
-    $ brew services postgres start
     $ cd {collections}/
 
 #### Set up `local.py` settings
