@@ -257,6 +257,7 @@ with open('tests/diverse_names.txt') as name_file:
 
 
 for c in meetings + repositories:
+    c.showcased = False
     c.save()
     admins = Group.objects.create(
         name=c.title + " Admin Group"

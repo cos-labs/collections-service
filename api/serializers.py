@@ -251,6 +251,7 @@ class CollectionSerializer(CollectionModelSerializer):
         many=False,
         required=False
     )
+    showcased = BooleanField()
     collection_workflows = ResourceRelatedField(
         queryset=CollectionWorkflow.objects.all(),
         many=True,
@@ -278,6 +279,7 @@ class CollectionSerializer(CollectionModelSerializer):
             'title',
             'description',
             'tags',
+            'showcased',
             'created_by',
             'workflows',
             'location',
