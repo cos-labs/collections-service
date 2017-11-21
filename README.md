@@ -28,6 +28,7 @@ You will need the following things properly installed on your computer.
     $ cd collections-service
 
 #### Install Dependencies:
+
 Setting up a virtual environment for Python 3 is recommended.
 
     $ pyenv virtualenv 3.6.0 osf-collections
@@ -40,6 +41,15 @@ Setting up a virtual environment for Python 3 is recommended.
     $ brew install postgres
     $ createdb
     $ brew services postgres start
+
+#### Set Up Redis
+
+OSF Collections uses Redis as a database for celery tasks, as well as a cache.
+
+    $ brew install redis
+    $ brew services start redis
+
+##### OSX
 
 #### Set Up Tika
 

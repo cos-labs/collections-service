@@ -16,6 +16,14 @@ import os
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 ALLOWED_HOSTS = ['*']
+CORS_PREFLIGHT_MAX_AGE = 1
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:4200',
+    'osf-collections.herokuapp.com',
+    'dev-labs-2.cos.io'
+)
+
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +51,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'osf_oauth2_adapter'
 ]
-
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -83,6 +90,55 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'service.wsgi.application'
 
+SITE_ID = 1
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_URL = '/static/'
+
+FIXTURE_DIRS = (
+   '/api/fixtures/',
+)
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10,
+    'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework_json_api.pagination.PageNumberPagination',
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework_json_api.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework_json_api.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.ext.rest_framework.authentication.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+}
+
+# REST FRAMEWORK
+JSON_API_PLURALIZE_TYPES = True
+JSON_API_FORMAT_TYPES = 'camelize'
+JSON_API_FORMAT_KEYS = 'dasherize'
 
 # auth and allauth settings
 OAUTH2_PROVIDER = {
@@ -121,73 +177,20 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
-    'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework_json_api.pagination.PageNumberPagination',
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework_json_api.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser'
-    ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework_json_api.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ),
-    'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.ext.rest_framework.authentication.OAuth2Authentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
-}
-
-# REST FRAMEWORK
-JSON_API_PLURALIZE_TYPES = True
-JSON_API_FORMAT_TYPES = 'camelize'
-JSON_API_FORMAT_KEYS = 'dasherize'
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
     'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
-CORS_PREFLIGHT_MAX_AGE = 1
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'localhost:4200',
-    'osf-collections.herokuapp.com',
-    'dev-labs-2.cos.io'
-)
-
 AUTH_USER_MODEL = 'api.User'
 GAURDIAN_MONKEY_PATCH = False
 GUARDIAN_GET_INIT_ANONYMOUS_USER = 'api.models.get_anonymous_user_instance'
 ANONYMOUS_USER_NAME = "anonymous"
 
-#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# Celery
 
-FIXTURE_DIRS = (
-   '/api/fixtures/',
-)
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+HAYSTACK_SIGNAL_PROCESSOR = 'search.signals.QueuedSignalProcessor'
 
-SITE_ID = 1
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
-STATIC_URL = '/static/'
