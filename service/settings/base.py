@@ -66,7 +66,7 @@ MIDDLEWARE_CLASSES = [
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+        'PATH': os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'whoosh_index'),
     },
 }
 
