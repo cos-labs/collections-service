@@ -1,5 +1,5 @@
 {{object.title}}
 {{object.description}}
-{{object.collection__title}}
+{{object.collection.title}}
 {{object.created_by.full_name}}
 {{object.content}}
