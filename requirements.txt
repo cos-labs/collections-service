@@ -43,6 +43,7 @@ Pygments==2.2.0
 python-dateutil==2.6.1
 python3-openid==3.1.0
 pytz==2017.2
+redis==2.10.6
 requests==2.13.0
 requests-oauthlib==0.8.0
 simplegeneric==0.8.1
