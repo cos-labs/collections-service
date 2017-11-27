@@ -198,7 +198,7 @@ repository_json = {
     },
     {
       "settings": {
-        "body": "As governments and funders of research see the benefit of open content, the creation of recommendations, mandates and enforcement of mandates are coming thick and fast. figshare has always led the way in enabling academics, publishers and institutions to easily adhere to these principles in the most intuitive and efficient manner."
+      "body": "Absorption unpredictable nuclear energy inertia exploration  unbelievable. Aven cycle fossil fuel mantle spectacular achieving. Potential unbelievable oxygen minerals spectrum geo-science. Probe centigrade data ratio marine relationships between. Environment black hole enzyme stage trade winds hemisphere."
       },
       "component": "section-paragraph",
       "section-header": "Why We Exist"
@@ -211,7 +211,7 @@ repository_json = {
     {
       "settings": {
           "hide-from-nav": True,
-          "img-url": "https://web-static.figshare.com/assets/7b717f16e9612c0b722a84908088638703888247/public/homepage/img/institutions_bg.jpg"
+          "img-url": "https://images.unsplash.com/photo-1505069148894-186e622d23a0"
       },
       "component": "section-splash-image",
       "section-header": "Splash Image"
