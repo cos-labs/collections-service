@@ -1,17 +1,19 @@
+from __future__ import unicode_literals
+
 from haystack import indexes
 from api.models import Collection, Item
 from django.contrib.auth.models import User
-from api.tasks import (
-    scrape_text,
-    do_update
-)
+from api.tasks import update_item
 from celery import chain
+
+import requests
+from tika import parser
 
 class CollectionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     title = indexes.EdgeNgramField(model_attr='title')
     description = indexes.EdgeNgramField(model_attr='title')
-    created_by = indexes.EdgeNgramField(model_attr='created_by', boost=2.0)
+    created_by = indexes.EdgeNgramField(model_attr='created_by__full_name', boost=2.0)
 
     def get_model(self):
         return Collection
@@ -41,11 +43,20 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
         if self.should_update(instance, **kwargs):
             backend = self.get_backend(using)
 
-            instance.content = "test filename"
-
-
             if backend is not None:
-                chain(scrape_text.s(), do_update.s(self, backend))
+                #update_item.delay(self, type(instance), instance.id, backend)
+                token = instance.created_by.socialaccount_set.all()[0].socialtoken_set.all()[0].token
+                res = requests.get(instance.file_link, headers={
+                    'authorization': "Bearer " + token,
+                })
+
+                if res.status_code == 401:
+                    # Probably the file is not public
+                    pass
+                parsed = parser.from_buffer(res.content)
+                instance.content = parsed["content"]
+                backend.update(self, [instance])
+
 
     def get_model(self):
         return Item
