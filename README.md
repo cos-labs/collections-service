@@ -46,10 +46,10 @@ Setting up a virtual environment for Python 3 is recommended.
 
 OSF Collections uses Redis as a database for celery tasks, as well as a cache.
 
+##### OSX
+
     $ brew install redis
     $ brew services start redis
-
-##### OSX
 
 #### Set Up Tika
 
