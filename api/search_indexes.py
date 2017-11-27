@@ -41,7 +41,6 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
         """
         # Check to make sure we want to index this first.
         if self.should_update(instance, **kwargs):
-            import ipdb; ipdb.set_trace()
             backend = self.get_backend(using)
 
             if backend is not None:
