@@ -6,7 +6,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-service/settings/whoosh_index/*
+whoosh_index
 
 # C extensions
 *.so

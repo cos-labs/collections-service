@@ -74,6 +74,13 @@ Now tika can be started and stopped using
     $ launchctl start apache.tika
     $ launchctl stop apache.tika
 
+#### Set Up Email
+
+##### Sendgrid
+
+Simply export the Sendgrid token in the environment so Django can pick it up
+
+    export SENDGRID_API_KEY='SG.the_key_given_to_you_by_sendgrid'
 
 ## Running
 

@@ -12,6 +12,8 @@
 # #############################################################################
 
 
+import os
+
 from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.auth.models import Group
@@ -29,6 +31,10 @@ from guardian.shortcuts import (
     get_objects_for_user
 )
 
+import requests
+
+import sendgrid
+from sendgrid.helpers.mail import *
 
 from api.models import (
     Collection,
@@ -234,6 +240,20 @@ class ItemViewSet(ModelViewSet):
         assign_perm('edit', item.collection.admins, item)
         assign_perm('view', item.collection.admins, item)
         assign_perm('approve', item.collection.admins, item)
+
+        token = user.socialaccount_set.all()[0].socialtoken_set.all()[0].token
+        res = requests.get('https://api.osf.io/v2/users/me', headers={
+            'authorization': "Bearer " + token,
+        })
+        recipient_email = res.json()['data']['attributes']['email']
+
+        sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+        to_email = Email(recipient_email)
+        from_email = Email("notifications@osf.io")
+        subject = "OSF Collection Submission"
+        content = Content("text/plain", """Congratulations on your submission.\n\n""" + item.title + """ has been created in the collection and is pending approval""")
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
 
     def perform_update(self, serializer):
 
