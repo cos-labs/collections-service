@@ -45,16 +45,19 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
 
             if backend is not None:
                 #update_item.delay(self, type(instance), instance.id, backend)
-                token = instance.created_by.socialaccount_set.all()[0].socialtoken_set.all()[0].token
-                res = requests.get(instance.file_link, headers={
-                    'authorization': "Bearer " + token,
-                })
+                try:
+                    token = instance.created_by.socialaccount_set.all()[0].socialtoken_set.all()[0].token
+                    res = requests.get(instance.file_link, headers={
+                        'authorization': "Bearer " + token,
+                    })
 
-                if res.status_code == 401:
-                    # Probably the file is not public
+                    if res.status_code == 401:
+                        # Probably the file is not public
+                        pass
+                    parsed = parser.from_buffer(res.content)
+                    instance.content = parsed["content"]
+                except:
                     pass
-                parsed = parser.from_buffer(res.content)
-                instance.content = parsed["content"]
                 backend.update(self, [instance])
 
 
