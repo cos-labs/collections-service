@@ -86,11 +86,8 @@ class Collection(models.Model):
         related_name="collection"
     )
 
-
     def save(self, *args, **kwargs):
-
         if not self.pk:  # If this is the first save
-
             if self.collection_type == 'meeting':
                 self.settings = resources.meeting_json
             elif self.collection_type == 'repository':
