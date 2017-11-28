@@ -67,7 +67,7 @@ Now that tika is installed, create a launch daemon to make starting and
 stopping tika more simple, and load it in so launchctl knows about it.
 
     $ cp <collections-service>/apache.tika.plist /Library/LaunchDaemons/apache.tika.plist
-    $ launchctl load /Library/LaunchDaemons/apache.tika/plist
+    $ launchctl load /Library/LaunchDaemons/apache.tika.plist
 
 Now tika can be started and stopped using
 
