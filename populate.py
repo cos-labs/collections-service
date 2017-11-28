@@ -54,19 +54,10 @@ from allauth.socialaccount.models import SocialApp
 
 from api.models import (
     Collection,
-    CollectionGroup,
-    CollectionWorkflow,
     Item,
     User
 )
-from workflow.models import (
-    Workflow,
-    Section,
-    Widget,
-    Parameter,
-    ParameterStub,
-    ParameterAlias
-)
+
 from tests import factories
 
 
@@ -126,119 +117,6 @@ except:
     public_group.save()
 
 
-# Setup Workflows
-# ##############################################################################
-
-# Workflows need to happen before the collections so that collections can have a
-# submission workflow associated with them.
-
-# Load the needed workflows. `workflows` is modified here.
-workflows = {
-    "meeting": "meeting.json",
-    "meeting-approval": "meeting-approval.json",
-    "repository": "repository.json",
-    "repository-approval": "repository-approval.json"
-}
-
-for workflow_name, workflow_schema in workflows.items():
-
-    with open('workflow/schemas/' + workflow_schema) as data_file:
-        wf_config = json.load(data_file)
-
-    workflow = Workflow()
-    workflow.title = wf_config.get("title", "")
-    workflow.description = wf_config.get("description", "")
-    workflow.case_description = wf_config.get("case_description", "")
-    workflow.initialization_values = wf_config.get("initialParameters", {})
-    workflow.save()
-
-    for name, value in wf_config.get("initialParameters", {}).items():
-
-        try:
-            parameter_stub = ParameterStub.objects\
-                .filter(workflow_id=workflow.id).get(name=name)
-        except:
-            parameter_stub = ParameterStub()
-
-        parameter_stub.name = name
-        parameter_stub.scope = "WORKFLOW"
-        parameter_stub.workflow = workflow
-        parameter_stub.save()
-
-        parameter = Parameter()
-        parameter.name = name
-        parameter.value = value.get('value', None)
-        parameter.properties = value.get('properties', None)
-        parameter.stub = parameter_stub
-        parameter.workflow = workflow
-        parameter.save()
-
-    section_index = 0
-    for section_config in wf_config.get("sections", []):
-        section_index += 1
-
-        section = Section()
-        section.label = section_config.get("label", "")
-        section.description = section_config.get("description", "")
-        section.index = section_index
-        section.workflow = workflow
-
-        section.save()
-
-        widget_index = 0
-        for widget_config in section_config.get("widgets", []):
-            widget_index += 1
-
-            widget = Widget()
-            widget.label = widget_config.get("label", "")
-            widget.description = widget_config.get("description", "")
-            widget.widget_type = widget_config.get("widgetType", "")
-            widget.index = widget_index
-            widget.workflow = workflow
-            widget.section = section
-
-            widget.save()
-
-            for alias, parameter_name in\
-                widget_config.get("parameters", {}).items():
-
-                parameter_alias = ParameterAlias()
-
-                try:
-                    parameter_stub = ParameterStub.objects\
-                        .filter(workflow_id=workflow.id)\
-                        .get(name=parameter_name)
-                except:
-                    parameter_stub = ParameterStub()
-                    parameter_stub.scope = "CASE"
-
-                parameter_alias.alias = alias
-                parameter_alias.workflow = workflow
-                parameter_alias.widget = widget
-
-                parameter_stub.name = parameter_name
-                parameter_stub.workflow = workflow
-                parameter_stub.save()
-
-                parameter_alias.parameter_stub = parameter_stub
-                parameter_alias.save()
-
-                parameter_stub.aliases.add(parameter_alias)
-
-            section.widgets.add(widget)
-
-        workflow.sections.add(section)
-
-    workflows[workflow_name] = workflow
-
-
-meetings_next_workflow_param = workflows["meeting"].parameters.get(name="next-workflow")
-meetings_next_workflow_param.value = workflows["meeting-approval"].id
-meetings_next_workflow_param.save()
-
-repositories_next_workflow_param = workflows["repository"].parameters.get(name="next-workflow")
-repositories_next_workflow_param.value = workflows["repository-approval"].id
-repositories_next_workflow_param.save()
 
 # Create Collections
 # ##############################################################################
@@ -320,44 +198,6 @@ for c in meetings + repositories:
                 ctr = 0
             else:
                 ctr += 1
-
-    if c.collection_type == "meeting":
-        cw = CollectionWorkflow.objects.create(
-            role="submission",
-            collection=c,
-            workflow=workflows["meeting"],
-        )
-        cw.authorized_groups.add(public_group)
-        assign_perm("read", public_group, workflows["meeting"])
-        assign_perm("execute", public_group, workflows["meeting"])
-
-        cw = CollectionWorkflow.objects.create(
-            role="approval",
-            collection=c,
-            workflow=workflows["meeting-approval"],
-        )
-        cw.authorized_groups.add(c.admins)
-        assign_perm("read", c.admins, workflows["meeting-approval"])
-        assign_perm("execute", c.admins, workflows["meeting-approval"])
-
-    elif c.collection_type == "repository":
-        cw = CollectionWorkflow.objects.create(
-            role="submission",
-            collection=c,
-            workflow = workflows["repository"],
-        )
-        cw.authorized_groups.add(public_group)
-        assign_perm("read", public_group, workflows["repository"])
-        assign_perm("execute", public_group, workflows["repository"])
-
-        cw = CollectionWorkflow.objects.create(
-            role="approval",
-            collection=c,
-            workflow=workflows["repository-approval"],
-        )
-        cw.authorized_groups.add(c.admins)
-        assign_perm("read", c.admins, workflows["repository-approval"])
-        assign_perm("execute", c.admins, workflows["repository-approval"])
 
     assign_perm("view", public_group, c)
     assign_perm("add_item", public_group, c)

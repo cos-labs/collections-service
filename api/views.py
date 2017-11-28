@@ -38,15 +38,11 @@ from sendgrid.helpers.mail import *
 
 from api.models import (
     Collection,
-    CollectionWorkflow,
-    CollectionGroup,
     Item,
     User
 )
 from api.serializers import (
     CollectionSerializer,
-    CollectionWorkflowSerializer,
-    CollectionGroupSerializer,
     ItemSerializer,
     UserSerializer,
     CollectionSearchSerializer,
@@ -181,16 +177,6 @@ class CollectionViewSet(ModelViewSet):
             serializer = self.get_serializer(collection)
             return Response(serializer.data)
         return HttpResponse('Not Found', status=404)
-
-
-class CollectionWorkflowViewSet(ModelViewSet):
-    queryset = CollectionWorkflow.objects.all()
-    serializer_class = CollectionWorkflowSerializer
-
-
-class CollectionGroupViewSet(ModelViewSet):
-    queryset = CollectionGroup.objects.all()
-    serializer_class = CollectionGroupSerializer
 
 
 class ItemViewSet(ModelViewSet):

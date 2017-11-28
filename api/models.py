@@ -52,7 +52,7 @@ class User(AbstractUser, GuardianUserMixin):
             public_group.name = "public"
             public_group.save()
         if not self.pk:
-            super().save(*args, **kwargs)
+            super(User, self).save(*args, **kwargs)
             self.groups.add(public_group)
             self.save()
 
@@ -75,7 +75,7 @@ class Collection(models.Model):
     address = models.CharField(max_length=200, null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
-    showcased = models.BooleanField()
+    showcased = models.BooleanField(default=False, blank=True)
 
     created_by = models.ForeignKey(User)
 
@@ -84,18 +84,6 @@ class Collection(models.Model):
         null=True,
         blank=True,
         related_name="collection"
-    )
-
-    groups = models.ManyToManyField(
-        "CollectionGroup",
-        blank=True,
-        related_name="authorized_collection_workflows"
-    )
-
-    workflows = models.ManyToManyField(
-        "workflow.Workflow",
-        related_name="collections",
-        through='CollectionWorkflow'
     )
 
 
@@ -108,7 +96,7 @@ class Collection(models.Model):
             elif self.collection_type == 'repository':
                 self.settings = resources.repository_json
 
-            super().save(*args, **kwargs)
+            super(Collection, self).save(*args, **kwargs)
 
             if not getattr(self, "admins", None):
                 admin_group = Group()
@@ -118,7 +106,7 @@ class Collection(models.Model):
                 self.save(force_update=True)
 
         else:
-            super().save(*args, **kwargs)
+            super(Collection, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -127,68 +115,6 @@ class Collection(models.Model):
         permissions = (
             ("view", "View this collection"),
             ("add_item", "Add a item to the collection")
-        )
-
-
-class CollectionGroup(models.Model):
-
-    role = models.TextField(null=True, blank=True)
-
-    collection = models.ForeignKey(
-        "Collection",
-        null=False,
-        blank=False,
-        related_name="collection_groups",
-    )
-
-    group = models.ForeignKey(
-        Group,
-        null=False,
-        blank=False,
-        related_name="collection_groups"
-    )
-
-    def __str__(self):
-        return self.collection.name + self.role
-
-    class Meta:
-        permissions = (
-            ("write", "Write priviledges"),
-        )
-
-
-class CollectionWorkflow(models.Model):
-
-    role = models.TextField(null=True, blank=True)
-
-    collection = models.ForeignKey(
-        'Collection',
-        null=True,
-        blank=True,
-        related_name="collection_workflows"
-    )
-
-    workflow = models.ForeignKey(
-        'workflow.Workflow',
-        null=True,
-        blank=True,
-        related_name="collection_workflows",
-        on_delete=models.SET_NULL
-    )
-
-    authorized_groups = models.ManyToManyField(
-        Group,
-        null=True,
-        blank=True,
-        related_name="authorized_collection_workflows"
-    )
-
-    def __str__(self):
-        return self.collection.title + self.workflow.title
-
-    class Meta:
-        permissions = (
-            ("write", "Write priviledges"),
         )
 
 
