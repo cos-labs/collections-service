@@ -191,11 +191,17 @@ class ItemViewSet(ModelViewSet):
     def get_queryset(self):
 
         user = self.request.user
+        user_id = self.request.query_params.get('user')
+        username = self.request.query_params.get('username')
         query = self.request.query_params.get("q")
         collection_id = self.request.query_params.get('collection')
 
         queryset = self.queryset
 
+        if user_id:
+            queryset = queryset.filter(created_by_id=user_id)
+        if username:
+            queryset = queryset.filter(created_by__username=username)
         if collection_id:
             queryset = queryset.filter(collection_id=collection_id)
         if query:
