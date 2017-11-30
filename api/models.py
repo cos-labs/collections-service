@@ -76,7 +76,7 @@ class Collection(models.Model):
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
     showcased = models.BooleanField(default=False, blank=True)
-
+    moderation_required = models.BooleanField(default=False)
     created_by = models.ForeignKey(User)
 
     admins = models.ForeignKey(
@@ -135,6 +135,14 @@ class Item(models.Model):
 
     collection = models.ForeignKey('Collection', related_name='items')
     created_by = models.ForeignKey(User)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # If this is the first save
+            if self.collection.moderation_required:
+                self.status = 'pending'
+            else:
+                self.status = 'approved'
+        super(Item, self).save(*args, **kwargs)
 
     class Meta:
         permissions = (
