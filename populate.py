@@ -106,18 +106,6 @@ except:
     sa.sites.add(site)
     sa.save()
 
-
-# Make a public group
-
-try:
-    public_group = Group.objects.get(name="public")
-except:
-    public_group = Group()
-    public_group.name = "public"
-    public_group.save()
-
-
-
 # Create Collections
 # ##############################################################################
 
@@ -137,11 +125,6 @@ with open('tests/diverse_names.txt') as name_file:
 for c in meetings + repositories:
     c.showcased = False
     c.save()
-    admins = Group.objects.create(
-        name=c.title + " Admin Group"
-    )
-    admins.user_set.add(su)
-    c.admins = admins
     print("New " + c.collection_type + ": " + c.title)
     users = [su]
     for x in range(0,19):
@@ -193,14 +176,11 @@ for c in meetings + repositories:
                              random.choice(["pdf", "png", "docx", "ppx", "odt", "tif", "jpg", "zip"])
 
             i.save()
-            assign_perm("view", public_group, i)
             if ctr == 10:
                 ctr = 0
             else:
                 ctr += 1
 
-    assign_perm("view", public_group, c)
-    assign_perm("add_item", public_group, c)
     c.save()
 
 

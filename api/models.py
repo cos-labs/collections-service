@@ -110,8 +110,8 @@ class Collection(models.Model):
 
     class Meta:
         permissions = (
-            ("view", "View this collection"),
-            ("add_item", "Add a item to the collection")
+            ("moderate_collection", "Moderate collection"),
+            ("change_items_in_collection", "Change items in collection")
         )
 
 
@@ -146,7 +146,6 @@ class Item(models.Model):
 
     class Meta:
         permissions = (
-            ("edit", "Edit this item"),
-            ("view", "View this item"),
-            ("approve", "Approve this item")
+            # ("change_item", "Change item"),  # item author (built in)
+            # ("view_item", "View item"),  # item author (built in)
         )

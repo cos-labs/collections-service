@@ -28,7 +28,7 @@ from rest_framework.reverse import reverse
 from drf_haystack.viewsets import HaystackViewSet
 from guardian.shortcuts import (
     assign_perm,
-    get_objects_for_user
+    get_objects_for_user,
 )
 
 import requests
@@ -139,7 +139,6 @@ class CollectionViewSet(ModelViewSet):
         org_name = self.request.query_params.get("org")
         showcased = self.request.query_params.get('showcased')
 
-
         queryset = Collection.objects.all().order_by('-date_created')
 
         if showcased:
@@ -157,7 +156,7 @@ class CollectionViewSet(ModelViewSet):
                 .models(Collection)\
                 .filter(content=AutoQuery(query))])
 
-        queryset = get_objects_for_user(user, 'view', klass=queryset)
+        # queryset = get_objects_for_user(user, 'view', klass=queryset)
 
         return queryset
 
@@ -166,17 +165,20 @@ class CollectionViewSet(ModelViewSet):
         collection = serializer.validated_data
         collection["created_by"] = user
         collection = serializer.save()
-        assign_perm('view', collection.admins, collection)
-        assign_perm('add_item', collection.admins, collection)
-        user.groups.add(collection.admins)
+        assign_perm('change_collection', user, collection)
+        assign_perm('moderate_collection', user, collection)
+        assign_perm('change_items_in_collection', user, collection)
         user.save()
 
     def retrieve(self, request, *args, **kwargs):
         collection = self.get_object()
-        if request.user.has_perm("view", collection):
-            serializer = self.get_serializer(collection)
-            return Response(serializer.data)
-        return HttpResponse('Not Found', status=404)
+        # if request.user.has_perm("view", collection):
+        #     serializer = self.get_serializer(collection)
+        #     return Response(serializer.data)
+        # else:
+        #     return HttpResponse('Not Found', status=404)
+        serializer = self.get_serializer(collection)
+        return Response(serializer.data)
 
 
 class ItemViewSet(ModelViewSet):
@@ -199,6 +201,8 @@ class ItemViewSet(ModelViewSet):
 
         queryset = self.queryset
 
+        # import ipdb
+        # ipdb.set_trace()
         if status:
             queryset = queryset.filter(status=status)
         if user_id:
@@ -211,8 +215,10 @@ class ItemViewSet(ModelViewSet):
             queryset = queryset.filter(id__in=[instance.pk for instance in SearchQuerySet()\
                 .models(Item)\
                 .filter(content=AutoQuery(query))])
+        if not user.has_perm('moderate_collection', collection_id):
+            queryset.filter(status='approved')
 
-        queryset = get_objects_for_user(user, 'view', klass=queryset)
+        # queryset = get_objects_for_user(user, 'view', klass=queryset)
 
         return queryset
 
@@ -220,21 +226,14 @@ class ItemViewSet(ModelViewSet):
 
         user = self.request.user
         item = serializer.validated_data
+        collection = item["collection"]
 
-        if not user.has_perm('add_item', item["collection"]):
-            return HttpResponse('Unauthorized', status=401)
-
-        if item["status"] == "approved" and not user.has_perm('approve_collection_items', item["collection"]):
+        if item["status"] == "approved" and not user.has_perm('moderate_collection', collection) \
+                and collection.moderation_required:
             return HttpResponse('Unauthorized', status=401)
         item = serializer.save(created_by=user)
 
-        assign_perm('edit', user, item)
-        assign_perm('view', user, item)
-        if item.status == "pending-visible":
-            assign_perm("view", Group.objects.get(name="public"), item)
-        assign_perm('edit', item.collection.admins, item)
-        assign_perm('view', item.collection.admins, item)
-        assign_perm('approve', item.collection.admins, item)
+        assign_perm('change_item', user, item)
 
         token = user.socialaccount_set.all()[0].socialtoken_set.all()[0].token
         res = requests.get('https://api.osf.io/v2/users/me', headers={
@@ -246,9 +245,10 @@ class ItemViewSet(ModelViewSet):
         to_email = Email(recipient_email)
         from_email = Email("notifications@osf.io")
         subject = "OSF Collection Submission"
-        content = Content("text/plain", """Congratulations on your submission.\n\n""" + item.title + """ has been created in the collection and is pending approval""")
+        content = Content("text/plain", "Congratulations on your submission.\n\n" + item.title +
+                          " has been created in the collection and is pending approval")
         mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        sg.client.mail.send.post(request_body=mail.get())
 
     def perform_update(self, serializer):
 
@@ -257,25 +257,18 @@ class ItemViewSet(ModelViewSet):
         initial_data = serializer.initial_data
         validated_data = serializer.validated_data
         collection = validated_data["collection"]
-        if validated_data["status"] == "approved" and\
-                not user.has_perm('approve', serializer.instance):
+        if validated_data["status"] != initial_data["status"] and\
+                not user.has_perm('moderate_collection', collection):
             return HttpResponse('Unauthorized', status=401)
-
-        if any([
-            (validated_data["status"] == "pending-visible"),
-            (validated_data["status"] == "approved")
-        ]):
-            assign_perm("view", Group.objects.get(name="public"), collection)
-
         serializer.save()
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user.has_perm("view", instance):
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
+        # if request.user.has_perm("view", instance):
         serializer = self.get_serializer(instance)
-        return HttpResponse('Not Found', status=404)
+        return Response(serializer.data)
+        # serializer = self.get_serializer(instance)
+        # return HttpResponse('Not Found', status=404)
 
 
 class UserViewSet(ModelViewSet):

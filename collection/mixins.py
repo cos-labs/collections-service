@@ -25,23 +25,23 @@ from tests import resources
 
 
 
-class CollectionUserMixin:
-
-    collection = ForeignKey(
-        "Collection",
-        blank=True,
-        null=True
-    )
-
-    def save(self, *args, **kwargs):
-        if not self.collection.pk:
-            self.collection = Collection()
-            self.collection.title = self.full_name + "'s Collection"
-            self.collection.description = "My Collection"
-            self.collection.owner = self
-            self.collection.save()
-            super().save(*args, **kwargs)
-            assign_perm("view_object", self, self._collection)
-        return self._collection
-
-
+# class CollectionUserMixin:
+#
+#     collection = ForeignKey(
+#         "Collection",
+#         blank=True,
+#         null=True
+#     )
+#
+#     def save(self, *args, **kwargs):
+#         if not self.collection.pk:
+#             self.collection = Collection()
+#             self.collection.title = self.full_name + "'s Collection"
+#             self.collection.description = "My Collection"
+#             self.collection.owner = self
+#             self.collection.save()
+#             super().save(*args, **kwargs)
+#             assign_perm("view_object", self, self._collection)
+#         return self._collection
+#
+#
