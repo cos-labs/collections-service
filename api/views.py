@@ -167,16 +167,10 @@ class CollectionViewSet(ModelViewSet):
         collection = serializer.save()
         assign_perm('change_collection', user, collection)
         assign_perm('moderate_collection', user, collection)
-        assign_perm('change_items_in_collection', user, collection)
         user.save()
 
     def retrieve(self, request, *args, **kwargs):
         collection = self.get_object()
-        # if request.user.has_perm("view", collection):
-        #     serializer = self.get_serializer(collection)
-        #     return Response(serializer.data)
-        # else:
-        #     return HttpResponse('Not Found', status=404)
         serializer = self.get_serializer(collection)
         return Response(serializer.data)
 
@@ -201,8 +195,6 @@ class ItemViewSet(ModelViewSet):
 
         queryset = self.queryset
 
-        # import ipdb
-        # ipdb.set_trace()
         if status:
             queryset = queryset.filter(status=status)
         if user_id:
