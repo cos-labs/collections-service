@@ -111,7 +111,6 @@ class Collection(models.Model):
     class Meta:
         permissions = (
             ("moderate_collection", "Moderate collection"),
-            ("change_items_in_collection", "Change items in collection")
         )
 
 
