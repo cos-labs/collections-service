@@ -38,7 +38,6 @@ from rest_framework_json_api.relations import (
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from drf_haystack.serializers import HaystackSerializer
 
-
 # App Imports
 # #############################################################################
 
@@ -247,6 +246,8 @@ class CollectionSerializer(CollectionModelSerializer):
         required=False
     )
     showcased = BooleanField(required=False, default=False)
+    can_moderate = SerializerMethodField()
+    can_edit = SerializerMethodField()
 
     items = ResourceRelatedField(
         many=True,
@@ -271,11 +272,21 @@ class CollectionSerializer(CollectionModelSerializer):
             'submission_settings',
             'date_updated',
             'items',
-            'date_created'
+            'date_created',
+            'can_moderate',
+            'can_edit'
         ]
 
     class JSONAPIMeta:
         resource_name = 'collections'
+
+    def get_can_moderate(self, obj):
+        user = self.context['request'].user
+        return user.has_perm('moderate_collection', obj)
+
+    def get_can_edit(self, obj):
+        user = self.context['request'].user
+        return user.has_perm('change_collection', obj)
 
 
 class ItemSerializer(CollectionModelSerializer):
@@ -286,6 +297,7 @@ class ItemSerializer(CollectionModelSerializer):
         many=False,
         required=False
     )
+    can_edit = SerializerMethodField()
     date_created = DateTimeField(read_only=True)
     date_submitted = DateTimeField(read_only=True, allow_null=True)
     date_accepted = DateTimeField(read_only=True, allow_null=True)
@@ -315,11 +327,16 @@ class ItemSerializer(CollectionModelSerializer):
             'end_time',
             'collection',
             'file_link',
-            'file_name'
+            'file_name',
+            'can_edit'
         ]
 
     class JSONAPIMeta:
         resource_name = 'items'
+
+    def get_can_edit(self, obj):
+        user = self.context['request'].user
+        return user.has_perm('change_item', obj) or user.has_perm('moderate_collection', obj.collection)
 
 
 class UserSerializer(CollectionModelSerializer):
