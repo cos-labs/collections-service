@@ -15,21 +15,15 @@
 import os
 
 from django.http import HttpResponse
-from django.db.models import Q
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import exceptions as drf_exceptions
-from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from drf_haystack.viewsets import HaystackViewSet
-from guardian.shortcuts import (
-    assign_perm,
-    get_objects_for_user,
-)
+from guardian.shortcuts import assign_perm, remove_perm
+
 
 import requests
 
@@ -174,6 +168,26 @@ class CollectionViewSet(ModelViewSet):
         serializer = self.get_serializer(collection)
         return Response(serializer.data)
 
+    def perform_update(self, serializer):
+        init = serializer.initial_data
+        vali = serializer.validated_data
+        collection_id = init['id']
+        collection = Collection.objects.get(id=int(collection_id))
+        
+        # TODO: run a diff on this so it only removes permissions from people who've been deleted...
+        # TODO: ...and only adds permissions for new mods
+
+        # TODO: make it so only collection owners can do this
+        if init['moderators'] != vali['moderators']:
+            for user in init['moderators']:
+                remove_perm('moderate_collection', user, collection)
+            for user in vali['moderators']:
+                assign_perm('moderate_collection', user, collection)
+            # give permission to everyone currently in the moderators
+            # remove permission from everyone else
+            pass
+        serializer.save()
+
 
 class ItemViewSet(ModelViewSet):
     """
@@ -256,11 +270,8 @@ class ItemViewSet(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # if request.user.has_perm("view", instance):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
-        # serializer = self.get_serializer(instance)
-        # return HttpResponse('Not Found', status=404)
 
 
 class UserViewSet(ModelViewSet):
@@ -269,7 +280,11 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return self.queryset
+        username = self.request.query_params.get('username')
+        queryset = self.queryset
+        if username:
+            queryset = queryset.filter(username=username)
+        return queryset
 
     def get_object(self):
         pk = self.kwargs.get("pk")
@@ -280,6 +295,33 @@ class UserViewSet(ModelViewSet):
         except:
             raise drf_exceptions.NotFound
 
+# @api_view(['POST', 'DELETE', 'GET'])
+# def edit_permission(request):
+#     import ipdb
+#     ipdb.set_trace()
+#     # if not the right permissions, return an unauthorized error
+#     if request.method == 'POST':
+#         # get the user
+#         user = request.POST.get('user_id', 1)
+#         collection = request.POST.get('collection_id', 1)
+#
+#         # get the collection they're gonna moderate
+#         # add the permission
+#         pass
+#     elif request.method == 'DELETE':
+#         user = request.POST.get('user_id', 1)
+#         collection = request.POST.get('collection_id', 1)
+#
+#         # get the user
+#         # get the collection they're moderating
+#         # delete the permission
+#         pass
+#     elif request.method == 'GET':
+#         # get all the users who moderate a collection, based off the collection
+#         collection = request.POST.get('collection_id', 1)
+#         queryset = get_users_with_perms(collection)
+#         queryset = queryset.filter()
+#         pass
 
 class GroupViewSet(ModelViewSet):
 

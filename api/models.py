@@ -78,13 +78,7 @@ class Collection(models.Model):
     showcased = models.BooleanField(default=False, blank=True)
     moderation_required = models.BooleanField(default=False)
     created_by = models.ForeignKey(User)
-
-    admins = models.ForeignKey(
-        Group,
-        null=True,
-        blank=True,
-        related_name="collection"
-    )
+    moderators = models.ManyToManyField(User, related_name="moderated_collections")
 
     def save(self, *args, **kwargs):
         if not self.pk:  # If this is the first save

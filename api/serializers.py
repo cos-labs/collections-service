@@ -255,6 +255,12 @@ class CollectionSerializer(CollectionModelSerializer):
         read_only=True
     )
 
+    moderators = ResourceRelatedField(
+        many=True,
+        required=False,
+        queryset=User.objects.all()
+    )
+
     class Meta:
         model = Collection
         fields = [
@@ -272,6 +278,7 @@ class CollectionSerializer(CollectionModelSerializer):
             'submission_settings',
             'date_updated',
             'items',
+            'moderators',
             'date_created',
             'can_moderate',
             'can_edit'
@@ -383,7 +390,6 @@ class UserSearchSerializer(HaystackSerializer):
             'email',
             'full_name'
         ]
-
 
 class ItemSearchSerializer(HaystackSerializer):
 
