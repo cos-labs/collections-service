@@ -161,6 +161,7 @@ class CollectionViewSet(ModelViewSet):
         collection = serializer.save()
         assign_perm('change_collection', user, collection)
         assign_perm('moderate_collection', user, collection)
+        assign_perm('administrate_collection', user, collection)
         user.save()
 
     def retrieve(self, request, *args, **kwargs):
@@ -178,14 +179,20 @@ class CollectionViewSet(ModelViewSet):
         # TODO: ...and only adds permissions for new mods
 
         # TODO: make it so only collection owners can do this
-        if init['moderators'] != vali['moderators']:
+        if init['moderators'] != vali['moderators'] and (init['moderators'] or vali['moderators']):
             for user in init['moderators']:
-                remove_perm('moderate_collection', user, collection)
+                remove_perm('moderate_collection', User.objects.get(pk=int(user['id'])), collection)
             for user in vali['moderators']:
                 assign_perm('moderate_collection', user, collection)
             # give permission to everyone currently in the moderators
             # remove permission from everyone else
-            pass
+        if init['admins'] != vali['admins'] and (init['admins'] or vali['admins']):
+            for user in init['admins']:
+                remove_perm('administrate_collection', User.objects.get(pk=int(user['id'])), collection)
+            for user in vali['admins']:
+                assign_perm('administrate_collection', user, collection)
+            # give permission to everyone currently in the moderators
+            # remove permission from everyone else
         serializer.save()
 
 

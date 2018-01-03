@@ -79,6 +79,7 @@ class Collection(models.Model):
     moderation_required = models.BooleanField(default=False)
     created_by = models.ForeignKey(User)
     moderators = models.ManyToManyField(User, related_name="moderated_collections")
+    admins = models.ManyToManyField(User, related_name="administrated_collections")
 
     def save(self, *args, **kwargs):
         if not self.pk:  # If this is the first save
@@ -105,6 +106,7 @@ class Collection(models.Model):
     class Meta:
         permissions = (
             ("moderate_collection", "Moderate collection"),
+            ("administrate_collection", "Administrate collection"),
         )
 
 

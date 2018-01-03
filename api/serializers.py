@@ -248,6 +248,7 @@ class CollectionSerializer(CollectionModelSerializer):
     showcased = BooleanField(required=False, default=False)
     can_moderate = SerializerMethodField()
     can_edit = SerializerMethodField()
+    can_admin = SerializerMethodField()
 
     items = ResourceRelatedField(
         many=True,
@@ -256,6 +257,11 @@ class CollectionSerializer(CollectionModelSerializer):
     )
 
     moderators = ResourceRelatedField(
+        many=True,
+        required=False,
+        queryset=User.objects.all()
+    )
+    admins = ResourceRelatedField(
         many=True,
         required=False,
         queryset=User.objects.all()
@@ -279,9 +285,11 @@ class CollectionSerializer(CollectionModelSerializer):
             'date_updated',
             'items',
             'moderators',
+            'admins',
             'date_created',
             'can_moderate',
-            'can_edit'
+            'can_edit',
+            'can_admin'
         ]
 
     class JSONAPIMeta:
@@ -294,6 +302,10 @@ class CollectionSerializer(CollectionModelSerializer):
     def get_can_edit(self, obj):
         user = self.context['request'].user
         return user.has_perm('change_collection', obj)
+
+    def get_can_admin(self, obj):
+        user = self.context['request'].user
+        return user.has_perm('administrate_collection', obj)
 
 
 class ItemSerializer(CollectionModelSerializer):
