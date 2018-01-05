@@ -70,6 +70,7 @@ class Collection(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     settings = JSONField(default={}, blank=True, null=True)
     submission_settings = JSONField(default={}, blank=True, null=True)
+    detail_view_settings = JSONField(default={}, blank=True, null=True)
     collection_type = models.CharField(max_length=50)
     location = models.CharField(max_length=200, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)

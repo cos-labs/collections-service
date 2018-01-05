@@ -282,6 +282,7 @@ class CollectionSerializer(CollectionModelSerializer):
             'settings',
             'created_by_org',
             'submission_settings',
+            'detail_view_settings',
             'date_updated',
             'items',
             'moderators',
