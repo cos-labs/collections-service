@@ -80,6 +80,7 @@ class Collection(models.Model):
     created_by = models.ForeignKey(User)
     moderators = models.ManyToManyField(User, related_name="moderated_collections")
     admins = models.ManyToManyField(User, related_name="administrated_collections")
+    anyone_can_submit = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:  # If this is the first save

@@ -289,7 +289,8 @@ class CollectionSerializer(CollectionModelSerializer):
             'date_created',
             'can_moderate',
             'can_edit',
-            'can_admin'
+            'can_admin',
+            'anyone_can_submit',
         ]
 
     class JSONAPIMeta:
