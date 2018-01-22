@@ -87,7 +87,7 @@ Simply export the Sendgrid token in the environment so Django can pick it up
     $ cd {collections}/
 
 #### Set up `local.py` settings
-
+(`SA` refers to "Social App", `SU` to Superuser)
 ```
 SA_CLIENT_ID = "55b229c83f6946fe8c16b86217781028"
 SA_CLIENT_SECRET = "70z9QBGWmYlFoXUr6HYZoi3QPr4ksafSEbJvTyNr"
