@@ -15,21 +15,15 @@
 import os
 
 from django.http import HttpResponse
-from django.db.models import Q
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import exceptions as drf_exceptions
-from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from drf_haystack.viewsets import HaystackViewSet
-from guardian.shortcuts import (
-    assign_perm,
-    get_objects_for_user
-)
+from guardian.shortcuts import assign_perm, remove_perm
+
 
 import requests
 
@@ -38,15 +32,11 @@ from sendgrid.helpers.mail import *
 
 from api.models import (
     Collection,
-    CollectionWorkflow,
-    CollectionGroup,
     Item,
     User
 )
 from api.serializers import (
     CollectionSerializer,
-    CollectionWorkflowSerializer,
-    CollectionGroupSerializer,
     ItemSerializer,
     UserSerializer,
     CollectionSearchSerializer,
@@ -143,7 +133,6 @@ class CollectionViewSet(ModelViewSet):
         org_name = self.request.query_params.get("org")
         showcased = self.request.query_params.get('showcased')
 
-
         queryset = Collection.objects.all().order_by('-date_created')
 
         if showcased:
@@ -161,7 +150,7 @@ class CollectionViewSet(ModelViewSet):
                 .models(Collection)\
                 .filter(content=AutoQuery(query))])
 
-        queryset = get_objects_for_user(user, 'view', klass=queryset)
+        # queryset = get_objects_for_user(user, 'view', klass=queryset)
 
         return queryset
 
@@ -170,27 +159,41 @@ class CollectionViewSet(ModelViewSet):
         collection = serializer.validated_data
         collection["created_by"] = user
         collection = serializer.save()
-        assign_perm('view', collection.admins, collection)
-        assign_perm('add_item', collection.admins, collection)
-        user.groups.add(collection.admins)
+        assign_perm('change_collection', user, collection)
+        assign_perm('moderate_collection', user, collection)
+        assign_perm('administrate_collection', user, collection)
         user.save()
 
     def retrieve(self, request, *args, **kwargs):
         collection = self.get_object()
-        if request.user.has_perm("view", collection):
-            serializer = self.get_serializer(collection)
-            return Response(serializer.data)
-        return HttpResponse('Not Found', status=404)
+        serializer = self.get_serializer(collection)
+        return Response(serializer.data)
 
+    def perform_update(self, serializer):
+        init = serializer.initial_data
+        vali = serializer.validated_data
+        collection_id = init['id']
+        collection = Collection.objects.get(id=int(collection_id))
+        
+        # TODO: run a diff on this so it only removes permissions from people who've been deleted...
+        # TODO: ...and only adds permissions for new mods
 
-class CollectionWorkflowViewSet(ModelViewSet):
-    queryset = CollectionWorkflow.objects.all()
-    serializer_class = CollectionWorkflowSerializer
-
-
-class CollectionGroupViewSet(ModelViewSet):
-    queryset = CollectionGroup.objects.all()
-    serializer_class = CollectionGroupSerializer
+        # TODO: make it so only collection owners can do this
+        if init['moderators'] != vali['moderators'] and (init['moderators'] or vali['moderators']):
+            for user in init['moderators']:
+                remove_perm('moderate_collection', User.objects.get(pk=int(user['id'])), collection)
+            for user in vali['moderators']:
+                assign_perm('moderate_collection', user, collection)
+            # give permission to everyone currently in the moderators
+            # remove permission from everyone else
+        if init['admins'] != vali['admins'] and (init['admins'] or vali['admins']):
+            for user in init['admins']:
+                remove_perm('administrate_collection', User.objects.get(pk=int(user['id'])), collection)
+            for user in vali['admins']:
+                assign_perm('administrate_collection', user, collection)
+            # give permission to everyone currently in the moderators
+            # remove permission from everyone else
+        serializer.save()
 
 
 class ItemViewSet(ModelViewSet):
@@ -205,19 +208,30 @@ class ItemViewSet(ModelViewSet):
     def get_queryset(self):
 
         user = self.request.user
+        user_id = self.request.query_params.get('user')
+        username = self.request.query_params.get('username')
         query = self.request.query_params.get("q")
-        collection_id = self.request.query_params.get('filter[collection]')
+        status = self.request.query_params.get("status")
+        collection_id = self.request.query_params.get('collection')
 
         queryset = self.queryset
 
+        if status:
+            queryset = queryset.filter(status=status)
+        if user_id:
+            queryset = queryset.filter(created_by_id=user_id)
+        if username:
+            queryset = queryset.filter(created_by__username=username)
         if collection_id:
             queryset = queryset.filter(collection_id=collection_id)
         if query:
             queryset = queryset.filter(id__in=[instance.pk for instance in SearchQuerySet()\
                 .models(Item)\
                 .filter(content=AutoQuery(query))])
+        if not user.has_perm('moderate_collection', collection_id):
+            queryset.filter(status='approved')
 
-        queryset = get_objects_for_user(user, 'view', klass=queryset)
+        # queryset = get_objects_for_user(user, 'view', klass=queryset)
 
         return queryset
 
@@ -225,21 +239,14 @@ class ItemViewSet(ModelViewSet):
 
         user = self.request.user
         item = serializer.validated_data
+        collection = item["collection"]
 
-        if not user.has_perm('add_item', item["collection"]):
-            return HttpResponse('Unauthorized', status=401)
-
-        if item["status"] == "approved" and not user.has_perm('approve_collection_items', item["collection"]):
+        if item["status"] == "approved" and not user.has_perm('moderate_collection', collection) \
+                and collection.moderation_required:
             return HttpResponse('Unauthorized', status=401)
         item = serializer.save(created_by=user)
 
-        assign_perm('edit', user, item)
-        assign_perm('view', user, item)
-        if item.status == "pending-visible":
-            assign_perm("view", Group.objects.get(name="public"), item)
-        assign_perm('edit', item.collection.admins, item)
-        assign_perm('view', item.collection.admins, item)
-        assign_perm('approve', item.collection.admins, item)
+        assign_perm('change_item', user, item)
 
         token = user.socialaccount_set.all()[0].socialtoken_set.all()[0].token
         res = requests.get('https://api.osf.io/v2/users/me', headers={
@@ -251,9 +258,10 @@ class ItemViewSet(ModelViewSet):
         to_email = Email(recipient_email)
         from_email = Email("notifications@osf.io")
         subject = "OSF Collection Submission"
-        content = Content("text/plain", """Congratulations on your submission.\n\n""" + item.title + """ has been created in the collection and is pending approval""")
+        content = Content("text/plain", "Congratulations on your submission.\n\n" + item.title +
+                          " has been created in the collection and is pending approval")
         mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        sg.client.mail.send.post(request_body=mail.get())
 
     def perform_update(self, serializer):
 
@@ -262,25 +270,15 @@ class ItemViewSet(ModelViewSet):
         initial_data = serializer.initial_data
         validated_data = serializer.validated_data
         collection = validated_data["collection"]
-        if validated_data["status"] == "approved" and\
-                not user.has_perm('approve', serializer.instance):
+        if validated_data["status"] != initial_data["status"] and\
+                not user.has_perm('moderate_collection', collection):
             return HttpResponse('Unauthorized', status=401)
-
-        if any([
-            (validated_data["status"] == "pending-visible"),
-            (validated_data["status"] == "approved")
-        ]):
-            assign_perm("view", Group.objects.get(name="public"), collection)
-
         serializer.save()
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user.has_perm("view", instance):
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
         serializer = self.get_serializer(instance)
-        return HttpResponse('Not Found', status=404)
+        return Response(serializer.data)
 
 
 class UserViewSet(ModelViewSet):
@@ -289,7 +287,11 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return self.queryset
+        username = self.request.query_params.get('username')
+        queryset = self.queryset
+        if username:
+            queryset = queryset.filter(username=username)
+        return queryset
 
     def get_object(self):
         pk = self.kwargs.get("pk")
@@ -300,6 +302,33 @@ class UserViewSet(ModelViewSet):
         except:
             raise drf_exceptions.NotFound
 
+# @api_view(['POST', 'DELETE', 'GET'])
+# def edit_permission(request):
+#     import ipdb
+#     ipdb.set_trace()
+#     # if not the right permissions, return an unauthorized error
+#     if request.method == 'POST':
+#         # get the user
+#         user = request.POST.get('user_id', 1)
+#         collection = request.POST.get('collection_id', 1)
+#
+#         # get the collection they're gonna moderate
+#         # add the permission
+#         pass
+#     elif request.method == 'DELETE':
+#         user = request.POST.get('user_id', 1)
+#         collection = request.POST.get('collection_id', 1)
+#
+#         # get the user
+#         # get the collection they're moderating
+#         # delete the permission
+#         pass
+#     elif request.method == 'GET':
+#         # get all the users who moderate a collection, based off the collection
+#         collection = request.POST.get('collection_id', 1)
+#         queryset = get_users_with_perms(collection)
+#         queryset = queryset.filter()
+#         pass
 
 class GroupViewSet(ModelViewSet):
 

@@ -19,7 +19,6 @@ from collections import namedtuple
 
 from api.views import (
     CollectionViewSet,
-    CollectionWorkflowViewSet,
     ItemViewSet,
     UserViewSet,
     UserSearchView,
@@ -35,7 +34,6 @@ collection_router = routers.DefaultRouter(trailing_slash=False)
 
 collection_router.register(r'collections', CollectionViewSet)
 collection_router.register(r'items', ItemViewSet)
-collection_router.register(r'collection-workflows', CollectionWorkflowViewSet)
 collection_router.register(r"groups", GroupViewSet)
 
 collection_router.register(r'users', UserViewSet)

@@ -52,7 +52,7 @@ class User(AbstractUser, GuardianUserMixin):
             public_group.name = "public"
             public_group.save()
         if not self.pk:
-            super().save(*args, **kwargs)
+            super(User, self).save(*args, **kwargs)
             self.groups.add(public_group)
             self.save()
 
@@ -70,45 +70,27 @@ class Collection(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     settings = JSONField(default={}, blank=True, null=True)
     submission_settings = JSONField(default={}, blank=True, null=True)
+    detail_view_settings = JSONField(default={}, blank=True, null=True)
     collection_type = models.CharField(max_length=50)
     location = models.CharField(max_length=200, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
-    showcased = models.BooleanField()
-
+    showcased = models.BooleanField(default=False, blank=True)
+    moderation_required = models.BooleanField(default=False)
     created_by = models.ForeignKey(User)
-
-    admins = models.ForeignKey(
-        Group,
-        null=True,
-        blank=True,
-        related_name="collection"
-    )
-
-    groups = models.ManyToManyField(
-        "CollectionGroup",
-        blank=True,
-        related_name="authorized_collection_workflows"
-    )
-
-    workflows = models.ManyToManyField(
-        "workflow.Workflow",
-        related_name="collections",
-        through='CollectionWorkflow'
-    )
-
+    moderators = models.ManyToManyField(User, related_name="moderated_collections")
+    admins = models.ManyToManyField(User, related_name="administrated_collections")
+    anyone_can_submit = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-
         if not self.pk:  # If this is the first save
-
             if self.collection_type == 'meeting':
                 self.settings = resources.meeting_json
             elif self.collection_type == 'repository':
                 self.settings = resources.repository_json
 
-            super().save(*args, **kwargs)
+            super(Collection, self).save(*args, **kwargs)
 
             if not getattr(self, "admins", None):
                 admin_group = Group()
@@ -118,77 +100,15 @@ class Collection(models.Model):
                 self.save(force_update=True)
 
         else:
-            super().save(*args, **kwargs)
+            super(Collection, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
         permissions = (
-            ("view", "View this collection"),
-            ("add_item", "Add a item to the collection")
-        )
-
-
-class CollectionGroup(models.Model):
-
-    role = models.TextField(null=True, blank=True)
-
-    collection = models.ForeignKey(
-        "Collection",
-        null=False,
-        blank=False,
-        related_name="collection_groups",
-    )
-
-    group = models.ForeignKey(
-        Group,
-        null=False,
-        blank=False,
-        related_name="collection_groups"
-    )
-
-    def __str__(self):
-        return self.collection.name + self.role
-
-    class Meta:
-        permissions = (
-            ("write", "Write priviledges"),
-        )
-
-
-class CollectionWorkflow(models.Model):
-
-    role = models.TextField(null=True, blank=True)
-
-    collection = models.ForeignKey(
-        'Collection',
-        null=True,
-        blank=True,
-        related_name="collection_workflows"
-    )
-
-    workflow = models.ForeignKey(
-        'workflow.Workflow',
-        null=True,
-        blank=True,
-        related_name="collection_workflows",
-        on_delete=models.SET_NULL
-    )
-
-    authorized_groups = models.ManyToManyField(
-        Group,
-        null=True,
-        blank=True,
-        related_name="authorized_collection_workflows"
-    )
-
-    def __str__(self):
-        return self.collection.title + self.workflow.title
-
-    class Meta:
-        permissions = (
-            ("write", "Write priviledges"),
+            ("moderate_collection", "Moderate collection"),
+            ("administrate_collection", "Administrate collection"),
         )
 
 
@@ -213,9 +133,16 @@ class Item(models.Model):
     collection = models.ForeignKey('Collection', related_name='items')
     created_by = models.ForeignKey(User)
 
+    def save(self, *args, **kwargs):
+        if not self.pk:  # If this is the first save
+            if self.collection.moderation_required:
+                self.status = 'pending'
+            else:
+                self.status = 'approved'
+        super(Item, self).save(*args, **kwargs)
+
     class Meta:
         permissions = (
-            ("edit", "Edit this item"),
-            ("view", "View this item"),
-            ("approve", "Approve this item")
+            # ("change_item", "Change item"),  # item author (built in)
+            # ("view_item", "View item"),  # item author (built in)
         )

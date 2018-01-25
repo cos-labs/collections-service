@@ -32,7 +32,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
-    'workflow.apps.WorkflowConfig',
+    # 'workflow.apps.WorkflowConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
